@@ -12,7 +12,9 @@
     ],
     "activationEvents": [
         "onLanguage:javascript",
-        "onLanguage:typescript"
+        "onLanguage:javascriptreact",
+        "onLanguage:typescript",
+        "onLanguage:typescriptreact"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -35,5 +37,11 @@
         "vscode": "^1.1.6",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "@types/prettier": "^1.10.0",
+        "babylon": "^7.0.0-beta.39",
+        "jscodeshift": "^0.4.0",
+        "prettier": "^1.10.2"
     }
 }
