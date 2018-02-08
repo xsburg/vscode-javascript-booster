@@ -1,22 +1,16 @@
-# vscode-javascript-action-pack README
+# JavaScript Action Pack
 
-This is the README for your extension "vscode-javascript-action-pack". After writing up a brief description, we recommend including the following sections.
+Provides UI to run [jscodeshift](https://github.com/facebook/jscodeshift) transformations inside VS Code. Cursor position is passed via `startPos` / `endPos` options and can be used inside the transform function.
+
+Define your own refactorings using jscodeshift API.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+A few codemods are already included into the extension. To extend this list, create a `codemods` directory in your workspace and put your transformations in there.
 
-For example if there is an image subfolder under your extension project workspace:
+![Run CodeMod Command](images/runCodeMod.gif)
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
+<!-- ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
@@ -46,20 +40,4 @@ Fixed issue #.
 ### 1.1.0
 
 Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+ -->

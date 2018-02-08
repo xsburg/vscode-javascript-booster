@@ -2,7 +2,7 @@
     "name": "vscode-javascript-action-pack",
     "displayName": "JavaScript Action Pack",
     "description": "Advanced JavaScript refactorings using jscodeshift",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "publisher": "sburg",
     "engines": {
         "vscode": "^1.19.0"
