@@ -1,0 +1,28 @@
+env:
+  global:
+    secure: BSMZjdDm0OP51fh2zGmI++Iqdz75ECjp0IY8/tsv2GxDm7RwGRtIV/09xzv55zb47CdoAcrfo538j++p9g4SUYOMRX7cygV5ynKmbxEROp04jZSjC5CWT8FTMe50hmPUTn+Pndk9FJBBPPTpMJKHBM+D7kwiB6l40E8MrdCGOyy0p0+fPY0kZjLZgFZup8vgbaiuy2dITOX5KKau/GN47t8M8BQlRARdjQOZNib5Xvlp/tnP7OcaaPs+Wb6sScfhZKVsmW2x5MVtY2yt/a4t4k/RXm5YHgi3RivN3+gl4IJ25tL8F5/bafe+GZJX6mgRoZtP1uPxhV2fFE6txu5bJXNTF4Z9L3xgPrAHaGTR/73D8g/wN+UmthJORdtC26Z4240pT5y4+xG4NjAToa0lTlKTH1N3asaQhoSeARTrHQaDcaP5SZ/RgIodI7EWSuBC9sY5uaT0lIsDZ4J4L95VSg45b8xG7Z5DA15lFzJmYGbCw2SLC2dYpIbMvtuK48dzdhKAma20K/mpH/ONTF6Ry4PJdzfpVK7JHWdlIms9Z39eODBcorOYR7GsQZV3Y92JabpVgYJhZJ+RiecHCknJeyoLrhycTfEHB6FDdpF9AVE51nkeAYCThWKzxP/NTlXJAdEYqpB/azAEJOLdtb0/ioY5XkvCVpHQvLUTb8fatw0=
+sudo: false
+os:
+- osx
+- linux
+before_install:
+- if [ $TRAVIS_OS_NAME == "linux" ]; then export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
+  sh -e /etc/init.d/xvfb start; sleep 3; fi
+install:
+- npm install
+- npm run vscode:prepublish
+script:
+- npm test --silent
+after_success:  
+- npm install -g vsce;
+- vsce package;
+deploy:
+- provider: script
+  script: vsce publish -p $VS_TOKEN
+  skip_cleanup: true
+  on:
+    tags: true
+    branch: master
+notifications:
+  email:
+    on_success: change

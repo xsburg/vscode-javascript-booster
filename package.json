@@ -1,7 +1,7 @@
 {
     "name": "vscode-javascript-action-pack",
     "displayName": "JavaScript Action Pack",
-    "description": "Advanced JavaScript/TypeScript refactorings and tooling to build them",
+    "description": "Advanced JavaScript refactorings using jscodeshift",
     "version": "0.0.1",
     "publisher": "sburg",
     "engines": {
@@ -20,8 +20,8 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "javascriptActionPack.runCodeMod",
+                "title": "Run JS CodeMod"
             }
         ]
     },
@@ -36,12 +36,12 @@
         "typescript": "^2.6.1",
         "vscode": "^1.1.6",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "@types/mocha": "^2.2.42",
+        "prettier": "^1.10.2"
     },
     "dependencies": {
         "@types/prettier": "^1.10.0",
         "babylon": "^7.0.0-beta.39",
-        "jscodeshift": "^0.4.0",
-        "prettier": "^1.10.2"
+        "jscodeshift": "^0.4.0"
     }
 }
