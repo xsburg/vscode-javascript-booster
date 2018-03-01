@@ -35,8 +35,9 @@ export async function runCodeModCommand() {
         [startPos, endPos] = [endPos, startPos];
     }
     const source = document.getText();
+    let result;
     try {
-        const result = codeModService.runCodeMod({
+        result = codeModService.runCodeMod({
             mod: selectedMod.mod,
             fileName: document.fileName,
             source,
@@ -47,33 +48,15 @@ export async function runCodeModCommand() {
         });
     } catch (e) {
         window.showErrorMessage(`Error while running codemod: ${e.message}`);
+        console.error(`Error while running codemod: ${e.toString()}`);
         return;
     }
-    try {
-        result = selectedMod.mod.modFn(
-            {
-                path: document.fileName,
-                source: text
-            },
-            {
-                jscodeshift: j,
-                stats: {}
-            },
-            {
-                startPos,
-                endPos
-            }
-        );
-    } catch (e) {
-        window.showErrorMessage(`Error while running codemod: ${e.message}`);
+
+    if (result === source) {
+        window.showInformationMessage('No changes.');
         return;
     }
-    // handle the results
-    if (result === null || result === undefined || result === text) {
-        window.showInformationMessage('Nothing to change.');
-        return;
-    }
-    const allTextRange = new Range(document.positionAt(0), document.positionAt(text.length - 1));
+    const allTextRange = new Range(document.positionAt(0), document.positionAt(source.length - 1));
     window.activeTextEditor.edit(edit => {
         edit.replace(allTextRange, result);
     });

@@ -43,8 +43,8 @@ class CodeModService {
     public loadAllCodeMods(): Thenable<CodeModDefinition[]> {
         return new Promise((resolve, reject) => {
             const predefinedMods = fs
-                .readdirSync(path.join(__dirname, '..', 'codemods'))
-                .map(name => path.join(__dirname, '..', 'codemods', name))
+                .readdirSync(path.join(__dirname, '..', '..', 'codemods'))
+                .map(name => path.join(__dirname, '..', '..', 'codemods', name))
                 .filter(fileName => {
                     return fs.lstatSync(fileName).isFile();
                 })
