@@ -10,6 +10,20 @@ A few codemods are already included into the extension. To extend this list, cre
 
 ![Run CodeMod Command](images/runCodeMod.gif)
 
+## TODO
+
+Refactorings:
+
+- Invert if
+- Remove else statement
+- Convert String to Template String
+- Convert lambda expression to lambda statement
+
+Commands:
+
+- Extend/Shrink selection
+- Duplicate line/selection
+
 <!-- ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.

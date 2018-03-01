@@ -18,12 +18,10 @@
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "javascriptActionPack.runCodeMod",
-                "title": "Run JS CodeMod"
-            }
-        ]
+        "commands": [{
+            "command": "javascriptActionPack.runCodeMod",
+            "title": "Run JS CodeMod"
+        }]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -42,6 +40,6 @@
     "dependencies": {
         "@types/prettier": "^1.10.0",
         "babylon": "^7.0.0-beta.39",
-        "jscodeshift": "^0.4.0"
+        "jscodeshift": "xsburg/jscodeshift"
     }
 }
