@@ -1,4 +1,6 @@
-module.exports = function (fileInfo, api, options) {
+import { CodeModExports } from "../models/CodeMod";
+
+let codeMod: CodeModExports = function (fileInfo, api, options) {
     const j = api.jscodeshift;
     const text = fileInfo.source;
     const src = j(text);
@@ -13,7 +15,9 @@ module.exports = function (fileInfo, api, options) {
 
     let resultText = src.toSource();
     return resultText;
-}
-module.exports.name = 'Update nothing';
-module.exports.description = 'Update nothing smoothly';
-module.exports.detail = 'Update nothing in detail';
+};
+codeMod.name = 'Add magic statements';
+codeMod.description = 'No harm intended';
+codeMod.detail = 'The statements added are scattered evenly throughout the code';
+
+module.exports = codeMod;

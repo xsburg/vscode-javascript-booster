@@ -2,22 +2,7 @@ import { workspace } from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as jscodeshift from 'jscodeshift';
-
-export interface CodeModDefinition {
-    name: string;
-    description: string;
-    detail?: string;
-    modFn: (
-        fileInfo: { path: string; source: string },
-        api: { jscodeshift: any; stats: any },
-        options: {
-            selection: {
-                startPos: number;
-                endPos: number;
-            };
-        }
-    ) => string | undefined | null;
-}
+import { CodeModDefinition } from '../models/CodeMod';
 
 class CodeModService {
     constructor() {
