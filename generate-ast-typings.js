@@ -70,13 +70,13 @@ function generateBuildersInterface(types, typeDefs) {
             return add(param, i);
         });
 
-        return `    ${builderName}(${params.join(', ')}): ${def.typeName};`;
+        return `        ${builderName}(${params.join(', ')}): ${def.typeName};`;
     }).join('\n\n');
-    return `interface Builders {\n${builders}\n}\n`;
+    return `    export interface Builders {\n${builders}\n    }`;
 }
 
-function generateAllTypeNamesUnion(types, typeDefs) {
-    return `type AllTypeNames = ${Object.keys(typeDefs).map(tn => `'${tn}'`).join('\n    | ')};\n`;
+function generateTypeNameUnion(types, typeDefs) {
+    return `    export type TypeName = ${Object.keys(typeDefs).map(tn => `'${tn}'`).join('\n        | ')};`;
 }
 
 function generateNamedTypes(types, typeDefs) {
@@ -88,29 +88,36 @@ function generateNamedTypes(types, typeDefs) {
                 typeStr = `any /* ${typeStr} */`;
             }
             typeStr = typeStr.replace('[', 'Array<').replace(']', '>');
-            return `    ${field.name}: ${typeStr};`;
+            return `        ${field.name}: ${typeStr};`;
         });
 
         const supertypes = def.baseNames;
-        let extendsBlock = '';
+        let extendsBlock;
         if (supertypes.length > 0) {
-            extendsBlock = ` extends ${supertypes.join(', ')}`;
+            extendsBlock = supertypes.join(', ');
+        } else {
+            extendsBlock = 'NodeBase'
         }
-        return `interface ${def.typeName}${extendsBlock} {\n${fields.join('\n')}\n}\n`;
+        return `    export interface ${def.typeName} extends ${extendsBlock} {\n${fields.join('\n')}\n    }\n`;
     }).join('\n');
     return interfaces;
 }
 
-const types = loadTypes();
+function generateNamedTypesObject(types, typeDefs) {
+    const fields = Object.keys(typeDefs).map(tn => `        ${tn}: NamedType;`).join('\n');
+    return `    export interface NamedTypes {\n${fields}\n    }`;
+}
 
+const types = loadTypes();
 const typeDefs = {};
 Object.keys(types.namedTypes).forEach(typeName => {
     typeDefs[typeName] = types.Type.def(typeName);
 });
 
 const namedTypes = generateNamedTypes(types, typeDefs);
-const allTypeNamesUnion = generateAllTypeNamesUnion(types, typeDefs);
+const allTypeNamesUnion = generateTypeNameUnion(types, typeDefs);
 const buildersInterface = generateBuildersInterface(types, typeDefs);
+const namedTypesObject = generateNamedTypesObject(types, typeDefs);
 
-const data = `${namedTypes}\n\n${allTypeNamesUnion}\n\n${buildersInterface}\n`;
+const data = `declare module 'ast-types' {\n${namedTypes}\n${allTypeNamesUnion}\n\n${buildersInterface}\n${namedTypesObject}\n}\n`;
 fs.writeFileSync(`${__dirname}/typings/generated.d.ts`, data, 'utf8');

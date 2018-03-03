@@ -6,7 +6,7 @@
             "type": "node",
             "request": "launch",
             "name": "Generate ast-types typings",
-            "program": "${workspaceFolder}/generate-types.js"
+            "program": "${workspaceFolder}/generate-ast-typings.js"
         },
         {
             "name": "Extension",
