@@ -16,6 +16,9 @@ let codeMod: CodeModExports = function (fileInfo, api, options) {
     let resultText = src.toSource();
     return resultText;
 };
+codeMod.canRun = function (fileInfo, api, options) {
+    return true;
+}
 codeMod.name = 'Add magic statements';
 codeMod.description = 'No harm intended';
 codeMod.detail = 'The statements added are scattered evenly throughout the code';
