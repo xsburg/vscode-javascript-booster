@@ -114,9 +114,146 @@ interface CollectionJSXElementExtension {
        * @return {Collection}
        */
     findJSXElements(name: string): Collection;
+
+    /**
+     * Finds all JSXElements by module name. Given
+     *
+     *     var Bar = require('Foo');
+     *     <Bar />
+     *
+     * findJSXElementsByModuleName('Foo') will find <Bar />, without having to
+     * know the variable name.
+     */
+    findJSXElementsByModuleName(moduleName: string): Collection;
+
+    /**
+     * JSX: Filter method for attributes.
+     *
+     * @param {Object} attributeFilter
+     * @return {function}
+     */
+    hasAttributes(attributeFilter: { [attributeName: string]: any }): boolean;
+
+    /**
+     * Filter elements which contain a specific child type
+     *
+     * @param {string} name
+     * @return {function}
+     */
+    hasChildren(name: string): boolean;
+
+    /**
+     * JSX: Returns all child nodes, including literals and expressions.
+     *
+     * @return {Collection}
+     */
+    childNodes(): Collection;
+
+    /**
+     * JSX: Returns all children that are JSXElements.
+     *
+     * @return {JSXElementCollection}
+     */
+    childElements(): Collection;
+
+    /**
+     * Given a JSXElement, returns its "root" name. E.g. it would return "Foo" for
+     * both <Foo /> and <Foo.Bar />.
+     *
+     * @param {NodePath} path
+     * @return {string}
+     */
+    getRootName(path: NodePath): string;
 }
 
-export interface Collection extends CollectionBase, CollectionJSXElementExtension {
+interface CollectionNodeExtension {
+    /**
+     * Find nodes of a specific type within the nodes of this collection.
+     *
+     * @param {type}
+     * @param {filter}
+     * @return {Collection}
+     */
+    find(type: string, filter: any): Collection;
+
+    /**
+     * Returns a collection containing the paths that create the scope of the
+     * currently selected paths. Dedupes the paths.
+     *
+     * @return {Collection}
+     */
+    closestScope(): Collection;
+
+    /**
+     * Traverse the AST up and finds the closest node of the provided type.
+     *
+     * @param {Collection} type
+     * @param {filter} filter
+     * @return {Collection}
+     */
+    closest(type: Collection, filter: any): Collection;
+
+    /**
+     * Finds the declaration for each selected path. Useful for member expressions
+     * or JSXElements. Expects a callback function that maps each path to the name
+     * to look for.
+     *
+     * If the callback returns a falsey value, the element is skipped.
+     *
+     * @param {function} nameGetter
+     *
+     * @return {Collection}
+     */
+    getVariableDeclarators(nameGetter: () => string | null | undefined): Collection;
+
+    /**
+     * Simply replaces the selected nodes with the provided node. If a function
+     * is provided it is executed for every node and the node is replaced with the
+     * functions return value.
+     *
+     * @param {Node|Array<Node>|function} nodes
+     * @return {Collection}
+     */
+    replaceWith(nodes: Node | Node[] | ((node: Node, i: number) => Node)): Collection;
+
+    /**
+     * Inserts a new node before the current one.
+     *
+     * @param {Node|Array<Node>|function} insert
+     * @return {Collection}
+     */
+    insertBefore(insert: Node | Node[] | ((node: Node, i: number) => Node)): Collection;
+
+    /**
+     * Inserts a new node after the current one.
+     *
+     * @param {Node|Array<Node>|function} insert
+     * @return {Collection}
+     */
+    insertAfter(insert: Node | Node[] | ((node: Node, i: number) => Node)): Collection;
+
+    remove(): Collection;
+}
+
+interface CollectionVariableDeclaratorExtension {
+    /**
+     * Finds all variable declarators, optionally filtered by name.
+     *
+     * @param {string} name
+     * @return {Collection}
+     */
+    findVariableDeclarators(name?: string): Collection;
+
+    /**
+       * Renames a variable and all its occurrences.
+       *
+       * @param {string} newName
+       * @return {Collection}
+       */
+    renameTo(newName: string): Collection;
+}
+
+export interface Collection extends CollectionBase, CollectionJSXElementExtension, CollectionNodeExtension, CollectionVariableDeclaratorExtension {
     /**
      * @param {Array} paths An array of AST paths
      * @param {Collection} parent A parent collection
@@ -124,7 +261,7 @@ export interface Collection extends CollectionBase, CollectionJSXElementExtensio
      *  have in common. If not passed, it will be inferred from the paths.
      * @return {Collection}
      */
-    constructor(paths: NodePath[], parent: Collection, types?: string[]);
+    new(paths: NodePath[], parent: Collection, types?: string[]);
 }
 
 export interface JsCodeShift {
@@ -158,7 +295,7 @@ export interface JsCodeShift {
      * @augments core
      * @static
      * @param {Node|NodePath|Object} path
-     * @parma {Object} filter
+     * @param {Object} filter
      * @return boolean
      */
     match(path: Node | NodePath | any, filter: any);

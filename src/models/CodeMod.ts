@@ -2,7 +2,7 @@ import { JsCodeShift } from "./jscodeshift";
 
 type CodeModTransform = (
     fileInfo: { path: string; source: string },
-    api: { jscodeshift: JsCodeShift; stats: any },
+    api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         selection: {
             startPos: number;
@@ -13,7 +13,7 @@ type CodeModTransform = (
 export interface CodeModExports extends CodeModTransform {
     canRun?: (
         fileInfo: { path: string; source: string },
-        api: { jscodeshift: JsCodeShift; stats: any },
+        api: { jscodeshift: JsCodeShift; stats(value: string): void },
         options: {
             selection: {
                 startPos: number;
