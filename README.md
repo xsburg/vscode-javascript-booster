@@ -1,4 +1,4 @@
-# JavaScript Action Pack
+# JavaScript Booster
 
 Provides UI to run [jscodeshift](https://github.com/facebook/jscodeshift) transformations inside VS Code. Cursor position is passed via `startPos` / `endPos` options and can be used inside the transform function.
 
@@ -14,17 +14,17 @@ A few codemods are already included into the extension. To extend this list, cre
 
 Refactorings:
 
-- Invert if
-- Remove else statement
-- Convert String to Template String
-- Convert lambda expression to lambda statement
-- Merge declaration & initialisation (for let & const)
-- Wrap value with {} (JSX attributes)
+* Invert if
+* Remove else statement
+* Convert String to Template String
+* Convert lambda expression to lambda statement
+* Merge declaration & initialisation (for let & const)
+* Wrap value with {} (JSX attributes)
 
 Commands:
 
-- Extend/Shrink selection
-- Duplicate line/selection
+* Extend/Shrink selection
+* Duplicate line/selection
 
 <!-- ## Extension Settings
 

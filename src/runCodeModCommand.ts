@@ -2,8 +2,9 @@ import { ExtensionContext, commands, window, workspace, Range, QuickPickItem, Ur
 import * as path from 'path';
 import * as fs from 'fs';
 import codeModService from './services/codeModService';
+import { CodeModDefinition } from './models/CodeMod';
 
-export async function runCodeModCommand() {
+export async function runCodeModCommand(codemod?: CodeModDefinition) {
     if (!window.activeTextEditor) {
         return;
     }

@@ -1,10 +1,18 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as jscodeshift from 'jscodeshift';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeMod';
 import { Position } from '../utils/Position';
 import { Program } from 'ast-types';
+import { configIds, extensionId } from '../const';
+
+const codeshifts = {
+    javascript: jscodeshift.withParser('babylon'),
+    javascriptreact: jscodeshift.withParser('babylon'),
+    typescript: jscodeshift.withParser('typescript'),
+    typescriptreact: jscodeshift.withParser('tsx')
+};
 
 class CodeModService {
     private _astCache: Map<
@@ -17,10 +25,29 @@ class CodeModService {
 
     private _codeModsCache: CodeModDefinition[] | null = null;
 
-    private _j: jscodeshift.JsCodeShift;
+    private _shiftsByExtension: {
+        [extension: string]: jscodeshift.JsCodeShift;
+    } = {};
 
     constructor() {
-        this._j = jscodeshift.withParser('tsx');
+        const config = vscode.workspace.getConfiguration(extensionId);
+        const extensionParserMap: any = config.get(configIds.extensionParser);
+        extensionParserMap.forEach(x => {
+            x.extensions.split(',').forEach(ext => {
+                this._shiftsByExtension[ext] = codeshifts[x.parser];
+            });
+        });
+    }
+
+    private _getCodeShift(fileName: string) {
+        const extension = path.extname(fileName);
+        const shift = this._shiftsByExtension[extension];
+        if (!shift) {
+            console.warn(
+                'File extension is not supported. Using default code shift (javascriptreact).'
+            );
+        }
+        return codeshifts.javascriptreact;
     }
 
     private _parseCodeModFile(fileName: string): CodeModDefinition {
@@ -51,14 +78,30 @@ class CodeModService {
     }
 
     public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
-        const predefinedMods = fs
-            .readdirSync(path.join(__dirname, '..', 'codemods'))
-            .map(name => path.join(__dirname, '..', 'codemods', name))
-            .filter(fileName => {
-                return fileName.match(/(\.ts|\.js)$/) && fs.lstatSync(fileName).isFile();
+        // local code mods
+        const files = await fs.readdir(path.join(__dirname, '..', 'codemods'));
+        const fileNames = files.map(name => path.join(__dirname, '..', 'codemods', name));
+        const predefinedMods = (await Promise.all(
+            fileNames.map(async fileName => {
+                if (!fileName.match(/(\.ts|\.js)$/)) {
+                    return {
+                        isFile: false,
+                        fileName
+                    };
+                }
+                const stat = await fs.lstat(fileName);
+                return {
+                    isFile: stat.isFile(),
+                    fileName
+                };
             })
-            .map(fileName => this._parseCodeModFile(fileName));
-        const uris = await vscode.workspace.findFiles('codemods/*.{ts,js}');
+        ))
+            .filter(x => x.isFile)
+            .map(x => this._parseCodeModFile(x.fileName));
+        // user-workspace code mods
+        const config = vscode.workspace.getConfiguration(extensionId);
+        const codemodDir = config.get(configIds.codemodDir);
+        const uris = await vscode.workspace.findFiles(`${codemodDir}/*.{ts,js}`);
         let codeMods = uris.map(uri => this._parseCodeModFile(uri.fsPath));
         codeMods.push(...predefinedMods);
         codeMods = codeMods.filter(c => c);
@@ -66,6 +109,12 @@ class CodeModService {
         this._codeModsCache = codeMods;
         return codeMods;
     }
+
+    public async getGlobalMods(options: {
+        fileName: string;
+        source: string;
+        selection: { startPos: vscode.Position; endPos: vscode.Position };
+    }) {}
 
     public async getCodeActionMods(options: {
         fileName: string;
@@ -85,7 +134,7 @@ class CodeModService {
                         ast: this._getAstTree(options)
                     },
                     {
-                        jscodeshift: this._j,
+                        jscodeshift: this._getCodeShift(options.fileName),
                         stats: () => ({})
                     },
                     {
@@ -116,7 +165,7 @@ class CodeModService {
                 ast: this._getAstTree(options)
             },
             {
-                jscodeshift: this._j,
+                jscodeshift: this._getCodeShift(options.fileName),
                 stats: () => ({})
             },
             {
@@ -137,7 +186,9 @@ class CodeModService {
         if (cache && cache.source === options.source) {
             return cache.ast;
         }
-        const ast = this._j(options.source) as jscodeshift.Collection<Program>;
+        const ast = this._getCodeShift(options.fileName)(options.source) as jscodeshift.Collection<
+            Program
+        >;
         this._astCache.set(options.fileName, {
             source: options.source,
             ast

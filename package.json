@@ -1,7 +1,7 @@
 {
-    "name": "vscode-javascript-action-pack",
-    "displayName": "JavaScript Action Pack",
-    "description": "Advanced JavaScript refactorings using jscodeshift",
+    "name": "vscode-javascript-booster",
+    "displayName": "JavaScript Booster",
+    "description": "Boost your productivity with advanced JavaScript refactorings and commands",
     "version": "0.1.0",
     "publisher": "sburg",
     "engines": {
@@ -20,12 +20,69 @@
     "contributes": {
         "commands": [
             {
-                "command": "javascriptActionPack.runCodeMod",
-                "title": "Run JS CodeMod"
+                "command": "javascriptBooster.runCodeMod",
+                "title": "[Booster] Run JS CodeMod"
             },
             {
-                "command": "javascriptActionPack.reloadCodeMods",
-                "title": "Reload CodeMods"
+                "command": "javascriptBooster.reloadCodeMods",
+                "title": "[Booster] Reload CodeMods"
+            }
+        ],
+        "configuration": [
+            {
+                "title": "JavaScript Booster",
+                "properties": {
+                    "javascriptBooster.codemodDir": {
+                        "type": "string",
+                        "default": "codemods",
+                        "description": "Specifies the directory containing workspace related codemods (Example: project related refactorings)"
+                    },
+                    "javascriptBooster.extensionParser": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Define extension to parser map.",
+                            "properties": {
+                                "extensions": {
+                                    "type": "string",
+                                    "pattern": "^(\\.[a-zA-Z0-9_]+)(,(\\.[a-zA-Z0-9_]+))*$"
+                                },
+                                "parser": {
+                                    "enum": [
+                                        "javascript",
+                                        "javascriptreact",
+                                        "typescript",
+                                        "typescriptreact"
+                                    ]
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "identifier",
+                                "order"
+                            ]
+                        },
+                        "default": [
+                            {
+                                "extensions": ".js,.es,.es6",
+                                "parser": "javascript"
+                            },
+                            {
+                                "extensions": ".jsx",
+                                "parser": "javascriptreact"
+                            },
+                            {
+                                "extensions": ".ts",
+                                "parser": "typescript"
+                            },
+                            {
+                                "extensions": ".tsx",
+                                "parser": "typescriptreact"
+                            }
+                        ],
+                        "description": "Specifies parsers that should be used to parse JavaScript or TypeScript files with certain extensions."
+                    }
+                }
             }
         ]
     },
@@ -45,8 +102,10 @@
         "prettier": "^1.10.2"
     },
     "dependencies": {
+        "@types/fs-extra": "^5.0.1",
         "@types/prettier": "^1.10.0",
         "babylon": "^7.0.0-beta.39",
+        "fs-extra": "^5.0.0",
         "jscodeshift": "xsburg/jscodeshift"
     }
 }

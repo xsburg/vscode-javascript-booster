@@ -1,4 +1,11 @@
+export const extensionId = 'javascriptBooster';
+
 export const commandIds = {
-    runCodeMod: 'javascriptActionPack.runCodeMod',
-    reloadCodeMods: 'javascriptActionPack.reloadCodeMods'
+    runCodeMod: `${extensionId}.runCodeMod`,
+    reloadCodeMods: `${extensionId}.reloadCodeMods`
+};
+
+export const configIds = {
+    codemodDir: 'codemodDir',
+    extensionParser: 'extensionParser'
 };
