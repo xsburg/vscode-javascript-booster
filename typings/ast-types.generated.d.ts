@@ -1,18 +1,18 @@
 declare module 'ast-types' {
     export interface Printable extends NodeBase {
-        loc: any /* SourceLocation | null */;
+        loc: SourceLocation | null;
     }
 
     export interface SourceLocation extends NodeBase {
         type: string;
         start: Position;
         end: Position;
-        source: any /* string | null */;
+        source: string | null;
     }
 
-    export interface Node extends Printable {
+    export interface AstNode extends Printable {
         type: string;
-        comments: any /* Array<Comment> | null */;
+        comments: Array<Comment> | null;
     }
 
     export interface Comment extends Printable {
@@ -23,52 +23,52 @@ declare module 'ast-types' {
 
     export interface Position extends NodeBase {
         type: string;
-        line: any /* number >= 1 */;
-        column: any /* number >= 0 */;
+        line: number;
+        column: number;
     }
 
-    export interface File extends Node {
+    export interface File extends AstNode {
         type: string;
         program: Program;
-        name: any /* string | null */;
+        name: string | null;
     }
 
-    export interface Program extends Node {
+    export interface Program extends AstNode {
         type: string;
         body: Array<Statement>;
         directives: Array<Directive>;
     }
 
-    export interface Statement extends Node {
+    export interface Statement extends AstNode {
 
     }
 
-    export interface Function extends Node {
-        id: any /* Identifier | null */;
+    export interface Function extends AstNode {
+        id: Identifier | null;
         params: Array<Pattern>;
-        body: any /* BlockStatement | Expression */;
+        body: BlockStatement | Expression;
         generator: boolean;
         expression: boolean;
-        defaults: any /* Array<Expression | null> */;
-        rest: any /* Identifier | null */;
+        defaults: Array<Expression | null>;
+        rest: Identifier | null;
         async: boolean;
-        returnType: any /* TypeAnnotation | null */;
-        typeParameters: any /* TypeParameterDeclaration | null */;
+        returnType: TypeAnnotation | null;
+        typeParameters: TypeParameterDeclaration | null;
     }
 
-    export interface Pattern extends Node {
-
-    }
-
-    export interface Expression extends Node, Pattern {
+    export interface Pattern extends AstNode {
 
     }
 
-    export interface Identifier extends Node, Expression, Pattern {
+    export interface Expression extends AstNode, Pattern {
+
+    }
+
+    export interface Identifier extends AstNode, Expression, Pattern {
         type: string;
         name: string;
         optional: boolean;
-        typeAnnotation: any /* TypeAnnotation | null */;
+        typeAnnotation: TypeAnnotation | null;
     }
 
     export interface BlockStatement extends Statement {
@@ -90,7 +90,7 @@ declare module 'ast-types' {
         type: string;
         test: Expression;
         consequent: Statement;
-        alternate: any /* Statement | null */;
+        alternate: Statement | null;
     }
 
     export interface LabeledStatement extends Statement {
@@ -101,12 +101,12 @@ declare module 'ast-types' {
 
     export interface BreakStatement extends Statement {
         type: string;
-        label: any /* Identifier | null */;
+        label: Identifier | null;
     }
 
     export interface ContinueStatement extends Statement {
         type: string;
-        label: any /* Identifier | null */;
+        label: Identifier | null;
     }
 
     export interface WithStatement extends Statement {
@@ -122,15 +122,15 @@ declare module 'ast-types' {
         lexical: boolean;
     }
 
-    export interface SwitchCase extends Node {
+    export interface SwitchCase extends AstNode {
         type: string;
-        test: any /* Expression | null */;
+        test: Expression | null;
         consequent: Array<Statement>;
     }
 
     export interface ReturnStatement extends Statement {
         type: string;
-        argument: any /* Expression | null */;
+        argument: Expression | null;
     }
 
     export interface ThrowStatement extends Statement {
@@ -141,16 +141,16 @@ declare module 'ast-types' {
     export interface TryStatement extends Statement {
         type: string;
         block: BlockStatement;
-        handler: any /* CatchClause | null */;
+        handler: CatchClause | null;
         handlers: Array<CatchClause>;
         guardedHandlers: Array<CatchClause>;
-        finalizer: any /* BlockStatement | null */;
+        finalizer: BlockStatement | null;
     }
 
-    export interface CatchClause extends Node {
+    export interface CatchClause extends AstNode {
         type: string;
-        param: any /* Pattern | null */;
-        guard: any /* Expression | null */;
+        param: Pattern | null;
+        guard: Expression | null;
         body: BlockStatement;
     }
 
@@ -168,9 +168,9 @@ declare module 'ast-types' {
 
     export interface ForStatement extends Statement {
         type: string;
-        init: any /* VariableDeclaration | Expression | null */;
-        test: any /* Expression | null */;
-        update: any /* Expression | null */;
+        init: VariableDeclaration | Expression | null;
+        test: Expression | null;
+        update: Expression | null;
         body: Statement;
     }
 
@@ -181,12 +181,12 @@ declare module 'ast-types' {
     export interface VariableDeclaration extends Declaration {
         type: string;
         kind: any /* var | let | const */;
-        declarations: any /* Array<VariableDeclarator | Identifier> */;
+        declarations: Array<VariableDeclarator | Identifier>;
     }
 
     export interface ForInStatement extends Statement {
         type: string;
-        left: any /* VariableDeclaration | Expression */;
+        left: VariableDeclaration | Expression;
         right: Expression;
         body: Statement;
         each: boolean;
@@ -205,10 +205,10 @@ declare module 'ast-types' {
         type: string;
     }
 
-    export interface VariableDeclarator extends Node {
+    export interface VariableDeclarator extends AstNode {
         type: string;
         id: Pattern;
-        init: any /* Expression | null */;
+        init: Expression | null;
     }
 
     export interface ThisExpression extends Expression {
@@ -217,29 +217,29 @@ declare module 'ast-types' {
 
     export interface ArrayExpression extends Expression {
         type: string;
-        elements: any /* Array<Expression | SpreadElement | RestElement | null> */;
+        elements: Array<Expression | SpreadElement | RestElement | null>;
     }
 
     export interface ObjectExpression extends Expression {
         type: string;
-        properties: any /* Array<Property | ObjectMethod | ObjectProperty | SpreadProperty | SpreadElement> */;
+        properties: Array<Property | ObjectMethod | ObjectProperty | SpreadProperty | SpreadElement>;
     }
 
-    export interface Property extends Node {
+    export interface Property extends AstNode {
         type: string;
         kind: any /* init | get | set */;
-        key: any /* Literal | Identifier | Expression */;
-        value: any /* Expression | Pattern */;
+        key: Literal | Identifier | Expression;
+        value: Expression | Pattern;
         method: boolean;
         shorthand: boolean;
         computed: boolean;
-        decorators: any /* Array<Decorator> | null */;
+        decorators: Array<Decorator> | null;
     }
 
-    export interface Literal extends Node, Expression {
+    export interface Literal extends AstNode, Expression {
         type: string;
-        value: any /* string | boolean | null | number | RegExp */;
-        regex: any /* { "pattern": string, "flags": string } | null */;
+        value: string | boolean | null | number | RegExp;
+        regex: { "pattern": string, "flags": string } | null;
     }
 
     export interface SequenceExpression extends Expression {
@@ -292,36 +292,36 @@ declare module 'ast-types' {
     export interface NewExpression extends Expression {
         type: string;
         callee: Expression;
-        arguments: any /* Array<Expression | SpreadElement> */;
+        arguments: Array<Expression | SpreadElement>;
     }
 
     export interface CallExpression extends Expression {
         type: string;
         callee: Expression;
-        arguments: any /* Array<Expression | SpreadElement> */;
+        arguments: Array<Expression | SpreadElement>;
     }
 
     export interface MemberExpression extends Expression {
         type: string;
         object: Expression;
-        property: any /* Identifier | Expression */;
+        property: Identifier | Expression;
         computed: boolean;
     }
 
     export interface RestElement extends Pattern {
         type: string;
         argument: Pattern;
-        typeAnnotation: any /* TypeAnnotation | TSTypeAnnotation | null */;
+        typeAnnotation: TypeAnnotation | TSTypeAnnotation | null;
     }
 
-    export interface TypeAnnotation extends Node {
+    export interface TypeAnnotation extends AstNode {
         type: string;
         typeAnnotation: Type;
     }
 
-    export interface TSTypeAnnotation extends Node {
+    export interface TSTypeAnnotation extends AstNode {
         type: string;
-        typeAnnotation: any /* TSType | TSTypeAnnotation */;
+        typeAnnotation: TSType | TSTypeAnnotation;
     }
 
     export interface SpreadElementPattern extends Pattern {
@@ -332,20 +332,20 @@ declare module 'ast-types' {
     export interface ArrowFunctionExpression extends Function, Expression {
         type: string;
         id: null;
-        body: any /* BlockStatement | Expression */;
+        body: BlockStatement | Expression;
         generator: false;
     }
 
     export interface ForOfStatement extends Statement {
         type: string;
-        left: any /* VariableDeclaration | Pattern */;
+        left: VariableDeclaration | Pattern;
         right: Expression;
         body: Statement;
     }
 
     export interface YieldExpression extends Expression {
         type: string;
-        argument: any /* Expression | null */;
+        argument: Expression | null;
         delegate: boolean;
     }
 
@@ -353,10 +353,10 @@ declare module 'ast-types' {
         type: string;
         body: Expression;
         blocks: Array<ComprehensionBlock>;
-        filter: any /* Expression | null */;
+        filter: Expression | null;
     }
 
-    export interface ComprehensionBlock extends Node {
+    export interface ComprehensionBlock extends AstNode {
         type: string;
         left: Pattern;
         right: Expression;
@@ -367,26 +367,26 @@ declare module 'ast-types' {
         type: string;
         body: Expression;
         blocks: Array<ComprehensionBlock>;
-        filter: any /* Expression | null */;
+        filter: Expression | null;
     }
 
     export interface PropertyPattern extends Pattern {
         type: string;
-        key: any /* Literal | Identifier | Expression */;
+        key: Literal | Identifier | Expression;
         pattern: Pattern;
         computed: boolean;
     }
 
     export interface ObjectPattern extends Pattern {
         type: string;
-        properties: any /* Array<Property | PropertyPattern | SpreadPropertyPattern | SpreadProperty | ObjectProperty | RestProperty> */;
-        typeAnnotation: any /* TypeAnnotation | null */;
-        decorators: any /* Array<Decorator> | null */;
+        properties: Array<Property | PropertyPattern | SpreadPropertyPattern | SpreadProperty | ObjectProperty | RestProperty>;
+        typeAnnotation: TypeAnnotation | null;
+        decorators: Array<Decorator> | null;
     }
 
     export interface ArrayPattern extends Pattern {
         type: string;
-        elements: any /* Array<Pattern | SpreadElement | null> */;
+        elements: Array<Pattern | SpreadElement | null>;
     }
 
     export interface MethodDefinition extends Declaration {
@@ -396,10 +396,10 @@ declare module 'ast-types' {
         value: Function;
         computed: boolean;
         static: boolean;
-        decorators: any /* Array<Decorator> | null */;
+        decorators: Array<Decorator> | null;
     }
 
-    export interface SpreadElement extends Node {
+    export interface SpreadElement extends AstNode {
         type: string;
         argument: Expression;
     }
@@ -417,10 +417,10 @@ declare module 'ast-types' {
 
     export interface ClassProperty extends Declaration {
         type: string;
-        key: any /* Literal | Identifier | Expression */;
+        key: Literal | Identifier | Expression;
         computed: boolean;
-        value: any /* Expression | null */;
-        typeAnnotation: any /* TypeAnnotation | null */;
+        value: Expression | null;
+        typeAnnotation: TypeAnnotation | null;
         static: boolean;
         variance: any /* Variance | plus | minus | null */;
     }
@@ -432,32 +432,32 @@ declare module 'ast-types' {
 
     export interface ClassDeclaration extends Declaration {
         type: string;
-        id: any /* Identifier | null */;
+        id: Identifier | null;
         body: ClassBody;
-        superClass: any /* Expression | null */;
-        typeParameters: any /* TypeParameterDeclaration | null */;
-        superTypeParameters: any /* Array<GenericTypeAnnotation> | null */;
+        superClass: Expression | null;
+        typeParameters: TypeParameterDeclaration | null;
+        superTypeParameters: Array<GenericTypeAnnotation> | null;
         implements: Array<TSExpressionWithTypeArguments>;
     }
 
     export interface ClassExpression extends Expression {
         type: string;
-        id: any /* Identifier | null */;
+        id: Identifier | null;
         body: ClassBody;
-        superClass: any /* Expression | null */;
-        typeParameters: any /* TypeParameterDeclaration | null */;
-        superTypeParameters: any /* Array<GenericTypeAnnotation> | null */;
+        superClass: Expression | null;
+        typeParameters: TypeParameterDeclaration | null;
+        superTypeParameters: Array<GenericTypeAnnotation> | null;
         implements: Array<TSExpressionWithTypeArguments>;
     }
 
-    export interface Specifier extends Node {
+    export interface Specifier extends AstNode {
 
     }
 
     export interface ModuleSpecifier extends Specifier {
-        local: any /* Identifier | null */;
-        id: any /* Identifier | null */;
-        name: any /* Identifier | null */;
+        local: Identifier | null;
+        id: Identifier | null;
+        name: Identifier | null;
     }
 
     export interface ImportSpecifier extends ModuleSpecifier {
@@ -475,7 +475,7 @@ declare module 'ast-types' {
 
     export interface ImportDeclaration extends Declaration {
         type: string;
-        specifiers: any /* Array<ImportSpecifier | ImportNamespaceSpecifier | ImportDefaultSpecifier> */;
+        specifiers: Array<ImportSpecifier | ImportNamespaceSpecifier | ImportDefaultSpecifier>;
         source: Literal;
         importKind: any /* value | type */;
     }
@@ -492,13 +492,13 @@ declare module 'ast-types' {
         expressions: Array<Expression>;
     }
 
-    export interface TemplateElement extends Node {
+    export interface TemplateElement extends AstNode {
         type: string;
-        value: any /* { "cooked": string, "raw": string } */;
+        value: { "cooked": string, "raw": string };
         tail: boolean;
     }
 
-    export interface SpreadProperty extends Node {
+    export interface SpreadProperty extends AstNode {
         type: string;
         argument: Expression;
     }
@@ -510,7 +510,7 @@ declare module 'ast-types' {
 
     export interface AwaitExpression extends Expression {
         type: string;
-        argument: any /* Expression | null */;
+        argument: Expression | null;
         all: boolean;
     }
 
@@ -528,13 +528,13 @@ declare module 'ast-types' {
 
     export interface GraphExpression extends Expression {
         type: string;
-        index: any /* number >= 0 */;
+        index: number;
         expression: Literal;
     }
 
     export interface GraphIndexExpression extends Expression {
         type: string;
-        index: any /* number >= 0 */;
+        index: number;
     }
 
     export interface XMLDefaultDeclaration extends Declaration {
@@ -546,13 +546,13 @@ declare module 'ast-types' {
     }
 
     export interface XMLQualifiedIdentifier extends Expression {
-        left: any /* Identifier | XMLAnyName */;
-        right: any /* Identifier | Expression */;
+        left: Identifier | XMLAnyName;
+        right: Identifier | Expression;
         computed: boolean;
     }
 
     export interface XMLFunctionQualifiedIdentifier extends Expression {
-        right: any /* Identifier | Expression */;
+        right: Identifier | Expression;
         computed: boolean;
     }
 
@@ -565,7 +565,7 @@ declare module 'ast-types' {
         right: Expression;
     }
 
-    export interface XML extends Node {
+    export interface XML extends AstNode {
 
     }
 
@@ -598,7 +598,7 @@ declare module 'ast-types' {
     }
 
     export interface XMLName extends XML {
-        contents: any /* string | Array<XML> */;
+        contents: string | Array<XML>;
     }
 
     export interface XMLAttribute extends XML {
@@ -615,13 +615,13 @@ declare module 'ast-types' {
 
     export interface XMLProcessingInstruction extends XML {
         target: string;
-        contents: any /* string | null */;
+        contents: string | null;
     }
 
-    export interface JSXAttribute extends Node {
+    export interface JSXAttribute extends AstNode {
         type: string;
-        name: any /* JSXIdentifier | JSXNamespacedName */;
-        value: any /* Literal | JSXExpressionContainer | null */;
+        name: JSXIdentifier | JSXNamespacedName;
+        value: Literal | JSXExpressionContainer | null;
     }
 
     export interface JSXIdentifier extends Identifier {
@@ -629,7 +629,7 @@ declare module 'ast-types' {
         name: string;
     }
 
-    export interface JSXNamespacedName extends Node {
+    export interface JSXNamespacedName extends AstNode {
         type: string;
         namespace: JSXIdentifier;
         name: JSXIdentifier;
@@ -642,12 +642,12 @@ declare module 'ast-types' {
 
     export interface JSXMemberExpression extends MemberExpression {
         type: string;
-        object: any /* JSXIdentifier | JSXMemberExpression */;
+        object: JSXIdentifier | JSXMemberExpression;
         property: JSXIdentifier;
         computed: boolean;
     }
 
-    export interface JSXSpreadAttribute extends Node {
+    export interface JSXSpreadAttribute extends AstNode {
         type: string;
         argument: Expression;
     }
@@ -655,30 +655,30 @@ declare module 'ast-types' {
     export interface JSXElement extends Expression {
         type: string;
         openingElement: JSXOpeningElement;
-        closingElement: any /* JSXClosingElement | null */;
-        children: any /* Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal> */;
-        name: any /* JSXIdentifier | JSXNamespacedName | JSXMemberExpression */;
+        closingElement: JSXClosingElement | null;
+        children: Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal>;
+        name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression;
         selfClosing: boolean;
-        attributes: any /* Array<JSXAttribute | JSXSpreadAttribute> */;
+        attributes: Array<JSXAttribute | JSXSpreadAttribute>;
     }
 
-    export interface JSXOpeningElement extends Node {
+    export interface JSXOpeningElement extends AstNode {
         type: string;
-        name: any /* JSXIdentifier | JSXNamespacedName | JSXMemberExpression */;
-        attributes: any /* Array<JSXAttribute | JSXSpreadAttribute> */;
+        name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression;
+        attributes: Array<JSXAttribute | JSXSpreadAttribute>;
         selfClosing: boolean;
     }
 
-    export interface JSXClosingElement extends Node {
+    export interface JSXClosingElement extends AstNode {
         type: string;
-        name: any /* JSXIdentifier | JSXNamespacedName | JSXMemberExpression */;
+        name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression;
     }
 
     export interface JSXFragment extends Expression {
         type: string;
         openingElement: JSXOpeningFragment;
         closingElement: JSXClosingFragment;
-        children: any /* Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal> */;
+        children: Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal>;
     }
 
     export interface JSXText extends Literal {
@@ -686,11 +686,11 @@ declare module 'ast-types' {
         value: string;
     }
 
-    export interface JSXOpeningFragment extends Node {
+    export interface JSXOpeningFragment extends AstNode {
         type: string;
     }
 
-    export interface JSXClosingFragment extends Node {
+    export interface JSXClosingFragment extends AstNode {
         type: string;
     }
 
@@ -703,7 +703,7 @@ declare module 'ast-types' {
         expression: Expression;
     }
 
-    export interface Type extends Node {
+    export interface Type extends AstNode {
 
     }
 
@@ -788,18 +788,18 @@ declare module 'ast-types' {
         type: string;
         params: Array<FunctionTypeParam>;
         returnType: Type;
-        rest: any /* FunctionTypeParam | null */;
-        typeParameters: any /* TypeParameterDeclaration | null */;
+        rest: FunctionTypeParam | null;
+        typeParameters: TypeParameterDeclaration | null;
     }
 
-    export interface FunctionTypeParam extends Node {
+    export interface FunctionTypeParam extends AstNode {
         type: string;
         name: Identifier;
         typeAnnotation: Type;
         optional: boolean;
     }
 
-    export interface TypeParameterDeclaration extends Node {
+    export interface TypeParameterDeclaration extends AstNode {
         type: string;
         params: Array<TypeParameter>;
     }
@@ -811,26 +811,26 @@ declare module 'ast-types' {
 
     export interface ObjectTypeAnnotation extends Type {
         type: string;
-        properties: any /* Array<ObjectTypeProperty | ObjectTypeSpreadProperty> */;
+        properties: Array<ObjectTypeProperty | ObjectTypeSpreadProperty>;
         indexers: Array<ObjectTypeIndexer>;
         callProperties: Array<ObjectTypeCallProperty>;
         exact: boolean;
     }
 
-    export interface ObjectTypeProperty extends Node {
+    export interface ObjectTypeProperty extends AstNode {
         type: string;
-        key: any /* Literal | Identifier */;
+        key: Literal | Identifier;
         value: Type;
         optional: boolean;
         variance: any /* Variance | plus | minus | null */;
     }
 
-    export interface ObjectTypeSpreadProperty extends Node {
+    export interface ObjectTypeSpreadProperty extends AstNode {
         type: string;
         argument: Type;
     }
 
-    export interface ObjectTypeIndexer extends Node {
+    export interface ObjectTypeIndexer extends AstNode {
         type: string;
         id: Identifier;
         key: Type;
@@ -838,30 +838,30 @@ declare module 'ast-types' {
         variance: any /* Variance | plus | minus | null */;
     }
 
-    export interface ObjectTypeCallProperty extends Node {
+    export interface ObjectTypeCallProperty extends AstNode {
         type: string;
         value: FunctionTypeAnnotation;
         static: boolean;
     }
 
-    export interface Variance extends Node {
+    export interface Variance extends AstNode {
         type: string;
         kind: any /* plus | minus */;
     }
 
-    export interface QualifiedTypeIdentifier extends Node {
+    export interface QualifiedTypeIdentifier extends AstNode {
         type: string;
-        qualification: any /* Identifier | QualifiedTypeIdentifier */;
+        qualification: Identifier | QualifiedTypeIdentifier;
         id: Identifier;
     }
 
     export interface GenericTypeAnnotation extends Type {
         type: string;
-        id: any /* Identifier | QualifiedTypeIdentifier */;
-        typeParameters: any /* TypeParameterInstantiation | null */;
+        id: Identifier | QualifiedTypeIdentifier;
+        typeParameters: TypeParameterInstantiation | null;
     }
 
-    export interface TypeParameterInstantiation extends Node {
+    export interface TypeParameterInstantiation extends AstNode {
         type: string;
         params: Array<Type>;
     }
@@ -869,7 +869,7 @@ declare module 'ast-types' {
     export interface MemberTypeAnnotation extends Type {
         type: string;
         object: Identifier;
-        property: any /* MemberTypeAnnotation | GenericTypeAnnotation */;
+        property: MemberTypeAnnotation | GenericTypeAnnotation;
     }
 
     export interface UnionTypeAnnotation extends Type {
@@ -891,28 +891,28 @@ declare module 'ast-types' {
         type: string;
         name: string;
         variance: any /* Variance | plus | minus | null */;
-        bound: any /* TypeAnnotation | null */;
+        bound: TypeAnnotation | null;
     }
 
-    export interface ClassImplements extends Node {
+    export interface ClassImplements extends AstNode {
         type: string;
         id: Identifier;
-        superClass: any /* Expression | null */;
-        typeParameters: any /* TypeParameterInstantiation | null */;
+        superClass: Expression | null;
+        typeParameters: TypeParameterInstantiation | null;
     }
 
     export interface InterfaceDeclaration extends Declaration {
         type: string;
         id: Identifier;
-        typeParameters: any /* TypeParameterDeclaration | null */;
+        typeParameters: TypeParameterDeclaration | null;
         body: ObjectTypeAnnotation;
         extends: Array<InterfaceExtends>;
     }
 
-    export interface InterfaceExtends extends Node {
+    export interface InterfaceExtends extends AstNode {
         type: string;
         id: Identifier;
-        typeParameters: any /* TypeParameterInstantiation | null */;
+        typeParameters: TypeParameterInstantiation | null;
     }
 
     export interface DeclareInterface extends InterfaceDeclaration {
@@ -922,14 +922,14 @@ declare module 'ast-types' {
     export interface TypeAlias extends Declaration {
         type: string;
         id: Identifier;
-        typeParameters: any /* TypeParameterDeclaration | null */;
+        typeParameters: TypeParameterDeclaration | null;
         right: Type;
     }
 
     export interface OpaqueType extends Declaration {
         type: string;
         id: Identifier;
-        typeParameters: any /* TypeParameterDeclaration | null */;
+        typeParameters: TypeParameterDeclaration | null;
         implType: Type;
         superType: Type;
     }
@@ -969,7 +969,7 @@ declare module 'ast-types' {
 
     export interface DeclareModule extends Statement {
         type: string;
-        id: any /* Identifier | Literal */;
+        id: Identifier | Literal;
         body: BlockStatement;
     }
 
@@ -981,9 +981,9 @@ declare module 'ast-types' {
     export interface DeclareExportDeclaration extends Declaration {
         type: string;
         default: boolean;
-        declaration: any /* DeclareVariable | DeclareFunction | DeclareClass | Type | null */;
-        specifiers: any /* Array<ExportSpecifier | ExportBatchSpecifier> */;
-        source: any /* Literal | null */;
+        declaration: DeclareVariable | DeclareFunction | DeclareClass | Type | null;
+        specifiers: Array<ExportSpecifier | ExportBatchSpecifier>;
+        source: Literal | null;
     }
 
     export interface ExportSpecifier extends ModuleSpecifier {
@@ -997,15 +997,15 @@ declare module 'ast-types' {
 
     export interface DeclareExportAllDeclaration extends Declaration {
         type: string;
-        source: any /* Literal | null */;
+        source: Literal | null;
     }
 
     export interface ExportDeclaration extends Declaration {
         type: string;
         default: boolean;
-        declaration: any /* Declaration | Expression | null */;
-        specifiers: any /* Array<ExportSpecifier | ExportBatchSpecifier> */;
-        source: any /* Literal | null */;
+        declaration: Declaration | Expression | null;
+        specifiers: Array<ExportSpecifier | ExportBatchSpecifier>;
+        source: Literal | null;
     }
 
     export interface Block extends Comment {
@@ -1031,11 +1031,11 @@ declare module 'ast-types' {
 
     export interface BindExpression extends Expression {
         type: string;
-        object: any /* Expression | null */;
+        object: Expression | null;
         callee: Expression;
     }
 
-    export interface Decorator extends Node {
+    export interface Decorator extends AstNode {
         type: string;
         expression: Expression;
     }
@@ -1053,14 +1053,14 @@ declare module 'ast-types' {
 
     export interface ExportDefaultDeclaration extends Declaration {
         type: string;
-        declaration: any /* Declaration | Expression */;
+        declaration: Declaration | Expression;
     }
 
     export interface ExportNamedDeclaration extends Declaration {
         type: string;
-        declaration: any /* Declaration | null */;
+        declaration: Declaration | null;
         specifiers: Array<ExportSpecifier>;
-        source: any /* Literal | null */;
+        source: Literal | null;
     }
 
     export interface ExportNamespaceSpecifier extends Specifier {
@@ -1075,7 +1075,7 @@ declare module 'ast-types' {
 
     export interface ExportAllDeclaration extends Declaration {
         type: string;
-        exported: any /* Identifier | null */;
+        exported: Identifier | null;
         source: Literal;
     }
 
@@ -1087,12 +1087,12 @@ declare module 'ast-types' {
         type: string;
     }
 
-    export interface Directive extends Node {
+    export interface Directive extends AstNode {
         type: string;
         value: DirectiveLiteral;
     }
 
-    export interface DirectiveLiteral extends Node, Expression {
+    export interface DirectiveLiteral extends AstNode, Expression {
         type: string;
         value: string;
     }
@@ -1105,14 +1105,14 @@ declare module 'ast-types' {
     export interface NumericLiteral extends Literal {
         type: string;
         value: number;
-        raw: any /* string | null */;
-        extra: any /* { "rawValue": number, "raw": string } */;
+        raw: string | null;
+        extra: { "rawValue": number, "raw": string };
     }
 
     export interface BigIntLiteral extends Literal {
         type: string;
-        value: any /* string | number */;
-        extra: any /* { "rawValue": string, "raw": string } */;
+        value: string | number;
+        extra: { "rawValue": string, "raw": string };
     }
 
     export interface NullLiteral extends Literal {
@@ -1132,48 +1132,48 @@ declare module 'ast-types' {
         value: RegExp;
     }
 
-    export interface ObjectMethod extends Node, Function {
+    export interface ObjectMethod extends AstNode, Function {
         type: string;
         kind: any /* method | get | set */;
-        key: any /* Literal | Identifier | Expression */;
+        key: Literal | Identifier | Expression;
         params: Array<Pattern>;
         body: BlockStatement;
         computed: boolean;
         generator: boolean;
         async: boolean;
-        accessibility: any /* Literal | null */;
-        decorators: any /* Array<Decorator> | null */;
+        accessibility: Literal | null;
+        decorators: Array<Decorator> | null;
     }
 
-    export interface ObjectProperty extends Node {
+    export interface ObjectProperty extends AstNode {
         type: string;
-        key: any /* Literal | Identifier | Expression */;
-        value: any /* Expression | Pattern */;
-        accessibility: any /* Literal | null */;
+        key: Literal | Identifier | Expression;
+        value: Expression | Pattern;
+        accessibility: Literal | null;
         computed: boolean;
     }
 
     export interface ClassMethod extends Declaration, Function {
         type: string;
         kind: any /* get | set | method | constructor */;
-        key: any /* Literal | Identifier | Expression */;
+        key: Literal | Identifier | Expression;
         params: Array<Pattern>;
         body: BlockStatement;
         computed: boolean;
         static: boolean;
         generator: boolean;
         async: boolean;
-        decorators: any /* Array<Decorator> | null */;
+        decorators: Array<Decorator> | null;
     }
 
-    export interface RestProperty extends Node {
+    export interface RestProperty extends AstNode {
         type: string;
         argument: Expression;
     }
 
     export interface ForAwaitStatement extends Statement {
         type: string;
-        left: any /* VariableDeclaration | Expression */;
+        left: VariableDeclaration | Expression;
         right: Expression;
         body: Statement;
     }
@@ -1182,28 +1182,28 @@ declare module 'ast-types' {
         type: string;
     }
 
-    export interface TSType extends Node {
+    export interface TSType extends AstNode {
 
     }
 
-    export interface TSQualifiedName extends Node {
+    export interface TSQualifiedName extends AstNode {
         type: string;
-        left: any /* Identifier | TSQualifiedName */;
-        right: any /* Identifier | TSQualifiedName */;
+        left: Identifier | TSQualifiedName;
+        right: Identifier | TSQualifiedName;
     }
 
     export interface TSTypeReference extends TSType {
-        typeName: any /* Identifier | TSQualifiedName */;
-        typeParameters: any /* TSTypeParameterInstantiation | null */;
+        typeName: Identifier | TSQualifiedName;
+        typeParameters: TSTypeParameterInstantiation | null;
     }
 
-    export interface TSTypeParameterInstantiation extends Node {
+    export interface TSTypeParameterInstantiation extends AstNode {
         type: string;
         params: Array<TSType>;
     }
 
     export interface TSHasOptionalTypeParameters extends NodeBase {
-        typeParameters: any /* TSTypeParameterDeclaration | null */;
+        typeParameters: TSTypeParameterDeclaration | null;
     }
 
     export interface TSTypeParameterDeclaration extends Declaration {
@@ -1212,14 +1212,14 @@ declare module 'ast-types' {
     }
 
     export interface TSHasOptionalTypeAnnotation extends NodeBase {
-        typeAnnotation: any /* TSTypeAnnotation | null */;
+        typeAnnotation: TSTypeAnnotation | null;
     }
 
     export interface TSAsExpression extends Expression {
         type: string;
         expression: Expression;
         typeAnnotation: TSType;
-        extra: any /* { "parenthesized": boolean } | null */;
+        extra: { "parenthesized": boolean } | null;
     }
 
     export interface TSNonNullExpression extends Expression {
@@ -1278,7 +1278,7 @@ declare module 'ast-types' {
 
     export interface TSLiteralType extends TSType {
         type: string;
-        literal: any /* NumericLiteral | StringLiteral | BooleanLiteral */;
+        literal: NumericLiteral | StringLiteral | BooleanLiteral;
     }
 
     export interface TSUnionType extends TSType {
@@ -1311,12 +1311,12 @@ declare module 'ast-types' {
 
     export interface TSFunctionType extends TSType, TSHasOptionalTypeParameters, TSHasOptionalTypeAnnotation {
         type: string;
-        parameters: any /* Array<Identifier | RestElement> */;
+        parameters: Array<Identifier | RestElement>;
     }
 
     export interface TSConstructorType extends TSType, TSHasOptionalTypeParameters, TSHasOptionalTypeAnnotation {
         type: string;
-        parameters: any /* Array<Identifier | RestElement> */;
+        parameters: Array<Identifier | RestElement>;
     }
 
     export interface TSDeclareFunction extends Declaration, TSHasOptionalTypeParameters {
@@ -1324,9 +1324,9 @@ declare module 'ast-types' {
         declare: boolean;
         async: boolean;
         generator: boolean;
-        id: any /* Identifier | null */;
+        id: Identifier | null;
         params: Array<Pattern>;
-        returnType: any /* TSTypeAnnotation | Noop | null */;
+        returnType: TSTypeAnnotation | Noop | null;
     }
 
     export interface TSDeclareMethod extends Declaration, TSHasOptionalTypeParameters {
@@ -1339,11 +1339,11 @@ declare module 'ast-types' {
         static: boolean;
         computed: boolean;
         optional: boolean;
-        key: any /* Identifier | StringLiteral | NumericLiteral | Expression */;
+        key: Identifier | StringLiteral | NumericLiteral | Expression;
         kind: any /* get | set | method | constructor */;
         access: any /* public | private | protected | undefined */;
-        decorators: any /* Array<Decorator> | null */;
-        returnType: any /* TSTypeAnnotation | Noop | null */;
+        decorators: Array<Decorator> | null;
+        returnType: TSTypeAnnotation | Noop | null;
     }
 
     export interface TSMappedType extends TSType {
@@ -1351,13 +1351,13 @@ declare module 'ast-types' {
         readonly: boolean;
         typeParameter: TSTypeParameter;
         optional: boolean;
-        typeAnnotation: any /* TSType | null */;
+        typeAnnotation: TSType | null;
     }
 
     export interface TSTypeParameter extends Identifier {
         name: string;
-        constraint: any /* TSType | null */;
-        default: any /* TSType | null */;
+        constraint: TSType | null;
+        default: TSType | null;
     }
 
     export interface TSTupleType extends TSType {
@@ -1389,7 +1389,7 @@ declare module 'ast-types' {
         computed: boolean;
         readonly: boolean;
         optional: boolean;
-        initializer: any /* Expression | null */;
+        initializer: Expression | null;
     }
 
     export interface TSMethodSignature extends Declaration, TSHasOptionalTypeParameters, TSHasOptionalTypeAnnotation {
@@ -1397,29 +1397,29 @@ declare module 'ast-types' {
         key: Expression;
         computed: boolean;
         optional: boolean;
-        parameters: any /* Array<Identifier | RestElement> */;
+        parameters: Array<Identifier | RestElement>;
     }
 
     export interface TSTypePredicate extends TSTypeAnnotation {
         type: string;
-        parameterName: any /* Identifier | TSThisType */;
+        parameterName: Identifier | TSThisType;
         typeAnnotation: TSTypeAnnotation;
     }
 
     export interface TSCallSignatureDeclaration extends Declaration, TSHasOptionalTypeParameters, TSHasOptionalTypeAnnotation {
         type: string;
-        parameters: any /* Array<Identifier | RestElement> */;
+        parameters: Array<Identifier | RestElement>;
     }
 
     export interface TSConstructSignatureDeclaration extends Declaration, TSHasOptionalTypeParameters, TSHasOptionalTypeAnnotation {
         type: string;
-        parameters: any /* Array<Identifier | RestElement> */;
+        parameters: Array<Identifier | RestElement>;
     }
 
-    export interface TSEnumMember extends Node {
+    export interface TSEnumMember extends AstNode {
         type: string;
-        id: any /* Identifier | StringLiteral */;
-        initializer: any /* Expression | null */;
+        id: Identifier | StringLiteral;
+        initializer: Expression | null;
     }
 
     export interface TSTypeQuery extends TSType {
@@ -1429,14 +1429,14 @@ declare module 'ast-types' {
 
     export interface TSTypeLiteral extends TSType {
         type: string;
-        members: any /* Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature> */;
+        members: Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature>;
     }
 
     export interface TSTypeAssertion extends Expression {
         type: string;
         typeAnnotation: TSType;
         expression: Expression;
-        extra: any /* { "parenthesized": boolean } | null */;
+        extra: { "parenthesized": boolean } | null;
     }
 
     export interface TSEnumDeclaration extends Declaration {
@@ -1445,7 +1445,7 @@ declare module 'ast-types' {
         const: boolean;
         declare: boolean;
         members: Array<TSEnumMember>;
-        initializer: any /* Expression | null */;
+        initializer: Expression | null;
     }
 
     export interface TSTypeAliasDeclaration extends Declaration, TSHasOptionalTypeParameters {
@@ -1455,24 +1455,24 @@ declare module 'ast-types' {
         typeAnnotation: TSType;
     }
 
-    export interface TSModuleBlock extends Node {
+    export interface TSModuleBlock extends AstNode {
         type: string;
         body: Array<Statement>;
     }
 
     export interface TSModuleDeclaration extends Declaration {
         type: string;
-        id: any /* StringLiteral | Identifier | TSQualifiedName */;
+        id: StringLiteral | Identifier | TSQualifiedName;
         declare: boolean;
         global: boolean;
-        body: any /* TSModuleBlock | TSModuleDeclaration | null */;
+        body: TSModuleBlock | TSModuleDeclaration | null;
     }
 
     export interface TSImportEqualsDeclaration extends Declaration {
         type: string;
         id: Identifier;
         isExport: boolean;
-        moduleReference: any /* Identifier | TSQualifiedName | TSExternalModuleReference */;
+        moduleReference: Identifier | TSQualifiedName | TSExternalModuleReference;
     }
 
     export interface TSExternalModuleReference extends Declaration {
@@ -1490,22 +1490,22 @@ declare module 'ast-types' {
         id: Identifier;
     }
 
-    export interface TSInterfaceBody extends Node {
+    export interface TSInterfaceBody extends AstNode {
         type: string;
-        body: any /* Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature> */;
+        body: Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature>;
     }
 
     export interface TSExpressionWithTypeArguments extends TSType {
         type: string;
-        expression: any /* Identifier | TSQualifiedName */;
-        typeParameters: any /* TSTypeParameterInstantiation | null */;
+        expression: Identifier | TSQualifiedName;
+        typeParameters: TSTypeParameterInstantiation | null;
     }
 
     export interface TSInterfaceDeclaration extends Declaration, TSHasOptionalTypeParameters {
         type: string;
-        id: any /* Identifier | TSQualifiedName */;
+        id: Identifier | TSQualifiedName;
         declare: boolean;
-        extends: any /* Array<TSExpressionWithTypeArguments> | null */;
+        extends: Array<TSExpressionWithTypeArguments> | null;
         body: TSInterfaceBody;
     }
 
@@ -1513,7 +1513,7 @@ declare module 'ast-types' {
         type: string;
         accessibility: any /* public | private | protected | undefined */;
         readonly: boolean;
-        parameter: any /* Identifier | AssignmentPattern */;
+        parameter: Identifier | AssignmentPattern;
     }
 
     export type TypeName = 'Printable'
@@ -1782,6 +1782,238 @@ declare module 'ast-types' {
         | 'TSExpressionWithTypeArguments'
         | 'TSInterfaceDeclaration'
         | 'TSParameterProperty';
+
+    export type Node = SourceLocation
+        | Position
+        | File
+        | Program
+        | Identifier
+        | BlockStatement
+        | EmptyStatement
+        | ExpressionStatement
+        | IfStatement
+        | LabeledStatement
+        | BreakStatement
+        | ContinueStatement
+        | WithStatement
+        | SwitchStatement
+        | SwitchCase
+        | ReturnStatement
+        | ThrowStatement
+        | TryStatement
+        | CatchClause
+        | WhileStatement
+        | DoWhileStatement
+        | ForStatement
+        | VariableDeclaration
+        | ForInStatement
+        | DebuggerStatement
+        | FunctionDeclaration
+        | FunctionExpression
+        | VariableDeclarator
+        | ThisExpression
+        | ArrayExpression
+        | ObjectExpression
+        | Property
+        | Literal
+        | SequenceExpression
+        | UnaryExpression
+        | BinaryExpression
+        | AssignmentExpression
+        | UpdateExpression
+        | LogicalExpression
+        | ConditionalExpression
+        | NewExpression
+        | CallExpression
+        | MemberExpression
+        | RestElement
+        | TypeAnnotation
+        | TSTypeAnnotation
+        | SpreadElementPattern
+        | ArrowFunctionExpression
+        | ForOfStatement
+        | YieldExpression
+        | GeneratorExpression
+        | ComprehensionBlock
+        | ComprehensionExpression
+        | PropertyPattern
+        | ObjectPattern
+        | ArrayPattern
+        | MethodDefinition
+        | SpreadElement
+        | AssignmentPattern
+        | ClassPropertyDefinition
+        | ClassProperty
+        | ClassBody
+        | ClassDeclaration
+        | ClassExpression
+        | ImportSpecifier
+        | ImportNamespaceSpecifier
+        | ImportDefaultSpecifier
+        | ImportDeclaration
+        | TaggedTemplateExpression
+        | TemplateLiteral
+        | TemplateElement
+        | SpreadProperty
+        | SpreadPropertyPattern
+        | AwaitExpression
+        | LetStatement
+        | LetExpression
+        | GraphExpression
+        | GraphIndexExpression
+        | JSXAttribute
+        | JSXIdentifier
+        | JSXNamespacedName
+        | JSXExpressionContainer
+        | JSXMemberExpression
+        | JSXSpreadAttribute
+        | JSXElement
+        | JSXOpeningElement
+        | JSXClosingElement
+        | JSXFragment
+        | JSXText
+        | JSXOpeningFragment
+        | JSXClosingFragment
+        | JSXEmptyExpression
+        | JSXSpreadChild
+        | AnyTypeAnnotation
+        | EmptyTypeAnnotation
+        | MixedTypeAnnotation
+        | VoidTypeAnnotation
+        | NumberTypeAnnotation
+        | NumberLiteralTypeAnnotation
+        | NumericLiteralTypeAnnotation
+        | StringTypeAnnotation
+        | StringLiteralTypeAnnotation
+        | BooleanTypeAnnotation
+        | BooleanLiteralTypeAnnotation
+        | NullableTypeAnnotation
+        | NullLiteralTypeAnnotation
+        | NullTypeAnnotation
+        | ThisTypeAnnotation
+        | ExistsTypeAnnotation
+        | ExistentialTypeParam
+        | FunctionTypeAnnotation
+        | FunctionTypeParam
+        | TypeParameterDeclaration
+        | ArrayTypeAnnotation
+        | ObjectTypeAnnotation
+        | ObjectTypeProperty
+        | ObjectTypeSpreadProperty
+        | ObjectTypeIndexer
+        | ObjectTypeCallProperty
+        | Variance
+        | QualifiedTypeIdentifier
+        | GenericTypeAnnotation
+        | TypeParameterInstantiation
+        | MemberTypeAnnotation
+        | UnionTypeAnnotation
+        | IntersectionTypeAnnotation
+        | TypeofTypeAnnotation
+        | TypeParameter
+        | ClassImplements
+        | InterfaceDeclaration
+        | InterfaceExtends
+        | DeclareInterface
+        | TypeAlias
+        | OpaqueType
+        | DeclareTypeAlias
+        | DeclareOpaqueType
+        | TypeCastExpression
+        | TupleTypeAnnotation
+        | DeclareVariable
+        | DeclareFunction
+        | DeclareClass
+        | DeclareModule
+        | DeclareModuleExports
+        | DeclareExportDeclaration
+        | ExportSpecifier
+        | ExportBatchSpecifier
+        | DeclareExportAllDeclaration
+        | ExportDeclaration
+        | Block
+        | Line
+        | Noop
+        | DoExpression
+        | Super
+        | BindExpression
+        | Decorator
+        | MetaProperty
+        | ParenthesizedExpression
+        | ExportDefaultDeclaration
+        | ExportNamedDeclaration
+        | ExportNamespaceSpecifier
+        | ExportDefaultSpecifier
+        | ExportAllDeclaration
+        | CommentBlock
+        | CommentLine
+        | Directive
+        | DirectiveLiteral
+        | StringLiteral
+        | NumericLiteral
+        | BigIntLiteral
+        | NullLiteral
+        | BooleanLiteral
+        | RegExpLiteral
+        | ObjectMethod
+        | ObjectProperty
+        | ClassMethod
+        | RestProperty
+        | ForAwaitStatement
+        | Import
+        | TSQualifiedName
+        | TSTypeParameterInstantiation
+        | TSTypeParameterDeclaration
+        | TSAsExpression
+        | TSNonNullExpression
+        | TSAnyKeyword
+        | TSBooleanKeyword
+        | TSNeverKeyword
+        | TSNullKeyword
+        | TSNumberKeyword
+        | TSObjectKeyword
+        | TSStringKeyword
+        | TSSymbolKeyword
+        | TSUndefinedKeyword
+        | TSVoidKeyword
+        | TSThisType
+        | TSArrayType
+        | TSLiteralType
+        | TSUnionType
+        | TSIntersectionType
+        | TSConditionalType
+        | TSInferType
+        | TSParenthesizedType
+        | TSFunctionType
+        | TSConstructorType
+        | TSDeclareFunction
+        | TSDeclareMethod
+        | TSMappedType
+        | TSTupleType
+        | TSIndexedAccessType
+        | TSTypeOperator
+        | TSIndexSignature
+        | TSPropertySignature
+        | TSMethodSignature
+        | TSTypePredicate
+        | TSCallSignatureDeclaration
+        | TSConstructSignatureDeclaration
+        | TSEnumMember
+        | TSTypeQuery
+        | TSTypeLiteral
+        | TSTypeAssertion
+        | TSEnumDeclaration
+        | TSTypeAliasDeclaration
+        | TSModuleBlock
+        | TSModuleDeclaration
+        | TSImportEqualsDeclaration
+        | TSExternalModuleReference
+        | TSExportAssignment
+        | TSNamespaceExportDeclaration
+        | TSInterfaceBody
+        | TSExpressionWithTypeArguments
+        | TSInterfaceDeclaration
+        | TSParameterProperty;
 
     export interface Builders {
         sourceLocation(start: Position, end: Position, source?: any /* string | null */): SourceLocation;
@@ -2247,271 +2479,271 @@ declare module 'ast-types' {
         tsParameterProperty(parameter: any /* Identifier | AssignmentPattern */): TSParameterProperty;
     }
     export interface NamedTypes {
-        Printable: NamedType;
-        SourceLocation: NamedType;
-        Node: NamedType;
-        Comment: NamedType;
-        Position: NamedType;
-        File: NamedType;
-        Program: NamedType;
-        Statement: NamedType;
-        Function: NamedType;
-        Pattern: NamedType;
-        Expression: NamedType;
-        Identifier: NamedType;
-        BlockStatement: NamedType;
-        EmptyStatement: NamedType;
-        ExpressionStatement: NamedType;
-        IfStatement: NamedType;
-        LabeledStatement: NamedType;
-        BreakStatement: NamedType;
-        ContinueStatement: NamedType;
-        WithStatement: NamedType;
-        SwitchStatement: NamedType;
-        SwitchCase: NamedType;
-        ReturnStatement: NamedType;
-        ThrowStatement: NamedType;
-        TryStatement: NamedType;
-        CatchClause: NamedType;
-        WhileStatement: NamedType;
-        DoWhileStatement: NamedType;
-        ForStatement: NamedType;
-        Declaration: NamedType;
-        VariableDeclaration: NamedType;
-        ForInStatement: NamedType;
-        DebuggerStatement: NamedType;
-        FunctionDeclaration: NamedType;
-        FunctionExpression: NamedType;
-        VariableDeclarator: NamedType;
-        ThisExpression: NamedType;
-        ArrayExpression: NamedType;
-        ObjectExpression: NamedType;
-        Property: NamedType;
-        Literal: NamedType;
-        SequenceExpression: NamedType;
-        UnaryExpression: NamedType;
-        BinaryExpression: NamedType;
-        AssignmentExpression: NamedType;
-        UpdateExpression: NamedType;
-        LogicalExpression: NamedType;
-        ConditionalExpression: NamedType;
-        NewExpression: NamedType;
-        CallExpression: NamedType;
-        MemberExpression: NamedType;
-        RestElement: NamedType;
-        TypeAnnotation: NamedType;
-        TSTypeAnnotation: NamedType;
-        SpreadElementPattern: NamedType;
-        ArrowFunctionExpression: NamedType;
-        ForOfStatement: NamedType;
-        YieldExpression: NamedType;
-        GeneratorExpression: NamedType;
-        ComprehensionBlock: NamedType;
-        ComprehensionExpression: NamedType;
-        PropertyPattern: NamedType;
-        ObjectPattern: NamedType;
-        ArrayPattern: NamedType;
-        MethodDefinition: NamedType;
-        SpreadElement: NamedType;
-        AssignmentPattern: NamedType;
-        ClassPropertyDefinition: NamedType;
-        ClassProperty: NamedType;
-        ClassBody: NamedType;
-        ClassDeclaration: NamedType;
-        ClassExpression: NamedType;
-        Specifier: NamedType;
-        ModuleSpecifier: NamedType;
-        ImportSpecifier: NamedType;
-        ImportNamespaceSpecifier: NamedType;
-        ImportDefaultSpecifier: NamedType;
-        ImportDeclaration: NamedType;
-        TaggedTemplateExpression: NamedType;
-        TemplateLiteral: NamedType;
-        TemplateElement: NamedType;
-        SpreadProperty: NamedType;
-        SpreadPropertyPattern: NamedType;
-        AwaitExpression: NamedType;
-        LetStatement: NamedType;
-        LetExpression: NamedType;
-        GraphExpression: NamedType;
-        GraphIndexExpression: NamedType;
-        XMLDefaultDeclaration: NamedType;
-        XMLAnyName: NamedType;
-        XMLQualifiedIdentifier: NamedType;
-        XMLFunctionQualifiedIdentifier: NamedType;
-        XMLAttributeSelector: NamedType;
-        XMLFilterExpression: NamedType;
-        XML: NamedType;
-        XMLElement: NamedType;
-        XMLList: NamedType;
-        XMLEscape: NamedType;
-        XMLText: NamedType;
-        XMLStartTag: NamedType;
-        XMLEndTag: NamedType;
-        XMLPointTag: NamedType;
-        XMLName: NamedType;
-        XMLAttribute: NamedType;
-        XMLCdata: NamedType;
-        XMLComment: NamedType;
-        XMLProcessingInstruction: NamedType;
-        JSXAttribute: NamedType;
-        JSXIdentifier: NamedType;
-        JSXNamespacedName: NamedType;
-        JSXExpressionContainer: NamedType;
-        JSXMemberExpression: NamedType;
-        JSXSpreadAttribute: NamedType;
-        JSXElement: NamedType;
-        JSXOpeningElement: NamedType;
-        JSXClosingElement: NamedType;
-        JSXFragment: NamedType;
-        JSXText: NamedType;
-        JSXOpeningFragment: NamedType;
-        JSXClosingFragment: NamedType;
-        JSXEmptyExpression: NamedType;
-        JSXSpreadChild: NamedType;
-        Type: NamedType;
-        AnyTypeAnnotation: NamedType;
-        EmptyTypeAnnotation: NamedType;
-        MixedTypeAnnotation: NamedType;
-        VoidTypeAnnotation: NamedType;
-        NumberTypeAnnotation: NamedType;
-        NumberLiteralTypeAnnotation: NamedType;
-        NumericLiteralTypeAnnotation: NamedType;
-        StringTypeAnnotation: NamedType;
-        StringLiteralTypeAnnotation: NamedType;
-        BooleanTypeAnnotation: NamedType;
-        BooleanLiteralTypeAnnotation: NamedType;
-        NullableTypeAnnotation: NamedType;
-        NullLiteralTypeAnnotation: NamedType;
-        NullTypeAnnotation: NamedType;
-        ThisTypeAnnotation: NamedType;
-        ExistsTypeAnnotation: NamedType;
-        ExistentialTypeParam: NamedType;
-        FunctionTypeAnnotation: NamedType;
-        FunctionTypeParam: NamedType;
-        TypeParameterDeclaration: NamedType;
-        ArrayTypeAnnotation: NamedType;
-        ObjectTypeAnnotation: NamedType;
-        ObjectTypeProperty: NamedType;
-        ObjectTypeSpreadProperty: NamedType;
-        ObjectTypeIndexer: NamedType;
-        ObjectTypeCallProperty: NamedType;
-        Variance: NamedType;
-        QualifiedTypeIdentifier: NamedType;
-        GenericTypeAnnotation: NamedType;
-        TypeParameterInstantiation: NamedType;
-        MemberTypeAnnotation: NamedType;
-        UnionTypeAnnotation: NamedType;
-        IntersectionTypeAnnotation: NamedType;
-        TypeofTypeAnnotation: NamedType;
-        TypeParameter: NamedType;
-        ClassImplements: NamedType;
-        InterfaceDeclaration: NamedType;
-        InterfaceExtends: NamedType;
-        DeclareInterface: NamedType;
-        TypeAlias: NamedType;
-        OpaqueType: NamedType;
-        DeclareTypeAlias: NamedType;
-        DeclareOpaqueType: NamedType;
-        TypeCastExpression: NamedType;
-        TupleTypeAnnotation: NamedType;
-        DeclareVariable: NamedType;
-        DeclareFunction: NamedType;
-        DeclareClass: NamedType;
-        DeclareModule: NamedType;
-        DeclareModuleExports: NamedType;
-        DeclareExportDeclaration: NamedType;
-        ExportSpecifier: NamedType;
-        ExportBatchSpecifier: NamedType;
-        DeclareExportAllDeclaration: NamedType;
-        ExportDeclaration: NamedType;
-        Block: NamedType;
-        Line: NamedType;
-        Noop: NamedType;
-        DoExpression: NamedType;
-        Super: NamedType;
-        BindExpression: NamedType;
-        Decorator: NamedType;
-        MetaProperty: NamedType;
-        ParenthesizedExpression: NamedType;
-        ExportDefaultDeclaration: NamedType;
-        ExportNamedDeclaration: NamedType;
-        ExportNamespaceSpecifier: NamedType;
-        ExportDefaultSpecifier: NamedType;
-        ExportAllDeclaration: NamedType;
-        CommentBlock: NamedType;
-        CommentLine: NamedType;
-        Directive: NamedType;
-        DirectiveLiteral: NamedType;
-        StringLiteral: NamedType;
-        NumericLiteral: NamedType;
-        BigIntLiteral: NamedType;
-        NullLiteral: NamedType;
-        BooleanLiteral: NamedType;
-        RegExpLiteral: NamedType;
-        ObjectMethod: NamedType;
-        ObjectProperty: NamedType;
-        ClassMethod: NamedType;
-        RestProperty: NamedType;
-        ForAwaitStatement: NamedType;
-        Import: NamedType;
-        TSType: NamedType;
-        TSQualifiedName: NamedType;
-        TSTypeReference: NamedType;
-        TSTypeParameterInstantiation: NamedType;
-        TSHasOptionalTypeParameters: NamedType;
-        TSTypeParameterDeclaration: NamedType;
-        TSHasOptionalTypeAnnotation: NamedType;
-        TSAsExpression: NamedType;
-        TSNonNullExpression: NamedType;
-        TSAnyKeyword: NamedType;
-        TSBooleanKeyword: NamedType;
-        TSNeverKeyword: NamedType;
-        TSNullKeyword: NamedType;
-        TSNumberKeyword: NamedType;
-        TSObjectKeyword: NamedType;
-        TSStringKeyword: NamedType;
-        TSSymbolKeyword: NamedType;
-        TSUndefinedKeyword: NamedType;
-        TSVoidKeyword: NamedType;
-        TSThisType: NamedType;
-        TSArrayType: NamedType;
-        TSLiteralType: NamedType;
-        TSUnionType: NamedType;
-        TSIntersectionType: NamedType;
-        TSConditionalType: NamedType;
-        TSInferType: NamedType;
-        TSParenthesizedType: NamedType;
-        TSFunctionType: NamedType;
-        TSConstructorType: NamedType;
-        TSDeclareFunction: NamedType;
-        TSDeclareMethod: NamedType;
-        TSMappedType: NamedType;
-        TSTypeParameter: NamedType;
-        TSTupleType: NamedType;
-        TSIndexedAccessType: NamedType;
-        TSTypeOperator: NamedType;
-        TSIndexSignature: NamedType;
-        TSPropertySignature: NamedType;
-        TSMethodSignature: NamedType;
-        TSTypePredicate: NamedType;
-        TSCallSignatureDeclaration: NamedType;
-        TSConstructSignatureDeclaration: NamedType;
-        TSEnumMember: NamedType;
-        TSTypeQuery: NamedType;
-        TSTypeLiteral: NamedType;
-        TSTypeAssertion: NamedType;
-        TSEnumDeclaration: NamedType;
-        TSTypeAliasDeclaration: NamedType;
-        TSModuleBlock: NamedType;
-        TSModuleDeclaration: NamedType;
-        TSImportEqualsDeclaration: NamedType;
-        TSExternalModuleReference: NamedType;
-        TSExportAssignment: NamedType;
-        TSNamespaceExportDeclaration: NamedType;
-        TSInterfaceBody: NamedType;
-        TSExpressionWithTypeArguments: NamedType;
-        TSInterfaceDeclaration: NamedType;
-        TSParameterProperty: NamedType;
+        Printable: NamedType<Printable>;
+        SourceLocation: NamedType<SourceLocation>;
+        Node: NamedType<Node>;
+        Comment: NamedType<Comment>;
+        Position: NamedType<Position>;
+        File: NamedType<File>;
+        Program: NamedType<Program>;
+        Statement: NamedType<Statement>;
+        Function: NamedType<Function>;
+        Pattern: NamedType<Pattern>;
+        Expression: NamedType<Expression>;
+        Identifier: NamedType<Identifier>;
+        BlockStatement: NamedType<BlockStatement>;
+        EmptyStatement: NamedType<EmptyStatement>;
+        ExpressionStatement: NamedType<ExpressionStatement>;
+        IfStatement: NamedType<IfStatement>;
+        LabeledStatement: NamedType<LabeledStatement>;
+        BreakStatement: NamedType<BreakStatement>;
+        ContinueStatement: NamedType<ContinueStatement>;
+        WithStatement: NamedType<WithStatement>;
+        SwitchStatement: NamedType<SwitchStatement>;
+        SwitchCase: NamedType<SwitchCase>;
+        ReturnStatement: NamedType<ReturnStatement>;
+        ThrowStatement: NamedType<ThrowStatement>;
+        TryStatement: NamedType<TryStatement>;
+        CatchClause: NamedType<CatchClause>;
+        WhileStatement: NamedType<WhileStatement>;
+        DoWhileStatement: NamedType<DoWhileStatement>;
+        ForStatement: NamedType<ForStatement>;
+        Declaration: NamedType<Declaration>;
+        VariableDeclaration: NamedType<VariableDeclaration>;
+        ForInStatement: NamedType<ForInStatement>;
+        DebuggerStatement: NamedType<DebuggerStatement>;
+        FunctionDeclaration: NamedType<FunctionDeclaration>;
+        FunctionExpression: NamedType<FunctionExpression>;
+        VariableDeclarator: NamedType<VariableDeclarator>;
+        ThisExpression: NamedType<ThisExpression>;
+        ArrayExpression: NamedType<ArrayExpression>;
+        ObjectExpression: NamedType<ObjectExpression>;
+        Property: NamedType<Property>;
+        Literal: NamedType<Literal>;
+        SequenceExpression: NamedType<SequenceExpression>;
+        UnaryExpression: NamedType<UnaryExpression>;
+        BinaryExpression: NamedType<BinaryExpression>;
+        AssignmentExpression: NamedType<AssignmentExpression>;
+        UpdateExpression: NamedType<UpdateExpression>;
+        LogicalExpression: NamedType<LogicalExpression>;
+        ConditionalExpression: NamedType<ConditionalExpression>;
+        NewExpression: NamedType<NewExpression>;
+        CallExpression: NamedType<CallExpression>;
+        MemberExpression: NamedType<MemberExpression>;
+        RestElement: NamedType<RestElement>;
+        TypeAnnotation: NamedType<TypeAnnotation>;
+        TSTypeAnnotation: NamedType<TSTypeAnnotation>;
+        SpreadElementPattern: NamedType<SpreadElementPattern>;
+        ArrowFunctionExpression: NamedType<ArrowFunctionExpression>;
+        ForOfStatement: NamedType<ForOfStatement>;
+        YieldExpression: NamedType<YieldExpression>;
+        GeneratorExpression: NamedType<GeneratorExpression>;
+        ComprehensionBlock: NamedType<ComprehensionBlock>;
+        ComprehensionExpression: NamedType<ComprehensionExpression>;
+        PropertyPattern: NamedType<PropertyPattern>;
+        ObjectPattern: NamedType<ObjectPattern>;
+        ArrayPattern: NamedType<ArrayPattern>;
+        MethodDefinition: NamedType<MethodDefinition>;
+        SpreadElement: NamedType<SpreadElement>;
+        AssignmentPattern: NamedType<AssignmentPattern>;
+        ClassPropertyDefinition: NamedType<ClassPropertyDefinition>;
+        ClassProperty: NamedType<ClassProperty>;
+        ClassBody: NamedType<ClassBody>;
+        ClassDeclaration: NamedType<ClassDeclaration>;
+        ClassExpression: NamedType<ClassExpression>;
+        Specifier: NamedType<Specifier>;
+        ModuleSpecifier: NamedType<ModuleSpecifier>;
+        ImportSpecifier: NamedType<ImportSpecifier>;
+        ImportNamespaceSpecifier: NamedType<ImportNamespaceSpecifier>;
+        ImportDefaultSpecifier: NamedType<ImportDefaultSpecifier>;
+        ImportDeclaration: NamedType<ImportDeclaration>;
+        TaggedTemplateExpression: NamedType<TaggedTemplateExpression>;
+        TemplateLiteral: NamedType<TemplateLiteral>;
+        TemplateElement: NamedType<TemplateElement>;
+        SpreadProperty: NamedType<SpreadProperty>;
+        SpreadPropertyPattern: NamedType<SpreadPropertyPattern>;
+        AwaitExpression: NamedType<AwaitExpression>;
+        LetStatement: NamedType<LetStatement>;
+        LetExpression: NamedType<LetExpression>;
+        GraphExpression: NamedType<GraphExpression>;
+        GraphIndexExpression: NamedType<GraphIndexExpression>;
+        XMLDefaultDeclaration: NamedType<XMLDefaultDeclaration>;
+        XMLAnyName: NamedType<XMLAnyName>;
+        XMLQualifiedIdentifier: NamedType<XMLQualifiedIdentifier>;
+        XMLFunctionQualifiedIdentifier: NamedType<XMLFunctionQualifiedIdentifier>;
+        XMLAttributeSelector: NamedType<XMLAttributeSelector>;
+        XMLFilterExpression: NamedType<XMLFilterExpression>;
+        XML: NamedType<XML>;
+        XMLElement: NamedType<XMLElement>;
+        XMLList: NamedType<XMLList>;
+        XMLEscape: NamedType<XMLEscape>;
+        XMLText: NamedType<XMLText>;
+        XMLStartTag: NamedType<XMLStartTag>;
+        XMLEndTag: NamedType<XMLEndTag>;
+        XMLPointTag: NamedType<XMLPointTag>;
+        XMLName: NamedType<XMLName>;
+        XMLAttribute: NamedType<XMLAttribute>;
+        XMLCdata: NamedType<XMLCdata>;
+        XMLComment: NamedType<XMLComment>;
+        XMLProcessingInstruction: NamedType<XMLProcessingInstruction>;
+        JSXAttribute: NamedType<JSXAttribute>;
+        JSXIdentifier: NamedType<JSXIdentifier>;
+        JSXNamespacedName: NamedType<JSXNamespacedName>;
+        JSXExpressionContainer: NamedType<JSXExpressionContainer>;
+        JSXMemberExpression: NamedType<JSXMemberExpression>;
+        JSXSpreadAttribute: NamedType<JSXSpreadAttribute>;
+        JSXElement: NamedType<JSXElement>;
+        JSXOpeningElement: NamedType<JSXOpeningElement>;
+        JSXClosingElement: NamedType<JSXClosingElement>;
+        JSXFragment: NamedType<JSXFragment>;
+        JSXText: NamedType<JSXText>;
+        JSXOpeningFragment: NamedType<JSXOpeningFragment>;
+        JSXClosingFragment: NamedType<JSXClosingFragment>;
+        JSXEmptyExpression: NamedType<JSXEmptyExpression>;
+        JSXSpreadChild: NamedType<JSXSpreadChild>;
+        Type: NamedType<Type>;
+        AnyTypeAnnotation: NamedType<AnyTypeAnnotation>;
+        EmptyTypeAnnotation: NamedType<EmptyTypeAnnotation>;
+        MixedTypeAnnotation: NamedType<MixedTypeAnnotation>;
+        VoidTypeAnnotation: NamedType<VoidTypeAnnotation>;
+        NumberTypeAnnotation: NamedType<NumberTypeAnnotation>;
+        NumberLiteralTypeAnnotation: NamedType<NumberLiteralTypeAnnotation>;
+        NumericLiteralTypeAnnotation: NamedType<NumericLiteralTypeAnnotation>;
+        StringTypeAnnotation: NamedType<StringTypeAnnotation>;
+        StringLiteralTypeAnnotation: NamedType<StringLiteralTypeAnnotation>;
+        BooleanTypeAnnotation: NamedType<BooleanTypeAnnotation>;
+        BooleanLiteralTypeAnnotation: NamedType<BooleanLiteralTypeAnnotation>;
+        NullableTypeAnnotation: NamedType<NullableTypeAnnotation>;
+        NullLiteralTypeAnnotation: NamedType<NullLiteralTypeAnnotation>;
+        NullTypeAnnotation: NamedType<NullTypeAnnotation>;
+        ThisTypeAnnotation: NamedType<ThisTypeAnnotation>;
+        ExistsTypeAnnotation: NamedType<ExistsTypeAnnotation>;
+        ExistentialTypeParam: NamedType<ExistentialTypeParam>;
+        FunctionTypeAnnotation: NamedType<FunctionTypeAnnotation>;
+        FunctionTypeParam: NamedType<FunctionTypeParam>;
+        TypeParameterDeclaration: NamedType<TypeParameterDeclaration>;
+        ArrayTypeAnnotation: NamedType<ArrayTypeAnnotation>;
+        ObjectTypeAnnotation: NamedType<ObjectTypeAnnotation>;
+        ObjectTypeProperty: NamedType<ObjectTypeProperty>;
+        ObjectTypeSpreadProperty: NamedType<ObjectTypeSpreadProperty>;
+        ObjectTypeIndexer: NamedType<ObjectTypeIndexer>;
+        ObjectTypeCallProperty: NamedType<ObjectTypeCallProperty>;
+        Variance: NamedType<Variance>;
+        QualifiedTypeIdentifier: NamedType<QualifiedTypeIdentifier>;
+        GenericTypeAnnotation: NamedType<GenericTypeAnnotation>;
+        TypeParameterInstantiation: NamedType<TypeParameterInstantiation>;
+        MemberTypeAnnotation: NamedType<MemberTypeAnnotation>;
+        UnionTypeAnnotation: NamedType<UnionTypeAnnotation>;
+        IntersectionTypeAnnotation: NamedType<IntersectionTypeAnnotation>;
+        TypeofTypeAnnotation: NamedType<TypeofTypeAnnotation>;
+        TypeParameter: NamedType<TypeParameter>;
+        ClassImplements: NamedType<ClassImplements>;
+        InterfaceDeclaration: NamedType<InterfaceDeclaration>;
+        InterfaceExtends: NamedType<InterfaceExtends>;
+        DeclareInterface: NamedType<DeclareInterface>;
+        TypeAlias: NamedType<TypeAlias>;
+        OpaqueType: NamedType<OpaqueType>;
+        DeclareTypeAlias: NamedType<DeclareTypeAlias>;
+        DeclareOpaqueType: NamedType<DeclareOpaqueType>;
+        TypeCastExpression: NamedType<TypeCastExpression>;
+        TupleTypeAnnotation: NamedType<TupleTypeAnnotation>;
+        DeclareVariable: NamedType<DeclareVariable>;
+        DeclareFunction: NamedType<DeclareFunction>;
+        DeclareClass: NamedType<DeclareClass>;
+        DeclareModule: NamedType<DeclareModule>;
+        DeclareModuleExports: NamedType<DeclareModuleExports>;
+        DeclareExportDeclaration: NamedType<DeclareExportDeclaration>;
+        ExportSpecifier: NamedType<ExportSpecifier>;
+        ExportBatchSpecifier: NamedType<ExportBatchSpecifier>;
+        DeclareExportAllDeclaration: NamedType<DeclareExportAllDeclaration>;
+        ExportDeclaration: NamedType<ExportDeclaration>;
+        Block: NamedType<Block>;
+        Line: NamedType<Line>;
+        Noop: NamedType<Noop>;
+        DoExpression: NamedType<DoExpression>;
+        Super: NamedType<Super>;
+        BindExpression: NamedType<BindExpression>;
+        Decorator: NamedType<Decorator>;
+        MetaProperty: NamedType<MetaProperty>;
+        ParenthesizedExpression: NamedType<ParenthesizedExpression>;
+        ExportDefaultDeclaration: NamedType<ExportDefaultDeclaration>;
+        ExportNamedDeclaration: NamedType<ExportNamedDeclaration>;
+        ExportNamespaceSpecifier: NamedType<ExportNamespaceSpecifier>;
+        ExportDefaultSpecifier: NamedType<ExportDefaultSpecifier>;
+        ExportAllDeclaration: NamedType<ExportAllDeclaration>;
+        CommentBlock: NamedType<CommentBlock>;
+        CommentLine: NamedType<CommentLine>;
+        Directive: NamedType<Directive>;
+        DirectiveLiteral: NamedType<DirectiveLiteral>;
+        StringLiteral: NamedType<StringLiteral>;
+        NumericLiteral: NamedType<NumericLiteral>;
+        BigIntLiteral: NamedType<BigIntLiteral>;
+        NullLiteral: NamedType<NullLiteral>;
+        BooleanLiteral: NamedType<BooleanLiteral>;
+        RegExpLiteral: NamedType<RegExpLiteral>;
+        ObjectMethod: NamedType<ObjectMethod>;
+        ObjectProperty: NamedType<ObjectProperty>;
+        ClassMethod: NamedType<ClassMethod>;
+        RestProperty: NamedType<RestProperty>;
+        ForAwaitStatement: NamedType<ForAwaitStatement>;
+        Import: NamedType<Import>;
+        TSType: NamedType<TSType>;
+        TSQualifiedName: NamedType<TSQualifiedName>;
+        TSTypeReference: NamedType<TSTypeReference>;
+        TSTypeParameterInstantiation: NamedType<TSTypeParameterInstantiation>;
+        TSHasOptionalTypeParameters: NamedType<TSHasOptionalTypeParameters>;
+        TSTypeParameterDeclaration: NamedType<TSTypeParameterDeclaration>;
+        TSHasOptionalTypeAnnotation: NamedType<TSHasOptionalTypeAnnotation>;
+        TSAsExpression: NamedType<TSAsExpression>;
+        TSNonNullExpression: NamedType<TSNonNullExpression>;
+        TSAnyKeyword: NamedType<TSAnyKeyword>;
+        TSBooleanKeyword: NamedType<TSBooleanKeyword>;
+        TSNeverKeyword: NamedType<TSNeverKeyword>;
+        TSNullKeyword: NamedType<TSNullKeyword>;
+        TSNumberKeyword: NamedType<TSNumberKeyword>;
+        TSObjectKeyword: NamedType<TSObjectKeyword>;
+        TSStringKeyword: NamedType<TSStringKeyword>;
+        TSSymbolKeyword: NamedType<TSSymbolKeyword>;
+        TSUndefinedKeyword: NamedType<TSUndefinedKeyword>;
+        TSVoidKeyword: NamedType<TSVoidKeyword>;
+        TSThisType: NamedType<TSThisType>;
+        TSArrayType: NamedType<TSArrayType>;
+        TSLiteralType: NamedType<TSLiteralType>;
+        TSUnionType: NamedType<TSUnionType>;
+        TSIntersectionType: NamedType<TSIntersectionType>;
+        TSConditionalType: NamedType<TSConditionalType>;
+        TSInferType: NamedType<TSInferType>;
+        TSParenthesizedType: NamedType<TSParenthesizedType>;
+        TSFunctionType: NamedType<TSFunctionType>;
+        TSConstructorType: NamedType<TSConstructorType>;
+        TSDeclareFunction: NamedType<TSDeclareFunction>;
+        TSDeclareMethod: NamedType<TSDeclareMethod>;
+        TSMappedType: NamedType<TSMappedType>;
+        TSTypeParameter: NamedType<TSTypeParameter>;
+        TSTupleType: NamedType<TSTupleType>;
+        TSIndexedAccessType: NamedType<TSIndexedAccessType>;
+        TSTypeOperator: NamedType<TSTypeOperator>;
+        TSIndexSignature: NamedType<TSIndexSignature>;
+        TSPropertySignature: NamedType<TSPropertySignature>;
+        TSMethodSignature: NamedType<TSMethodSignature>;
+        TSTypePredicate: NamedType<TSTypePredicate>;
+        TSCallSignatureDeclaration: NamedType<TSCallSignatureDeclaration>;
+        TSConstructSignatureDeclaration: NamedType<TSConstructSignatureDeclaration>;
+        TSEnumMember: NamedType<TSEnumMember>;
+        TSTypeQuery: NamedType<TSTypeQuery>;
+        TSTypeLiteral: NamedType<TSTypeLiteral>;
+        TSTypeAssertion: NamedType<TSTypeAssertion>;
+        TSEnumDeclaration: NamedType<TSEnumDeclaration>;
+        TSTypeAliasDeclaration: NamedType<TSTypeAliasDeclaration>;
+        TSModuleBlock: NamedType<TSModuleBlock>;
+        TSModuleDeclaration: NamedType<TSModuleDeclaration>;
+        TSImportEqualsDeclaration: NamedType<TSImportEqualsDeclaration>;
+        TSExternalModuleReference: NamedType<TSExternalModuleReference>;
+        TSExportAssignment: NamedType<TSExportAssignment>;
+        TSNamespaceExportDeclaration: NamedType<TSNamespaceExportDeclaration>;
+        TSInterfaceBody: NamedType<TSInterfaceBody>;
+        TSExpressionWithTypeArguments: NamedType<TSExpressionWithTypeArguments>;
+        TSInterfaceDeclaration: NamedType<TSInterfaceDeclaration>;
+        TSParameterProperty: NamedType<TSParameterProperty>;
     }
 }

@@ -5,8 +5,7 @@ import * as jscodeshift from 'jscodeshift';
 import { CodeModDefinition } from '../models/CodeMod';
 
 class CodeModService {
-    constructor() {
-    }
+    constructor() {}
 
     private _parseCodeModFile(fileName: string): CodeModDefinition {
         let modFn;
@@ -44,19 +43,27 @@ class CodeModService {
         });
     }
 
-    public runCodeMod(options: { mod: CodeModDefinition, fileName: string, source: string, selection: { startPos: number, endPos: number } }): string {
+    public runCodeMod(options: {
+        mod: CodeModDefinition;
+        fileName: string;
+        source: string;
+        selection: { startPos: number; endPos: number };
+    }): string {
         const j = jscodeshift.withParser('tsx');
         let result;
         result = options.mod.modFn(
             {
                 path: options.fileName,
                 source: options.source
-            }, {
+            },
+            {
                 jscodeshift: j,
-                stats: {}
-            }, {
+                stats: () => ({})
+            },
+            {
                 selection: options.selection
-            });
+            }
+        );
         if (!result) {
             return options.source;
         }

@@ -1,6 +1,7 @@
-import { CodeModExports } from "../models/CodeMod";
+import { CodeModExports } from '../models/CodeMod';
+import { FunctionDeclaration } from 'ast-types';
 
-let codeMod: CodeModExports = function (fileInfo, api, options) {
+let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const text = fileInfo.source;
     const src = j(text);
@@ -9,16 +10,12 @@ let codeMod: CodeModExports = function (fileInfo, api, options) {
         result.nodes()[0].id.name = 'bar';
     }
 
-    if (src === text) {
-        return null;
-    }
-
     let resultText = src.toSource();
     return resultText;
 };
-codeMod.canRun = function (fileInfo, api, options) {
+codeMod.canRun = function(fileInfo, api, options) {
     return true;
-}
+};
 codeMod.name = 'Add magic statements';
 codeMod.description = 'No harm intended';
 codeMod.detail = 'The statements added are scattered evenly throughout the code';

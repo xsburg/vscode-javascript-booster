@@ -1,4 +1,4 @@
-import { JsCodeShift } from "./jscodeshift";
+import { JsCodeShift } from 'jscodeshift';
 
 type CodeModTransform = (
     fileInfo: { path: string; source: string },
@@ -8,7 +8,8 @@ type CodeModTransform = (
             startPos: number;
             endPos: number;
         };
-    }) => string | undefined | null;
+    }
+) => string | undefined | null;
 
 export interface CodeModExports extends CodeModTransform {
     canRun?: (
@@ -19,7 +20,8 @@ export interface CodeModExports extends CodeModTransform {
                 startPos: number;
                 endPos: number;
             };
-        }) => boolean;
+        }
+    ) => boolean;
     name?: string;
     description?: string;
     detail?: string;
