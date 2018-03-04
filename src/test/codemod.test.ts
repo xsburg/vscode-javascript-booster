@@ -5,30 +5,30 @@ import * as prettier from 'prettier';
 
 const babylon = require('babylon');
 const parserOptions = {
-  sourceType: 'module',
-  allowImportExportEverywhere: true,
-  allowReturnOutsideFunction: true,
-  plugins: [
-    'jsx',
-    'typescript',
-    'asyncFunctions',
-    'classConstructorCall',
-    'doExpressions',
-    'trailingFunctionCommas',
-    'objectRestSpread',
-    'decorators',
-    'classProperties',
-    'exportExtensions',
-    'exponentiationOperator',
-    'asyncGenerators',
-    'functionBind',
-    'functionSent',
-    'dynamicImport',
-  ],
+    sourceType: 'module',
+    allowImportExportEverywhere: true,
+    allowReturnOutsideFunction: true,
+    plugins: [
+        'jsx',
+        'typescript',
+        'asyncFunctions',
+        'classConstructorCall',
+        'doExpressions',
+        'trailingFunctionCommas',
+        'objectRestSpread',
+        'decorators',
+        'classProperties',
+        'exportExtensions',
+        'exponentiationOperator',
+        'asyncGenerators',
+        'functionBind',
+        'functionSent',
+        'dynamicImport'
+    ]
 };
 
-suite("CodeMod Tests", () => {
-    test("Something 1", () => {
+suite('CodeMod Tests', () => {
+    test('Something 1', () => {
         const text = `const a = 1;
         const c = 1;
         
@@ -65,10 +65,14 @@ suite("CodeMod Tests", () => {
             if (result.length > 0) {
                 result.nodes()[0].id.name = 'bar';
             }
-        } catch (e) {
-        }
+        } catch (e) {}
 
         let resultText = src.toSource();
         resultText = prettier.format(resultText);
     });
 });
+
+/* suite("CodeMod Tests", () => {
+    test("Something 1", () => {
+    });
+}); */

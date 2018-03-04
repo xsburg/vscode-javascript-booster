@@ -18,7 +18,8 @@ Refactorings:
 * Remove else statement
 * Convert String to Template String
 * Convert lambda expression to lambda statement
-* Merge declaration & initialisation (for let & const)
+* Merge declaration and initialisation (for let & const)
+* Split into declaration and initialisation
 * Wrap value with {} (JSX attributes)
 
 Commands:

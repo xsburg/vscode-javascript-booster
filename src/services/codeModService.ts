@@ -110,11 +110,12 @@ class CodeModService {
         return codeMods;
     }
 
-    public async getGlobalMods(options: {
-        fileName: string;
-        source: string;
-        selection: { startPos: vscode.Position; endPos: vscode.Position };
-    }) {}
+    public async getGlobalMods() {
+        const mods = (await this._getAllCodeMods()).filter(
+            mod => mod.scope === CodeModScope.Global
+        );
+        return mods;
+    }
 
     public async getCodeActionMods(options: {
         fileName: string;

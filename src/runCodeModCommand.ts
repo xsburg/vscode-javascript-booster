@@ -17,17 +17,22 @@ export async function runCodeModCommand(codemod?: CodeModDefinition) {
         return;
     }
 
-    const codeMods = await codeModService.reloadAllCodeMods();
-    const selectedMod = await window.showQuickPick(
-        codeMods.map(mod => ({
-            label: mod.name,
-            description: mod.description,
-            detail: mod.detail,
-            mod
-        }))
-    );
-    if (!selectedMod) {
-        return;
+    let selectedMod;
+    if (!codemod) {
+        const codeMods = await codeModService.getGlobalMods();
+        selectedMod = await window.showQuickPick(
+            codeMods.map(mod => ({
+                label: mod.name,
+                description: mod.description,
+                detail: mod.detail,
+                mod
+            }))
+        );
+        if (!selectedMod) {
+            return;
+        }
+    } else {
+        selectedMod = codemod;
     }
 
     const source = document.getText();
