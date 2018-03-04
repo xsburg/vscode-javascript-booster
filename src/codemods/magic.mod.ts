@@ -5,7 +5,7 @@ import { findNodeAtPosition } from '../utils';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = j(fileInfo.source);
+    const src = fileInfo.ast;
     let result = src.find(j.FunctionDeclaration);
     if (result.length > 0) {
         result.nodes()[0].id.name = 'bar';
@@ -17,11 +17,13 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = j(fileInfo.source);
+    const src = fileInfo.ast;
     const pos = options.selection.endPos;
     const target = findNodeAtPosition(j, src, pos);
     return j.IfStatement.check(target.nodes()[0]);
 };
+
+codeMod.scope = 'cursor';
 
 codeMod.title = 'Add magic statements';
 

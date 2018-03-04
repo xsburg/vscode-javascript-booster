@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import codeModService from './services/codeModService';
+import { commandIds } from './const';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
     public async provideCodeActions(
@@ -17,7 +18,7 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         }
 
         const source = document.getText();
-        const codeMods = await codeModService.getExecutableMods({
+        const codeMods = await codeModService.getCodeActionMods({
             fileName: document.fileName,
             source,
             selection: {
@@ -30,7 +31,7 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
                 ({
                     title: mod.name,
                     tooltip: mod.detail || mod.description,
-                    command: 'javascriptActionPack.runCodeMod',
+                    command: commandIds.runCodeMod,
                     arguments: [mod]
                 } as vscode.Command)
         );

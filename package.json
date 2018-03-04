@@ -22,6 +22,10 @@
             {
                 "command": "javascriptActionPack.runCodeMod",
                 "title": "Run JS CodeMod"
+            },
+            {
+                "command": "javascriptActionPack.reloadCodeMods",
+                "title": "Reload CodeMods"
             }
         ]
     },

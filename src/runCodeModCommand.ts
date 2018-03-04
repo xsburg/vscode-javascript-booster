@@ -16,7 +16,7 @@ export async function runCodeModCommand() {
         return;
     }
 
-    const codeMods = await codeModService.loadAllCodeMods();
+    const codeMods = await codeModService.reloadAllCodeMods();
     const selectedMod = await window.showQuickPick(
         codeMods.map(mod => ({
             label: mod.name,
