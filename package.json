@@ -18,10 +18,12 @@
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [{
-            "command": "javascriptActionPack.runCodeMod",
-            "title": "Run JS CodeMod"
-        }]
+        "commands": [
+            {
+                "command": "javascriptActionPack.runCodeMod",
+                "title": "Run JS CodeMod"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

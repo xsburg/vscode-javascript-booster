@@ -147,7 +147,7 @@ function generateBuildersInterface(types, typeDefs) {
 function generateNamedTypes(types, typeDefs) {
     const interfaces = Object.values(typeDefs)
         .map(def => {
-            const typeName = def.typeName === 'Node' ? 'AstNode' : def.typeName;
+            const typeName = def.typeName;
             const fields = Object.values(def.ownFields).map(function(field, i) {
                 let typeStr =
                     typeof field.type.name === 'function' ? field.type.name() : field.type.name;
@@ -174,7 +174,7 @@ function generateNamedTypes(types, typeDefs) {
             const supertypes = def.baseNames;
             let extendsBlock;
             if (supertypes.length > 0) {
-                extendsBlock = supertypes.map(st => (st === 'Node' ? 'AstNode' : st)).join(', ');
+                extendsBlock = supertypes.join(', ');
             } else {
                 extendsBlock = 'NodeBase';
             }
@@ -198,7 +198,7 @@ function generateTypeUnion(types, typeDefs) {
         .map(def => def.typeName)
         .join('\n        | ');
 
-    return `    export type Node = ${options};\n`;
+    return `    export type AstNode = ${options};\n`;
 }
 
 function generateNamedTypesObject(types, typeDefs) {

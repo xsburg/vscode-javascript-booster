@@ -1,28 +1,31 @@
-import { JsCodeShift } from 'jscodeshift';
+import { JsCodeShift, Collection } from 'jscodeshift';
+import { Position } from '../utils/Position';
 
 type CodeModTransform = (
-    fileInfo: { path: string; source: string },
+    fileInfo: { path: string; source: string; ast: Collection },
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         selection: {
-            startPos: number;
-            endPos: number;
+            startPos: Position;
+            endPos: Position;
         };
     }
 ) => string | undefined | null;
 
+type CanRunFunction = (
+    fileInfo: { path: string; source: string; ast: Collection },
+    api: { jscodeshift: JsCodeShift; stats(value: string): void },
+    options: {
+        selection: {
+            startPos: Position;
+            endPos: Position;
+        };
+    }
+) => boolean;
+
 export interface CodeModExports extends CodeModTransform {
-    canRun?: (
-        fileInfo: { path: string; source: string },
-        api: { jscodeshift: JsCodeShift; stats(value: string): void },
-        options: {
-            selection: {
-                startPos: number;
-                endPos: number;
-            };
-        }
-    ) => boolean;
-    name?: string;
+    canRun?: CanRunFunction;
+    title?: string;
     description?: string;
     detail?: string;
 }
@@ -32,4 +35,5 @@ export interface CodeModDefinition {
     description: string;
     detail?: string;
     modFn: CodeModTransform;
+    canRun?: CanRunFunction;
 }

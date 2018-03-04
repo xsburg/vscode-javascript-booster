@@ -10,7 +10,7 @@ declare module 'ast-types' {
         source: string | null;
     }
 
-    export interface AstNode extends Printable {
+    export interface Node extends Printable {
         type: string;
         comments: Array<Comment> | null;
     }
@@ -27,23 +27,23 @@ declare module 'ast-types' {
         column: number;
     }
 
-    export interface File extends AstNode {
+    export interface File extends Node {
         type: string;
         program: Program;
         name: string | null;
     }
 
-    export interface Program extends AstNode {
+    export interface Program extends Node {
         type: string;
         body: Array<Statement>;
         directives: Array<Directive>;
     }
 
-    export interface Statement extends AstNode {
+    export interface Statement extends Node {
 
     }
 
-    export interface Function extends AstNode {
+    export interface Function extends Node {
         id: Identifier | null;
         params: Array<Pattern>;
         body: BlockStatement | Expression;
@@ -56,15 +56,15 @@ declare module 'ast-types' {
         typeParameters: TypeParameterDeclaration | null;
     }
 
-    export interface Pattern extends AstNode {
+    export interface Pattern extends Node {
 
     }
 
-    export interface Expression extends AstNode, Pattern {
+    export interface Expression extends Node, Pattern {
 
     }
 
-    export interface Identifier extends AstNode, Expression, Pattern {
+    export interface Identifier extends Node, Expression, Pattern {
         type: string;
         name: string;
         optional: boolean;
@@ -122,7 +122,7 @@ declare module 'ast-types' {
         lexical: boolean;
     }
 
-    export interface SwitchCase extends AstNode {
+    export interface SwitchCase extends Node {
         type: string;
         test: Expression | null;
         consequent: Array<Statement>;
@@ -147,7 +147,7 @@ declare module 'ast-types' {
         finalizer: BlockStatement | null;
     }
 
-    export interface CatchClause extends AstNode {
+    export interface CatchClause extends Node {
         type: string;
         param: Pattern | null;
         guard: Expression | null;
@@ -205,7 +205,7 @@ declare module 'ast-types' {
         type: string;
     }
 
-    export interface VariableDeclarator extends AstNode {
+    export interface VariableDeclarator extends Node {
         type: string;
         id: Pattern;
         init: Expression | null;
@@ -225,7 +225,7 @@ declare module 'ast-types' {
         properties: Array<Property | ObjectMethod | ObjectProperty | SpreadProperty | SpreadElement>;
     }
 
-    export interface Property extends AstNode {
+    export interface Property extends Node {
         type: string;
         kind: any /* init | get | set */;
         key: Literal | Identifier | Expression;
@@ -236,7 +236,7 @@ declare module 'ast-types' {
         decorators: Array<Decorator> | null;
     }
 
-    export interface Literal extends AstNode, Expression {
+    export interface Literal extends Node, Expression {
         type: string;
         value: string | boolean | null | number | RegExp;
         regex: { "pattern": string, "flags": string } | null;
@@ -314,12 +314,12 @@ declare module 'ast-types' {
         typeAnnotation: TypeAnnotation | TSTypeAnnotation | null;
     }
 
-    export interface TypeAnnotation extends AstNode {
+    export interface TypeAnnotation extends Node {
         type: string;
         typeAnnotation: Type;
     }
 
-    export interface TSTypeAnnotation extends AstNode {
+    export interface TSTypeAnnotation extends Node {
         type: string;
         typeAnnotation: TSType | TSTypeAnnotation;
     }
@@ -356,7 +356,7 @@ declare module 'ast-types' {
         filter: Expression | null;
     }
 
-    export interface ComprehensionBlock extends AstNode {
+    export interface ComprehensionBlock extends Node {
         type: string;
         left: Pattern;
         right: Expression;
@@ -399,7 +399,7 @@ declare module 'ast-types' {
         decorators: Array<Decorator> | null;
     }
 
-    export interface SpreadElement extends AstNode {
+    export interface SpreadElement extends Node {
         type: string;
         argument: Expression;
     }
@@ -450,7 +450,7 @@ declare module 'ast-types' {
         implements: Array<TSExpressionWithTypeArguments>;
     }
 
-    export interface Specifier extends AstNode {
+    export interface Specifier extends Node {
 
     }
 
@@ -492,13 +492,13 @@ declare module 'ast-types' {
         expressions: Array<Expression>;
     }
 
-    export interface TemplateElement extends AstNode {
+    export interface TemplateElement extends Node {
         type: string;
         value: { "cooked": string, "raw": string };
         tail: boolean;
     }
 
-    export interface SpreadProperty extends AstNode {
+    export interface SpreadProperty extends Node {
         type: string;
         argument: Expression;
     }
@@ -565,7 +565,7 @@ declare module 'ast-types' {
         right: Expression;
     }
 
-    export interface XML extends AstNode {
+    export interface XML extends Node {
 
     }
 
@@ -618,7 +618,7 @@ declare module 'ast-types' {
         contents: string | null;
     }
 
-    export interface JSXAttribute extends AstNode {
+    export interface JSXAttribute extends Node {
         type: string;
         name: JSXIdentifier | JSXNamespacedName;
         value: Literal | JSXExpressionContainer | null;
@@ -629,7 +629,7 @@ declare module 'ast-types' {
         name: string;
     }
 
-    export interface JSXNamespacedName extends AstNode {
+    export interface JSXNamespacedName extends Node {
         type: string;
         namespace: JSXIdentifier;
         name: JSXIdentifier;
@@ -647,7 +647,7 @@ declare module 'ast-types' {
         computed: boolean;
     }
 
-    export interface JSXSpreadAttribute extends AstNode {
+    export interface JSXSpreadAttribute extends Node {
         type: string;
         argument: Expression;
     }
@@ -662,14 +662,14 @@ declare module 'ast-types' {
         attributes: Array<JSXAttribute | JSXSpreadAttribute>;
     }
 
-    export interface JSXOpeningElement extends AstNode {
+    export interface JSXOpeningElement extends Node {
         type: string;
         name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression;
         attributes: Array<JSXAttribute | JSXSpreadAttribute>;
         selfClosing: boolean;
     }
 
-    export interface JSXClosingElement extends AstNode {
+    export interface JSXClosingElement extends Node {
         type: string;
         name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression;
     }
@@ -686,11 +686,11 @@ declare module 'ast-types' {
         value: string;
     }
 
-    export interface JSXOpeningFragment extends AstNode {
+    export interface JSXOpeningFragment extends Node {
         type: string;
     }
 
-    export interface JSXClosingFragment extends AstNode {
+    export interface JSXClosingFragment extends Node {
         type: string;
     }
 
@@ -703,7 +703,7 @@ declare module 'ast-types' {
         expression: Expression;
     }
 
-    export interface Type extends AstNode {
+    export interface Type extends Node {
 
     }
 
@@ -792,14 +792,14 @@ declare module 'ast-types' {
         typeParameters: TypeParameterDeclaration | null;
     }
 
-    export interface FunctionTypeParam extends AstNode {
+    export interface FunctionTypeParam extends Node {
         type: string;
         name: Identifier;
         typeAnnotation: Type;
         optional: boolean;
     }
 
-    export interface TypeParameterDeclaration extends AstNode {
+    export interface TypeParameterDeclaration extends Node {
         type: string;
         params: Array<TypeParameter>;
     }
@@ -817,7 +817,7 @@ declare module 'ast-types' {
         exact: boolean;
     }
 
-    export interface ObjectTypeProperty extends AstNode {
+    export interface ObjectTypeProperty extends Node {
         type: string;
         key: Literal | Identifier;
         value: Type;
@@ -825,12 +825,12 @@ declare module 'ast-types' {
         variance: any /* Variance | plus | minus | null */;
     }
 
-    export interface ObjectTypeSpreadProperty extends AstNode {
+    export interface ObjectTypeSpreadProperty extends Node {
         type: string;
         argument: Type;
     }
 
-    export interface ObjectTypeIndexer extends AstNode {
+    export interface ObjectTypeIndexer extends Node {
         type: string;
         id: Identifier;
         key: Type;
@@ -838,18 +838,18 @@ declare module 'ast-types' {
         variance: any /* Variance | plus | minus | null */;
     }
 
-    export interface ObjectTypeCallProperty extends AstNode {
+    export interface ObjectTypeCallProperty extends Node {
         type: string;
         value: FunctionTypeAnnotation;
         static: boolean;
     }
 
-    export interface Variance extends AstNode {
+    export interface Variance extends Node {
         type: string;
         kind: any /* plus | minus */;
     }
 
-    export interface QualifiedTypeIdentifier extends AstNode {
+    export interface QualifiedTypeIdentifier extends Node {
         type: string;
         qualification: Identifier | QualifiedTypeIdentifier;
         id: Identifier;
@@ -861,7 +861,7 @@ declare module 'ast-types' {
         typeParameters: TypeParameterInstantiation | null;
     }
 
-    export interface TypeParameterInstantiation extends AstNode {
+    export interface TypeParameterInstantiation extends Node {
         type: string;
         params: Array<Type>;
     }
@@ -894,7 +894,7 @@ declare module 'ast-types' {
         bound: TypeAnnotation | null;
     }
 
-    export interface ClassImplements extends AstNode {
+    export interface ClassImplements extends Node {
         type: string;
         id: Identifier;
         superClass: Expression | null;
@@ -909,7 +909,7 @@ declare module 'ast-types' {
         extends: Array<InterfaceExtends>;
     }
 
-    export interface InterfaceExtends extends AstNode {
+    export interface InterfaceExtends extends Node {
         type: string;
         id: Identifier;
         typeParameters: TypeParameterInstantiation | null;
@@ -1035,7 +1035,7 @@ declare module 'ast-types' {
         callee: Expression;
     }
 
-    export interface Decorator extends AstNode {
+    export interface Decorator extends Node {
         type: string;
         expression: Expression;
     }
@@ -1087,12 +1087,12 @@ declare module 'ast-types' {
         type: string;
     }
 
-    export interface Directive extends AstNode {
+    export interface Directive extends Node {
         type: string;
         value: DirectiveLiteral;
     }
 
-    export interface DirectiveLiteral extends AstNode, Expression {
+    export interface DirectiveLiteral extends Node, Expression {
         type: string;
         value: string;
     }
@@ -1132,7 +1132,7 @@ declare module 'ast-types' {
         value: RegExp;
     }
 
-    export interface ObjectMethod extends AstNode, Function {
+    export interface ObjectMethod extends Node, Function {
         type: string;
         kind: any /* method | get | set */;
         key: Literal | Identifier | Expression;
@@ -1145,7 +1145,7 @@ declare module 'ast-types' {
         decorators: Array<Decorator> | null;
     }
 
-    export interface ObjectProperty extends AstNode {
+    export interface ObjectProperty extends Node {
         type: string;
         key: Literal | Identifier | Expression;
         value: Expression | Pattern;
@@ -1166,7 +1166,7 @@ declare module 'ast-types' {
         decorators: Array<Decorator> | null;
     }
 
-    export interface RestProperty extends AstNode {
+    export interface RestProperty extends Node {
         type: string;
         argument: Expression;
     }
@@ -1182,11 +1182,11 @@ declare module 'ast-types' {
         type: string;
     }
 
-    export interface TSType extends AstNode {
+    export interface TSType extends Node {
 
     }
 
-    export interface TSQualifiedName extends AstNode {
+    export interface TSQualifiedName extends Node {
         type: string;
         left: Identifier | TSQualifiedName;
         right: Identifier | TSQualifiedName;
@@ -1197,7 +1197,7 @@ declare module 'ast-types' {
         typeParameters: TSTypeParameterInstantiation | null;
     }
 
-    export interface TSTypeParameterInstantiation extends AstNode {
+    export interface TSTypeParameterInstantiation extends Node {
         type: string;
         params: Array<TSType>;
     }
@@ -1416,7 +1416,7 @@ declare module 'ast-types' {
         parameters: Array<Identifier | RestElement>;
     }
 
-    export interface TSEnumMember extends AstNode {
+    export interface TSEnumMember extends Node {
         type: string;
         id: Identifier | StringLiteral;
         initializer: Expression | null;
@@ -1455,7 +1455,7 @@ declare module 'ast-types' {
         typeAnnotation: TSType;
     }
 
-    export interface TSModuleBlock extends AstNode {
+    export interface TSModuleBlock extends Node {
         type: string;
         body: Array<Statement>;
     }
@@ -1490,7 +1490,7 @@ declare module 'ast-types' {
         id: Identifier;
     }
 
-    export interface TSInterfaceBody extends AstNode {
+    export interface TSInterfaceBody extends Node {
         type: string;
         body: Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature>;
     }
@@ -1783,7 +1783,7 @@ declare module 'ast-types' {
         | 'TSInterfaceDeclaration'
         | 'TSParameterProperty';
 
-    export type Node = SourceLocation
+    export type AstNode = SourceLocation
         | Position
         | File
         | Program

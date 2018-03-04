@@ -10,7 +10,7 @@ declare module 'ast-types' {
          * @example path.parentPath.value === path.parent.node.elements
          * // `elements` property is a mediator object (not an AST-node)
          */
-        parentPath: NodePath;
+        parentPath: Path;
 
         // The value here might be either a node or a mediator object
         value: any;
@@ -31,17 +31,17 @@ declare module 'ast-types' {
 
         shift();
 
-        unshift(node: Node);
+        unshift(node: AstNode);
 
-        push(node: Node);
+        push(node: AstNode);
 
-        pop(node: Node);
+        pop(node: AstNode);
 
-        insertAt(index: number, node: Node): Path;
+        insertAt(index: number, node: AstNode): Path;
 
-        insertBefore(index: number, node: Node): Path;
+        insertBefore(index: number, node: AstNode): Path;
 
-        insertAfter(index: number, node: Node): Path;
+        insertAfter(index: number, node: AstNode): Path;
 
         replace(replacement);
     }
@@ -82,8 +82,8 @@ declare module 'ast-types' {
     export class Type {
         constructor(check: (value: any) => boolean, name: string | Function);
 
-        assert(value: any, deep: any): boolean;
-        check(value: any, deep: any): boolean;
+        assert(value: any, deep?: any): boolean;
+        check(value: any, deep?: any): boolean;
         toString(): string;
     }
 
@@ -120,12 +120,12 @@ declare module 'ast-types' {
     /**
      * Like Object.keys, but aware of what fields each AST type should have.
      */
-    export function getFieldNames(node: Node): string[];
+    export function getFieldNames(node: AstNode): string[];
 
     /**
      * Get the value of an object property, taking object.type and default functions into account.
      */
-    export function getFieldValue(node: Node, fieldName: string): any;
+    export function getFieldValue(node: AstNode, fieldName: string): any;
 
     /**
      * Iterate over all defined fields of an object, including those missing
@@ -134,7 +134,7 @@ declare module 'ast-types' {
      * Def, the callback will never be called.
      */
     export function eachField(
-        node: Node,
+        node: AstNode,
         callback: (fieldName: string, fieldValue: any) => void,
         context: any
     ): void;
@@ -146,7 +146,7 @@ declare module 'ast-types' {
      * returned true for any element or not.
      */
     export function someField(
-        node: Node,
+        node: AstNode,
         callback: (fieldName: string, fieldValue: any) => boolean,
         context: any
     ): boolean;
@@ -157,8 +157,8 @@ declare module 'ast-types' {
      */
     export function getSupertypeNames(): TypeName[];
 
-    export const astNodesAreEquivalent: ((a: Node, b: Node) => boolean) & {
-        assert(a: Node, b: Node): void;
+    export const astNodesAreEquivalent: ((a: AstNode, b: AstNode) => boolean) & {
+        assert(a: AstNode, b: AstNode): void;
     };
 
     export function finalize(): void;

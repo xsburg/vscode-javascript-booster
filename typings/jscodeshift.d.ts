@@ -1,5 +1,14 @@
 declare module 'jscodeshift' {
-    import { NodePath, Node, Builders, NamedTypes, AstTypes, Type, NamedType } from 'ast-types';
+    import {
+        NodePath,
+        Node,
+        Builders,
+        NamedTypes,
+        AstTypes,
+        Type,
+        NamedType,
+        AstNode
+    } from 'ast-types';
     import { RecastPrinterOptions, Parser, RecastParserOptions } from 'recast';
 
     interface CollectionBase<TNode> {
@@ -210,7 +219,7 @@ declare module 'jscodeshift' {
          * @param {filter} filter
          * @return {Collection}
          */
-        closest(type: Collection, filter: any): Collection;
+        closest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode>;
 
         /**
          * Finds the declaration for each selected path. Useful for member expressions
@@ -233,7 +242,9 @@ declare module 'jscodeshift' {
          * @param {Node|Array<Node>|function} nodes
          * @return {Collection}
          */
-        replaceWith(nodes: Node | Node[] | ((node: Node, i: number) => Node)): Collection;
+        replaceWith(
+            nodes: AstNode | AstNode[] | ((node: AstNode, i: number) => AstNode)
+        ): Collection;
 
         /**
          * Inserts a new node before the current one.
@@ -241,7 +252,9 @@ declare module 'jscodeshift' {
          * @param {Node|Array<Node>|function} insert
          * @return {Collection}
          */
-        insertBefore(insert: Node | Node[] | ((node: Node, i: number) => Node)): Collection;
+        insertBefore(
+            insert: AstNode | AstNode[] | ((node: AstNode, i: number) => AstNode)
+        ): Collection;
 
         /**
          * Inserts a new node after the current one.
@@ -249,7 +262,9 @@ declare module 'jscodeshift' {
          * @param {Node|Array<Node>|function} insert
          * @return {Collection}
          */
-        insertAfter(insert: Node | Node[] | ((node: Node, i: number) => Node)): Collection;
+        insertAfter(
+            insert: AstNode | AstNode[] | ((node: AstNode, i: number) => AstNode)
+        ): Collection;
 
         remove(): Collection;
     }
@@ -272,7 +287,7 @@ declare module 'jscodeshift' {
         renameTo(newName: string): Collection;
     }
 
-    export interface Collection<TNode = any>
+    export interface Collection<TNode = AstNode>
         extends CollectionBase<TNode>,
             CollectionJSXElementExtension<TNode>,
             CollectionNodeExtension<TNode>,
@@ -324,7 +339,7 @@ declare module 'jscodeshift' {
          * @param {Object} filter
          * @return boolean
          */
-        match(path: Node | NodePath<any> | any, filter: any);
+        match(path: AstNode | NodePath<any> | any, filter: any);
 
         /**
          * Utility function for registering plugins.

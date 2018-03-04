@@ -1,58 +1,38 @@
 import * as vscode from 'vscode';
+import codeModService from './services/codeModService';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
-	public provideCodeActions(
-		document: vscode.TextDocument,
-		range: vscode.Range,
-		context: vscode.CodeActionContext,
-		token: vscode.CancellationToken
-	): Thenable<vscode.Command[]> {
-		console.log('code action checker!');
-		return Promise.resolve([
-			{
-				title: 'Code Action 1',
-				tooltip: 'Code Action 1 Tooltip',
-				command: 'extension.sayCodeAction',
-				arguments: [
-					'foo',
-					{
-						a: 2
-					}
-				]
-			}
-		] as vscode.Command[]);
-        /* let promises = context.diagnostics.map(diag => {
-			// When a name is not found but could refer to a package, offer to add import
-			if (diag.message.indexOf('undefined: ') === 0) {
-				let [_, name] = /^undefined: (\S*)/.exec(diag.message);
-				return listPackages().then(packages => {
-					let commands = packages
-						.filter(pkg => pkg === name || pkg.endsWith('/' + name))
-						.map(pkg => {
-							return {
-								title: 'import "' + pkg + '"',
-								command: 'go.import.add',
-								arguments: [pkg]
-							};
-						});
-					return commands;
-				});
-			}
-			return [];
-		});
+    public async provideCodeActions(
+        document: vscode.TextDocument,
+        range: vscode.Range,
+        context: vscode.CodeActionContext,
+        token: vscode.CancellationToken
+    ): Promise<vscode.Command[]> {
+        if (
+            ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'].indexOf(
+                document.languageId
+            ) === -1
+        ) {
+            return;
+        }
 
-		return Promise.all(promises).then(arrs => {
-			let results = {};
-			for (let segment of arrs) {
-				for (let item of segment) {
-					results[item.title] = item;
-				}
-			}
-			let ret = [];
-			for (let title of Object.keys(results).sort()) {
-				ret.push(results[title]);
-			}
-			return ret;
-		}); */
-	}
+        const source = document.getText();
+        const codeMods = await codeModService.getExecutableMods({
+            fileName: document.fileName,
+            source,
+            selection: {
+                startPos: range.start,
+                endPos: range.end
+            }
+        });
+        return codeMods.map(
+            mod =>
+                ({
+                    title: mod.name,
+                    tooltip: mod.detail || mod.description,
+                    command: 'javascriptActionPack.runCodeMod',
+                    arguments: [mod]
+                } as vscode.Command)
+        );
+    }
 }

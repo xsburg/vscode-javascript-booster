@@ -29,11 +29,6 @@ export async function runCodeModCommand() {
         return;
     }
 
-    let startPos = document.offsetAt(window.activeTextEditor.selection.start);
-    let endPos = document.offsetAt(window.activeTextEditor.selection.end);
-    if (startPos > endPos) {
-        [startPos, endPos] = [endPos, startPos];
-    }
     const source = document.getText();
     let result;
     try {
@@ -42,8 +37,8 @@ export async function runCodeModCommand() {
             fileName: document.fileName,
             source,
             selection: {
-                startPos,
-                endPos
+                startPos: window.activeTextEditor.selection.start,
+                endPos: window.activeTextEditor.selection.end
             }
         });
     } catch (e) {
