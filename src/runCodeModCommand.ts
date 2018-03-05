@@ -38,8 +38,7 @@ export async function runCodeModCommand(codemod?: CodeModDefinition) {
     const source = document.getText();
     let result;
     try {
-        result = codeModService.runCodeMod({
-            mod: selectedMod.mod,
+        result = codeModService.executeTransform(selectedMod.mod, {
             fileName: document.fileName,
             source,
             selection: {

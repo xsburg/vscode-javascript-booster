@@ -14,6 +14,8 @@ const codeshifts = {
     typescriptreact: jscodeshift.withParser('tsx')
 };
 
+const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
+
 class CodeModService {
     private _astCache: Map<
         string, // cached by fileName
@@ -79,8 +81,8 @@ class CodeModService {
 
     public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
         // local code mods
-        const files = await fs.readdir(path.join(__dirname, '..', 'codemods'));
-        const fileNames = files.map(name => path.join(__dirname, '..', 'codemods', name));
+        const files = await fs.readdir(embeddedCodeModDir);
+        const fileNames = files.map(name => path.join(embeddedCodeModDir, name));
         const predefinedMods = (await Promise.all(
             fileNames.map(async fileName => {
                 if (!fileName.match(/(\.ts|\.js)$/)) {
@@ -110,6 +112,11 @@ class CodeModService {
         return codeMods;
     }
 
+    public loadOneEmbeddedCodeMod(modId: string) {
+        const fileName = path.join(embeddedCodeModDir, modId);
+        return this._parseCodeModFile(fileName);
+    }
+
     public async getGlobalMods() {
         const mods = (await this._getAllCodeMods()).filter(
             mod => mod.scope === CodeModScope.Global
@@ -128,23 +135,7 @@ class CodeModService {
                 return false;
             }
             try {
-                return mod.canRun(
-                    {
-                        path: options.fileName,
-                        source: options.source,
-                        ast: this._getAstTree(options)
-                    },
-                    {
-                        jscodeshift: this._getCodeShift(options.fileName),
-                        stats: () => ({})
-                    },
-                    {
-                        selection: {
-                            startPos: Position.fromLineCharacter(options.selection.startPos),
-                            endPos: Position.fromLineCharacter(options.selection.endPos)
-                        }
-                    }
-                );
+                return this.executeCanRun(mod, options);
             } catch (e) {
                 console.error(`Error while running codemod.canRun: ${e.toString()}`);
                 return false;
@@ -152,14 +143,43 @@ class CodeModService {
         });
     }
 
-    public runCodeMod(options: {
-        mod: CodeModDefinition;
-        fileName: string;
-        source: string;
-        selection: { startPos: vscode.Position; endPos: vscode.Position };
-    }): string {
+    public executeCanRun(
+        mod: CodeModDefinition,
+        options: {
+            fileName: string;
+            source: string;
+            selection: { startPos: vscode.Position; endPos: vscode.Position };
+        }
+    ) {
+        return mod.canRun(
+            {
+                path: options.fileName,
+                source: options.source,
+                ast: this._getAstTree(options)
+            },
+            {
+                jscodeshift: this._getCodeShift(options.fileName),
+                stats: () => ({})
+            },
+            {
+                selection: {
+                    startPos: Position.fromLineCharacter(options.selection.startPos),
+                    endPos: Position.fromLineCharacter(options.selection.endPos)
+                }
+            }
+        );
+    }
+
+    public executeTransform(
+        mod: CodeModDefinition,
+        options: {
+            fileName: string;
+            source: string;
+            selection: { startPos: vscode.Position; endPos: vscode.Position };
+        }
+    ): string {
         let result;
-        result = options.mod.modFn(
+        result = mod.modFn(
             {
                 path: options.fileName,
                 source: options.source,

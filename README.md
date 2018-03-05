@@ -21,6 +21,7 @@ Refactorings:
 * Merge declaration and initialisation (for let & const)
 * Split into declaration and initialisation
 * Wrap value with {} (JSX attributes)
+* Replace with template string ('foo' + bar => `${foo}bar`)
 
 Commands:
 
