@@ -19,12 +19,36 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { Position, IPosition } from '../../utils';
+
+function toVsPosition(pos: IPosition) {
+    return new vscode.Position(pos.line - 1, pos.column - 1);
+}
+
+function getSelection(options: { pos?: IPosition; startPos?: IPosition; endPos?: IPosition }) {
+    let startPos;
+    let endPos;
+    if (options.pos) {
+        startPos = toVsPosition(options.pos);
+        endPos = toVsPosition(options.pos);
+    } else if (options.startPos) {
+        startPos = toVsPosition(options.startPos);
+        endPos = toVsPosition(options.endPos);
+    } else {
+        startPos = new vscode.Position(0, 0);
+        endPos = new vscode.Position(0, 0);
+    }
+    return {
+        startPos,
+        endPos
+    };
+}
 
 export function runInlineTest(
     modId: string,
     input: string,
     output: string,
-    options: { fileName?: string; startPos?: vscode.Position; endPos?: vscode.Position } = {}
+    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
 
@@ -32,10 +56,7 @@ export function runInlineTest(
         fileName:
             (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
         source: input,
-        selection: {
-            startPos: (options && options.startPos) || new vscode.Position(0, 0),
-            endPos: (options && options.endPos) || new vscode.Position(0, 0)
-        }
+        selection: getSelection(options)
     };
 
     const canRun = codeModService.executeCanRun(mod, runOptions);
@@ -51,7 +72,7 @@ export function runInlineCanRunTest(
     modId: string,
     input: string,
     expected: boolean,
-    options: { fileName?: string; startPos?: vscode.Position; endPos?: vscode.Position } = {}
+    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
 
@@ -59,10 +80,7 @@ export function runInlineCanRunTest(
         fileName:
             (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
         source: input,
-        selection: {
-            startPos: (options && options.startPos) || new vscode.Position(0, 0),
-            endPos: (options && options.endPos) || new vscode.Position(0, 0)
-        }
+        selection: getSelection(options)
     };
 
     const actualOutput = codeModService.executeCanRun(mod, runOptions);
@@ -73,7 +91,7 @@ export function runTransformTest(
     dirName,
     modId: string,
     fixtureId: string | null = null,
-    options: { fileName?: string; startPos?: vscode.Position; endPos?: vscode.Position } = {}
+    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
     const fixDir = path.join(dirName, '__fixtures__');
     const fixtureSuffix = fixtureId ? `.${fixtureId}` : '';
@@ -95,7 +113,7 @@ export function runCanRunTest(
     modId: string,
     expected: boolean,
     fixtureId: string | null = null,
-    options: { fileName?: string; startPos?: vscode.Position; endPos?: vscode.Position } = {}
+    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
     const fixDir = path.join(dirName, '__fixtures__');
     const fixtureSuffix = fixtureId ? `.${fixtureId}` : '';
@@ -114,7 +132,7 @@ export function defineTransformTest(
     dirName: string,
     modId: string,
     fixtureId: string | null = null,
-    options: { fileName?: string; startPos?: vscode.Position; endPos?: vscode.Position } = {}
+    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
     const testName = fixtureId
         ? `"${modId}" transforms correctly using "${fixtureId}" data`
@@ -131,7 +149,7 @@ export function defineCanRunTest(
     modId: string,
     expected: boolean,
     fixtureId: string | null = null,
-    options: { fileName?: string; startPos?: vscode.Position; endPos?: vscode.Position } = {}
+    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
     const testName = fixtureId
         ? `"${modId}" transforms correctly using "${fixtureId}" data`

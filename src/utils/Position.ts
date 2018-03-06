@@ -9,8 +9,8 @@ export class Position implements IPosition {
     }
 
     /**
-     * @param line A zero-based line value.
-     * @param column A zero-based character value.
+     * @param line A one-based line value.
+     * @param column A one-based character value.
      */
     constructor(public readonly line: number, public readonly column: number) {}
 
