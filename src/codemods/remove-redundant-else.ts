@@ -9,28 +9,6 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { findNodeAtPosition } from '../utils';
 
-function negateExpression(j: JsCodeShift, expr: Expression) {
-    // 1. !a => a
-    if (j.match(expr, { type: 'UnaryExpression', operator: '!' })) {
-        return (expr as UnaryExpression).argument;
-    }
-
-    // 2. invert binary operators
-    const operatorMap = {
-        '<': '>=',
-        '>': '<=',
-        '>=': '<',
-        '<=': '>'
-    };
-    if (j.BinaryExpression.check(expr) && operatorMap[expr.operator]) {
-        expr.operator = operatorMap[expr.operator];
-        return expr;
-    }
-
-    // Fallback: a => !a
-    return j.unaryExpression('!', expr);
-}
-
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
@@ -39,17 +17,7 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const target = findNodeAtPosition(j, src, pos);
     let node = target.nodes()[0] as IfStatement;
 
-    const consequent = node.consequent;
-    let alternate;
-    if (node.alternate) {
-        alternate = node.alternate;
-    } else {
-        alternate = j.blockStatement([j.debuggerStatement()]);
-    }
-
-    node.consequent = alternate;
-    node.alternate = consequent;
-    node.test = negateExpression(j, node.test);
+    node.alternate = null;
 
     let resultText = src.toSource();
     return resultText;
@@ -62,12 +30,16 @@ codeMod.canRun = function(fileInfo, api, options) {
     const target = findNodeAtPosition(j, src, pos);
     const node = target.nodes()[0] as IfStatement;
 
-    return j.IfStatement.check(node);
+    return Boolean(
+        j.IfStatement.check(node) &&
+            j.BlockStatement.check(node.alternate) &&
+            node.alternate.body.length === 0
+    );
 };
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Flip if-else';
+codeMod.title = 'Remove redundant else';
 
 codeMod.description = '';
 

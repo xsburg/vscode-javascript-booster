@@ -16,8 +16,8 @@ Refactorings:
 
 * ~~Flip if~~
 * ~~Convert lambda expression to lambda statement~~
-* Convert to shorthand arrow fn
-* Remove else statement
+* ~~Convert to shorthand arrow fn~~
+* ~~Remove redundant else~~
 * Convert String to Template String
 * Merge declaration and initialisation (for let & const)
 * Split into declaration and initialisation

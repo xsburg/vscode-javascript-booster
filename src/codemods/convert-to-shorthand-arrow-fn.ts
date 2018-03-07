@@ -32,7 +32,7 @@ codeMod.canRun = function(fileInfo, api, options) {
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
     const target = findNodeAtPosition(j, src, pos);
-    const node = target.nodes()[0] as IfStatement;
+    const node = target.nodes()[0];
 
     return (
         j.ArrowFunctionExpression.check(node) &&
@@ -44,7 +44,7 @@ codeMod.canRun = function(fileInfo, api, options) {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Add braces to arrow function statement';
+codeMod.title = 'Convert to shorthand arrow function';
 
 codeMod.description = '';
 

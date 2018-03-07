@@ -200,7 +200,7 @@ export function defineTransformTests(
     const inputFixtures = extractFixtures(input, fixtureId, true);
     const outputFixtures = extractFixtures(output, fixtureId, false);
 
-    suite(modId, () => {
+    suite(`${modId} transform`, () => {
         inputFixtures.forEach(fx => {
             const testName = fx.name
                 ? `"${modId}:${fx.name}" transforms correctly (pos ${fx.pos.line}:${fx.pos.column})`
@@ -238,18 +238,23 @@ export function defineCanRunTests(
     const input = fs.readFileSync(path.join(fixDir, inputFile), 'utf8');
     const inputFixtures = extractFixtures(input, fixtureId, true);
 
-    suite(modId, () => {
+    suite(`${modId} can run`, () => {
         inputFixtures.forEach(fx => {
-            const testName = fx.name
-                ? `"${modId}:${fx.name}" can run (pos ${fx.pos.line}:${fx.pos.column})`
-                : `"${modId}" can run (pos ${fx.pos.line}:${fx.pos.column})`;
             if (typeof fx.raw.expected !== 'boolean') {
                 throw new Error(
                     `Invalid type of 'expected' property in fixture ${fx.name}, mod ${modId}.`
                 );
             }
+            const expected: boolean = fx.raw.expected;
+            const testName = fx.name
+                ? `"${modId}:${fx.name}" ${expected ? 'can' : 'cannot'} run (pos ${fx.pos.line}:${
+                      fx.pos.column
+                  })`
+                : `"${modId}" ${expected ? 'can' : 'cannot'} run (pos ${fx.pos.line}:${
+                      fx.pos.column
+                  })`;
             test(testName, () => {
-                runInlineCanRunTest(modId, fx.source, fx.raw.expected, {
+                runInlineCanRunTest(modId, fx.source, expected, {
                     fileName: options.fileName,
                     pos: fx.pos
                 });

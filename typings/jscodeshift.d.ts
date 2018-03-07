@@ -340,10 +340,10 @@ declare module 'jscodeshift' {
          * @param {Object} filter
          * @return boolean
          */
-        match<TFilter extends { type: TypeName }>(
+        match<TFilter extends Node>(
             path: AstNode | NodePath<any> | any,
-            filter: TFilter
-        );
+            filter: Partial<TFilter>
+        ): path is TFilter;
 
         /**
          * Utility function for registering plugins.
