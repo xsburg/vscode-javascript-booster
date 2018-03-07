@@ -17,10 +17,10 @@ export async function runCodeModCommand(codemod?: CodeModDefinition) {
         return;
     }
 
-    let selectedMod;
+    let selectedMod: CodeModDefinition;
     if (!codemod) {
         const codeMods = await codeModService.getGlobalMods();
-        selectedMod = await window.showQuickPick(
+        const result = await window.showQuickPick(
             codeMods.map(mod => ({
                 label: mod.name,
                 description: mod.description,
@@ -28,9 +28,10 @@ export async function runCodeModCommand(codemod?: CodeModDefinition) {
                 mod
             }))
         );
-        if (!selectedMod) {
+        if (!result) {
             return;
         }
+        selectedMod = result.mod;
     } else {
         selectedMod = codemod;
     }
@@ -38,7 +39,7 @@ export async function runCodeModCommand(codemod?: CodeModDefinition) {
     const source = document.getText();
     let result;
     try {
-        result = codeModService.executeTransform(selectedMod.mod, {
+        result = codeModService.executeTransform(selectedMod, {
             fileName: document.fileName,
             source,
             selection: {
