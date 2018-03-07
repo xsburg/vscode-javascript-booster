@@ -19,11 +19,12 @@ Refactorings:
 * ~~Convert to shorthand arrow fn~~
 * ~~Remove redundant else~~
 * ~~Convert String to Template String~~
+* ~~Replace with regular string~~
 * ~~Convert to let~~
 * ~~Convert to const~~
 * ~~Split into multiple declarations~~
+* ~~Split into declaration and initialisation~~
 * Merge declaration and initialisation (for let & const)
-* Split into declaration and initialisation
 * Wrap value with {} (JSX attributes)
 * Replace if-else with ?:
 

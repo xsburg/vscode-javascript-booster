@@ -7,6 +7,17 @@ import { Position } from '../utils/Position';
 import { Program } from 'ast-types';
 import { configIds, extensionId } from '../const';
 
+// Hack to adjust default recast options
+// making it as close to Prettier as possible.
+const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
+const toSource = CollectionPrototype.toSource;
+CollectionPrototype.toSource = function(options) {
+    return toSource.call(this, {
+        quote: 'single',
+        ...options
+    });
+};
+
 const codeshifts = {
     javascript: jscodeshift.withParser('babylon'),
     javascriptreact: jscodeshift.withParser('babylon'),
