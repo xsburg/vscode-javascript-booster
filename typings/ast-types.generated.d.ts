@@ -2016,11 +2016,11 @@ declare module 'ast-types' {
         | TSParameterProperty;
 
     export interface Builders {
-        sourceLocation(start: Position, end: Position, source?: any /* string | null */): SourceLocation;
+        sourceLocation(start: Position, end: Position, source?: string | null): SourceLocation;
 
-        position(line: any /* number >= 1 */, column: any /* number >= 0 */): Position;
+        position(line: number, column: number): Position;
 
-        file(program: Program, name?: any /* string | null */): File;
+        file(program: Program, name?: string | null): File;
 
         program(body: Array<Statement>): Program;
 
@@ -2032,55 +2032,55 @@ declare module 'ast-types' {
 
         expressionStatement(expression: Expression): ExpressionStatement;
 
-        ifStatement(test: Expression, consequent: Statement, alternate?: any /* Statement | null */): IfStatement;
+        ifStatement(test: Expression, consequent: Statement, alternate?: Statement | null): IfStatement;
 
         labeledStatement(label: Identifier, body: Statement): LabeledStatement;
 
-        breakStatement(label?: any /* Identifier | null */): BreakStatement;
+        breakStatement(label?: Identifier | null): BreakStatement;
 
-        continueStatement(label?: any /* Identifier | null */): ContinueStatement;
+        continueStatement(label?: Identifier | null): ContinueStatement;
 
         withStatement(object: Expression, body: Statement): WithStatement;
 
         switchStatement(discriminant: Expression, cases: Array<SwitchCase>, lexical?: boolean): SwitchStatement;
 
-        switchCase(test: any /* Expression | null */, consequent: Array<Statement>): SwitchCase;
+        switchCase(test: Expression | null, consequent: Array<Statement>): SwitchCase;
 
-        returnStatement(argument: any /* Expression | null */): ReturnStatement;
+        returnStatement(argument: Expression | null): ReturnStatement;
 
         throwStatement(argument: Expression): ThrowStatement;
 
-        tryStatement(block: BlockStatement, handler?: any /* CatchClause | null */, finalizer?: any /* BlockStatement | null */): TryStatement;
+        tryStatement(block: BlockStatement, handler?: CatchClause | null, finalizer?: BlockStatement | null): TryStatement;
 
-        catchClause(param?: any /* Pattern | null */, guard?: any /* Expression | null */, body?: BlockStatement): CatchClause;
+        catchClause(param?: Pattern | null, guard?: Expression | null, body?: BlockStatement): CatchClause;
 
         whileStatement(test: Expression, body: Statement): WhileStatement;
 
         doWhileStatement(body: Statement, test: Expression): DoWhileStatement;
 
-        forStatement(init: any /* VariableDeclaration | Expression | null */, test: any /* Expression | null */, update: any /* Expression | null */, body: Statement): ForStatement;
+        forStatement(init: VariableDeclaration | Expression | null, test: Expression | null, update: Expression | null, body: Statement): ForStatement;
 
-        variableDeclaration(kind: any /* var | let | const */, declarations: any /* Array<VariableDeclarator | Identifier> */): VariableDeclaration;
+        variableDeclaration(kind: any /* var | let | const */, declarations: Array<VariableDeclarator | Identifier>): VariableDeclaration;
 
-        forInStatement(left: any /* VariableDeclaration | Expression */, right: Expression, body: Statement, each?: boolean): ForInStatement;
+        forInStatement(left: VariableDeclaration | Expression, right: Expression, body: Statement, each?: boolean): ForInStatement;
 
         debuggerStatement(): DebuggerStatement;
 
-        functionDeclaration(id: Identifier, params: Array<Pattern>, body: any /* BlockStatement | Expression */, generator?: boolean, expression?: boolean): FunctionDeclaration;
+        functionDeclaration(id: Identifier, params: Array<Pattern>, body: BlockStatement | Expression, generator?: boolean, expression?: boolean): FunctionDeclaration;
 
-        functionExpression(id?: any /* Identifier | null */, params?: Array<Pattern>, body?: any /* BlockStatement | Expression */, generator?: boolean, expression?: boolean): FunctionExpression;
+        functionExpression(id?: Identifier | null, params?: Array<Pattern>, body?: BlockStatement | Expression, generator?: boolean, expression?: boolean): FunctionExpression;
 
-        variableDeclarator(id: Pattern, init: any /* Expression | null */): VariableDeclarator;
+        variableDeclarator(id: Pattern, init: Expression | null): VariableDeclarator;
 
         thisExpression(): ThisExpression;
 
-        arrayExpression(elements: any /* Array<Expression | SpreadElement | RestElement | null> */): ArrayExpression;
+        arrayExpression(elements: Array<Expression | SpreadElement | RestElement | null>): ArrayExpression;
 
-        objectExpression(properties: any /* Array<Property | ObjectMethod | ObjectProperty | SpreadProperty | SpreadElement> */): ObjectExpression;
+        objectExpression(properties: Array<Property | ObjectMethod | ObjectProperty | SpreadProperty | SpreadElement>): ObjectExpression;
 
-        property(kind: any /* init | get | set */, key: any /* Literal | Identifier | Expression */, value: any /* Expression | Pattern */): Property;
+        property(kind: any /* init | get | set */, key: Literal | Identifier | Expression, value: Expression | Pattern): Property;
 
-        literal(value: any /* string | boolean | null | number | RegExp */): Literal;
+        literal(value: string | boolean | null | number | RegExp): Literal;
 
         sequenceExpression(expressions: Array<Expression>): SequenceExpression;
 
@@ -2096,37 +2096,37 @@ declare module 'ast-types' {
 
         conditionalExpression(test: Expression, consequent: Expression, alternate: Expression): ConditionalExpression;
 
-        newExpression(callee: Expression, $arguments: any /* Array<Expression | SpreadElement> */): NewExpression;
+        newExpression(callee: Expression, $arguments: Array<Expression | SpreadElement>): NewExpression;
 
-        callExpression(callee: Expression, $arguments: any /* Array<Expression | SpreadElement> */): CallExpression;
+        callExpression(callee: Expression, $arguments: Array<Expression | SpreadElement>): CallExpression;
 
-        memberExpression(object: Expression, property: any /* Identifier | Expression */, computed?: boolean): MemberExpression;
+        memberExpression(object: Expression, property: Identifier | Expression, computed?: boolean): MemberExpression;
 
         restElement(argument: Pattern): RestElement;
 
         typeAnnotation(typeAnnotation: Type): TypeAnnotation;
 
-        tsTypeAnnotation(typeAnnotation: any /* TSType | TSTypeAnnotation */): TSTypeAnnotation;
+        tsTypeAnnotation(typeAnnotation: TSType | TSTypeAnnotation): TSTypeAnnotation;
 
         spreadElementPattern(argument: Pattern): SpreadElementPattern;
 
-        arrowFunctionExpression(params: Array<Pattern>, body: any /* BlockStatement | Expression */, expression?: boolean): ArrowFunctionExpression;
+        arrowFunctionExpression(params: Array<Pattern>, body: BlockStatement | Expression, expression?: boolean): ArrowFunctionExpression;
 
-        forOfStatement(left: any /* VariableDeclaration | Pattern */, right: Expression, body: Statement): ForOfStatement;
+        forOfStatement(left: VariableDeclaration | Pattern, right: Expression, body: Statement): ForOfStatement;
 
-        yieldExpression(argument: any /* Expression | null */, delegate?: boolean): YieldExpression;
+        yieldExpression(argument: Expression | null, delegate?: boolean): YieldExpression;
 
-        generatorExpression(body: Expression, blocks: Array<ComprehensionBlock>, filter: any /* Expression | null */): GeneratorExpression;
+        generatorExpression(body: Expression, blocks: Array<ComprehensionBlock>, filter: Expression | null): GeneratorExpression;
 
         comprehensionBlock(left: Pattern, right: Expression, each: boolean): ComprehensionBlock;
 
-        comprehensionExpression(body: Expression, blocks: Array<ComprehensionBlock>, filter: any /* Expression | null */): ComprehensionExpression;
+        comprehensionExpression(body: Expression, blocks: Array<ComprehensionBlock>, filter: Expression | null): ComprehensionExpression;
 
-        propertyPattern(key: any /* Literal | Identifier | Expression */, pattern: Pattern): PropertyPattern;
+        propertyPattern(key: Literal | Identifier | Expression, pattern: Pattern): PropertyPattern;
 
-        objectPattern(properties: any /* Array<Property | PropertyPattern | SpreadPropertyPattern | SpreadProperty | ObjectProperty | RestProperty> */): ObjectPattern;
+        objectPattern(properties: Array<Property | PropertyPattern | SpreadPropertyPattern | SpreadProperty | ObjectProperty | RestProperty>): ObjectPattern;
 
-        arrayPattern(elements: any /* Array<Pattern | SpreadElement | null> */): ArrayPattern;
+        arrayPattern(elements: Array<Pattern | SpreadElement | null>): ArrayPattern;
 
         methodDefinition(kind: any /* constructor | method | get | set */, key: Expression, value: Function, $static?: boolean): MethodDefinition;
 
@@ -2136,43 +2136,43 @@ declare module 'ast-types' {
 
         classPropertyDefinition(definition: any /* MethodDefinition | VariableDeclarator | ClassPropertyDefinition | ClassProperty */): ClassPropertyDefinition;
 
-        classProperty(key: any /* Literal | Identifier | Expression */, value: any /* Expression | null */, typeAnnotation: any /* TypeAnnotation | null */, $static?: boolean): ClassProperty;
+        classProperty(key: Literal | Identifier | Expression, value: Expression | null, typeAnnotation: TypeAnnotation | null, $static?: boolean): ClassProperty;
 
         classBody(body: any /* Array<MethodDefinition | VariableDeclarator | ClassPropertyDefinition | ClassProperty | ClassMethod | TSDeclareMethod | TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature> */): ClassBody;
 
-        classDeclaration(id: any /* Identifier | null */, body: ClassBody, superClass?: any /* Expression | null */): ClassDeclaration;
+        classDeclaration(id: Identifier | null, body: ClassBody, superClass?: Expression | null): ClassDeclaration;
 
-        classExpression(id?: any /* Identifier | null */, body?: ClassBody, superClass?: any /* Expression | null */): ClassExpression;
+        classExpression(id?: Identifier | null, body?: ClassBody, superClass?: Expression | null): ClassExpression;
 
-        importSpecifier(imported: Identifier, local?: any /* Identifier | null */): ImportSpecifier;
+        importSpecifier(imported: Identifier, local?: Identifier | null): ImportSpecifier;
 
-        importNamespaceSpecifier(local?: any /* Identifier | null */): ImportNamespaceSpecifier;
+        importNamespaceSpecifier(local?: Identifier | null): ImportNamespaceSpecifier;
 
-        importDefaultSpecifier(local?: any /* Identifier | null */): ImportDefaultSpecifier;
+        importDefaultSpecifier(local?: Identifier | null): ImportDefaultSpecifier;
 
-        importDeclaration(specifiers?: any /* Array<ImportSpecifier | ImportNamespaceSpecifier | ImportDefaultSpecifier> */, source?: Literal, importKind?: any /* value | type */): ImportDeclaration;
+        importDeclaration(specifiers?: Array<ImportSpecifier | ImportNamespaceSpecifier | ImportDefaultSpecifier>, source?: Literal, importKind?: any /* value | type */): ImportDeclaration;
 
         taggedTemplateExpression(tag: Expression, quasi: TemplateLiteral): TaggedTemplateExpression;
 
         templateLiteral(quasis: Array<TemplateElement>, expressions: Array<Expression>): TemplateLiteral;
 
-        templateElement(value: any /* { "cooked": string, "raw": string } */, tail: boolean): TemplateElement;
+        templateElement(value: { "cooked": string, "raw": string }, tail: boolean): TemplateElement;
 
         spreadProperty(argument: Expression): SpreadProperty;
 
         spreadPropertyPattern(argument: Pattern): SpreadPropertyPattern;
 
-        awaitExpression(argument: any /* Expression | null */, all?: boolean): AwaitExpression;
+        awaitExpression(argument: Expression | null, all?: boolean): AwaitExpression;
 
         letStatement(head: Array<VariableDeclarator>, body: Statement): LetStatement;
 
         letExpression(head: Array<VariableDeclarator>, body: Expression): LetExpression;
 
-        graphExpression(index: any /* number >= 0 */, expression: Literal): GraphExpression;
+        graphExpression(index: number, expression: Literal): GraphExpression;
 
-        graphIndexExpression(index: any /* number >= 0 */): GraphIndexExpression;
+        graphIndexExpression(index: number): GraphIndexExpression;
 
-        jsxAttribute(name: any /* JSXIdentifier | JSXNamespacedName */, value?: any /* Literal | JSXExpressionContainer | null */): JSXAttribute;
+        jsxAttribute(name: JSXIdentifier | JSXNamespacedName, value?: Literal | JSXExpressionContainer | null): JSXAttribute;
 
         jsxIdentifier(name: string): JSXIdentifier;
 
@@ -2180,17 +2180,17 @@ declare module 'ast-types' {
 
         jsxExpressionContainer(expression: Expression): JSXExpressionContainer;
 
-        jsxMemberExpression(object: any /* JSXIdentifier | JSXMemberExpression */, property: JSXIdentifier): JSXMemberExpression;
+        jsxMemberExpression(object: JSXIdentifier | JSXMemberExpression, property: JSXIdentifier): JSXMemberExpression;
 
         jsxSpreadAttribute(argument: Expression): JSXSpreadAttribute;
 
-        jsxElement(openingElement: JSXOpeningElement, closingElement?: any /* JSXClosingElement | null */, children?: any /* Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal> */): JSXElement;
+        jsxElement(openingElement: JSXOpeningElement, closingElement?: JSXClosingElement | null, children?: Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal>): JSXElement;
 
-        jsxOpeningElement(name: any /* JSXIdentifier | JSXNamespacedName | JSXMemberExpression */, attributes?: any /* Array<JSXAttribute | JSXSpreadAttribute> */, selfClosing?: boolean): JSXOpeningElement;
+        jsxOpeningElement(name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression, attributes?: Array<JSXAttribute | JSXSpreadAttribute>, selfClosing?: boolean): JSXOpeningElement;
 
-        jsxClosingElement(name: any /* JSXIdentifier | JSXNamespacedName | JSXMemberExpression */): JSXClosingElement;
+        jsxClosingElement(name: JSXIdentifier | JSXNamespacedName | JSXMemberExpression): JSXClosingElement;
 
-        jsxFragment(openingElement: JSXOpeningFragment, closingElement: JSXClosingFragment, children?: any /* Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal> */): JSXFragment;
+        jsxFragment(openingElement: JSXOpeningFragment, closingElement: JSXClosingFragment, children?: Array<JSXElement | JSXExpressionContainer | JSXFragment | JSXText | Literal>): JSXFragment;
 
         jsxText(value: string): JSXText;
 
@@ -2236,7 +2236,7 @@ declare module 'ast-types' {
 
         existentialTypeParam(): ExistentialTypeParam;
 
-        functionTypeAnnotation(params: Array<FunctionTypeParam>, returnType: Type, rest: any /* FunctionTypeParam | null */, typeParameters: any /* TypeParameterDeclaration | null */): FunctionTypeAnnotation;
+        functionTypeAnnotation(params: Array<FunctionTypeParam>, returnType: Type, rest: FunctionTypeParam | null, typeParameters: TypeParameterDeclaration | null): FunctionTypeAnnotation;
 
         functionTypeParam(name: Identifier, typeAnnotation: Type, optional: boolean): FunctionTypeParam;
 
@@ -2244,9 +2244,9 @@ declare module 'ast-types' {
 
         arrayTypeAnnotation(elementType: Type): ArrayTypeAnnotation;
 
-        objectTypeAnnotation(properties: any /* Array<ObjectTypeProperty | ObjectTypeSpreadProperty> */, indexers?: Array<ObjectTypeIndexer>, callProperties?: Array<ObjectTypeCallProperty>): ObjectTypeAnnotation;
+        objectTypeAnnotation(properties: Array<ObjectTypeProperty | ObjectTypeSpreadProperty>, indexers?: Array<ObjectTypeIndexer>, callProperties?: Array<ObjectTypeCallProperty>): ObjectTypeAnnotation;
 
-        objectTypeProperty(key: any /* Literal | Identifier */, value: Type, optional: boolean): ObjectTypeProperty;
+        objectTypeProperty(key: Literal | Identifier, value: Type, optional: boolean): ObjectTypeProperty;
 
         objectTypeSpreadProperty(argument: Type): ObjectTypeSpreadProperty;
 
@@ -2256,13 +2256,13 @@ declare module 'ast-types' {
 
         variance(kind: any /* plus | minus */): Variance;
 
-        qualifiedTypeIdentifier(qualification: any /* Identifier | QualifiedTypeIdentifier */, id: Identifier): QualifiedTypeIdentifier;
+        qualifiedTypeIdentifier(qualification: Identifier | QualifiedTypeIdentifier, id: Identifier): QualifiedTypeIdentifier;
 
-        genericTypeAnnotation(id: any /* Identifier | QualifiedTypeIdentifier */, typeParameters: any /* TypeParameterInstantiation | null */): GenericTypeAnnotation;
+        genericTypeAnnotation(id: Identifier | QualifiedTypeIdentifier, typeParameters: TypeParameterInstantiation | null): GenericTypeAnnotation;
 
         typeParameterInstantiation(params: Array<Type>): TypeParameterInstantiation;
 
-        memberTypeAnnotation(object: Identifier, property: any /* MemberTypeAnnotation | GenericTypeAnnotation */): MemberTypeAnnotation;
+        memberTypeAnnotation(object: Identifier, property: MemberTypeAnnotation | GenericTypeAnnotation): MemberTypeAnnotation;
 
         unionTypeAnnotation(types: Array<Type>): UnionTypeAnnotation;
 
@@ -2270,7 +2270,7 @@ declare module 'ast-types' {
 
         typeofTypeAnnotation(argument: Type): TypeofTypeAnnotation;
 
-        typeParameter(name: string, variance?: any /* Variance | plus | minus | null */, bound?: any /* TypeAnnotation | null */): TypeParameter;
+        typeParameter(name: string, variance?: any /* Variance | plus | minus | null */, bound?: TypeAnnotation | null): TypeParameter;
 
         classImplements(id: Identifier): ClassImplements;
 
@@ -2280,13 +2280,13 @@ declare module 'ast-types' {
 
         declareInterface(id: Identifier, body: ObjectTypeAnnotation, $extends: Array<InterfaceExtends>): DeclareInterface;
 
-        typeAlias(id: Identifier, typeParameters: any /* TypeParameterDeclaration | null */, right: Type): TypeAlias;
+        typeAlias(id: Identifier, typeParameters: TypeParameterDeclaration | null, right: Type): TypeAlias;
 
-        opaqueType(id: Identifier, typeParameters: any /* TypeParameterDeclaration | null */, impltype: any, supertype: any): OpaqueType;
+        opaqueType(id: Identifier, typeParameters: TypeParameterDeclaration | null, impltype: any, supertype: any): OpaqueType;
 
-        declareTypeAlias(id: Identifier, typeParameters: any /* TypeParameterDeclaration | null */, right: Type): DeclareTypeAlias;
+        declareTypeAlias(id: Identifier, typeParameters: TypeParameterDeclaration | null, right: Type): DeclareTypeAlias;
 
-        declareOpaqueType(id: Identifier, typeParameters: any /* TypeParameterDeclaration | null */, supertype: any): DeclareOpaqueType;
+        declareOpaqueType(id: Identifier, typeParameters: TypeParameterDeclaration | null, supertype: any): DeclareOpaqueType;
 
         typeCastExpression(expression: Expression, typeAnnotation: TypeAnnotation): TypeCastExpression;
 
@@ -2298,19 +2298,19 @@ declare module 'ast-types' {
 
         declareClass(id: Identifier): DeclareClass;
 
-        declareModule(id: any /* Identifier | Literal */, body: BlockStatement): DeclareModule;
+        declareModule(id: Identifier | Literal, body: BlockStatement): DeclareModule;
 
         declareModuleExports(typeAnnotation: Type): DeclareModuleExports;
 
-        declareExportDeclaration($default: boolean, declaration: any /* DeclareVariable | DeclareFunction | DeclareClass | Type | null */, specifiers?: any /* Array<ExportSpecifier | ExportBatchSpecifier> */, source?: any /* Literal | null */): DeclareExportDeclaration;
+        declareExportDeclaration($default: boolean, declaration: DeclareVariable | DeclareFunction | DeclareClass | Type | null, specifiers?: Array<ExportSpecifier | ExportBatchSpecifier>, source?: Literal | null): DeclareExportDeclaration;
 
-        exportSpecifier(local?: any /* Identifier | null */, exported?: Identifier): ExportSpecifier;
+        exportSpecifier(local?: Identifier | null, exported?: Identifier): ExportSpecifier;
 
         exportBatchSpecifier(): ExportBatchSpecifier;
 
-        declareExportAllDeclaration(source?: any /* Literal | null */): DeclareExportAllDeclaration;
+        declareExportAllDeclaration(source?: Literal | null): DeclareExportAllDeclaration;
 
-        exportDeclaration($default: boolean, declaration: any /* Declaration | Expression | null */, specifiers?: any /* Array<ExportSpecifier | ExportBatchSpecifier> */, source?: any /* Literal | null */): ExportDeclaration;
+        exportDeclaration($default: boolean, declaration: Declaration | Expression | null, specifiers?: Array<ExportSpecifier | ExportBatchSpecifier>, source?: Literal | null): ExportDeclaration;
 
         block(value: string, leading?: boolean, trailing?: boolean): Block;
 
@@ -2322,7 +2322,7 @@ declare module 'ast-types' {
 
         super(): Super;
 
-        bindExpression(object: any /* Expression | null */, callee: Expression): BindExpression;
+        bindExpression(object: Expression | null, callee: Expression): BindExpression;
 
         decorator(expression: Expression): Decorator;
 
@@ -2330,15 +2330,15 @@ declare module 'ast-types' {
 
         parenthesizedExpression(expression: Expression): ParenthesizedExpression;
 
-        exportDefaultDeclaration(declaration: any /* Declaration | Expression */): ExportDefaultDeclaration;
+        exportDefaultDeclaration(declaration: Declaration | Expression): ExportDefaultDeclaration;
 
-        exportNamedDeclaration(declaration: any /* Declaration | null */, specifiers?: Array<ExportSpecifier>, source?: any /* Literal | null */): ExportNamedDeclaration;
+        exportNamedDeclaration(declaration: Declaration | null, specifiers?: Array<ExportSpecifier>, source?: Literal | null): ExportNamedDeclaration;
 
         exportNamespaceSpecifier(exported: Identifier): ExportNamespaceSpecifier;
 
         exportDefaultSpecifier(exported: Identifier): ExportDefaultSpecifier;
 
-        exportAllDeclaration(exported: any /* Identifier | null */, source: Literal): ExportAllDeclaration;
+        exportAllDeclaration(exported: Identifier | null, source: Literal): ExportAllDeclaration;
 
         commentBlock(value: string, leading?: boolean, trailing?: boolean): CommentBlock;
 
@@ -2352,7 +2352,7 @@ declare module 'ast-types' {
 
         numericLiteral(value: number): NumericLiteral;
 
-        bigIntLiteral(value: any /* string | number */): BigIntLiteral;
+        bigIntLiteral(value: string | number): BigIntLiteral;
 
         nullLiteral(): NullLiteral;
 
@@ -2360,19 +2360,19 @@ declare module 'ast-types' {
 
         regExpLiteral(pattern: string, flags: string): RegExpLiteral;
 
-        objectMethod(kind: any /* method | get | set */, key: any /* Literal | Identifier | Expression */, params: Array<Pattern>, body: BlockStatement, computed?: boolean): ObjectMethod;
+        objectMethod(kind: any /* method | get | set */, key: Literal | Identifier | Expression, params: Array<Pattern>, body: BlockStatement, computed?: boolean): ObjectMethod;
 
-        objectProperty(key: any /* Literal | Identifier | Expression */, value: any /* Expression | Pattern */): ObjectProperty;
+        objectProperty(key: Literal | Identifier | Expression, value: Expression | Pattern): ObjectProperty;
 
-        classMethod(kind: any /* get | set | method | constructor */, key: any /* Literal | Identifier | Expression */, params: Array<Pattern>, body: BlockStatement, computed?: boolean, $static?: boolean): ClassMethod;
+        classMethod(kind: any /* get | set | method | constructor */, key: Literal | Identifier | Expression, params: Array<Pattern>, body: BlockStatement, computed?: boolean, $static?: boolean): ClassMethod;
 
         restProperty(argument: Expression): RestProperty;
 
-        forAwaitStatement(left: any /* VariableDeclaration | Expression */, right: Expression, body: Statement): ForAwaitStatement;
+        forAwaitStatement(left: VariableDeclaration | Expression, right: Expression, body: Statement): ForAwaitStatement;
 
         import(): Import;
 
-        tsQualifiedName(left: any /* Identifier | TSQualifiedName */, right: any /* Identifier | TSQualifiedName */): TSQualifiedName;
+        tsQualifiedName(left: Identifier | TSQualifiedName, right: Identifier | TSQualifiedName): TSQualifiedName;
 
         tsTypeParameterInstantiation(params: Array<TSType>): TSTypeParameterInstantiation;
 
@@ -2406,7 +2406,7 @@ declare module 'ast-types' {
 
         tsArrayType(elementType: TSType): TSArrayType;
 
-        tsLiteralType(literal: any /* NumericLiteral | StringLiteral | BooleanLiteral */): TSLiteralType;
+        tsLiteralType(literal: NumericLiteral | StringLiteral | BooleanLiteral): TSLiteralType;
 
         tsUnionType(types: Array<TSType>): TSUnionType;
 
@@ -2418,15 +2418,15 @@ declare module 'ast-types' {
 
         tsParenthesizedType(typeAnnotation: TSType): TSParenthesizedType;
 
-        tsFunctionType(parameters: any /* Array<Identifier | RestElement> */): TSFunctionType;
+        tsFunctionType(parameters: Array<Identifier | RestElement>): TSFunctionType;
 
-        tsConstructorType(parameters: any /* Array<Identifier | RestElement> */): TSConstructorType;
+        tsConstructorType(parameters: Array<Identifier | RestElement>): TSConstructorType;
 
-        tsDeclareFunction(id?: any /* Identifier | null */, params?: Array<Pattern>, returnType?: any /* TSTypeAnnotation | Noop | null */): TSDeclareFunction;
+        tsDeclareFunction(id?: Identifier | null, params?: Array<Pattern>, returnType?: TSTypeAnnotation | Noop | null): TSDeclareFunction;
 
-        tsDeclareMethod(key: any /* Identifier | StringLiteral | NumericLiteral | Expression */, params: Array<Pattern>, returnType?: any /* TSTypeAnnotation | Noop | null */): TSDeclareMethod;
+        tsDeclareMethod(key: Identifier | StringLiteral | NumericLiteral | Expression, params: Array<Pattern>, returnType?: TSTypeAnnotation | Noop | null): TSDeclareMethod;
 
-        tsMappedType(typeParameter: TSTypeParameter, typeAnnotation?: any /* TSType | null */): TSMappedType;
+        tsMappedType(typeParameter: TSTypeParameter, typeAnnotation?: TSType | null): TSMappedType;
 
         tsTupleType(elementTypes: Array<TSType>): TSTupleType;
 
@@ -2440,17 +2440,17 @@ declare module 'ast-types' {
 
         tsMethodSignature(key: Expression): TSMethodSignature;
 
-        tsTypePredicate(parameterName: any /* Identifier | TSThisType */, typeAnnotation: TSTypeAnnotation): TSTypePredicate;
+        tsTypePredicate(parameterName: Identifier | TSThisType, typeAnnotation: TSTypeAnnotation): TSTypePredicate;
 
-        tsCallSignatureDeclaration(parameters: any /* Array<Identifier | RestElement> */): TSCallSignatureDeclaration;
+        tsCallSignatureDeclaration(parameters: Array<Identifier | RestElement>): TSCallSignatureDeclaration;
 
-        tsConstructSignatureDeclaration(parameters: any /* Array<Identifier | RestElement> */): TSConstructSignatureDeclaration;
+        tsConstructSignatureDeclaration(parameters: Array<Identifier | RestElement>): TSConstructSignatureDeclaration;
 
-        tsEnumMember(id: any /* Identifier | StringLiteral */, initializer?: any /* Expression | null */): TSEnumMember;
+        tsEnumMember(id: Identifier | StringLiteral, initializer?: Expression | null): TSEnumMember;
 
         tsTypeQuery(exprName: Identifier): TSTypeQuery;
 
-        tsTypeLiteral(members: any /* Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature> */): TSTypeLiteral;
+        tsTypeLiteral(members: Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature>): TSTypeLiteral;
 
         tsTypeAssertion(typeAnnotation: TSType, expression: Expression): TSTypeAssertion;
 
@@ -2460,9 +2460,9 @@ declare module 'ast-types' {
 
         tsModuleBlock(body: Array<Statement>): TSModuleBlock;
 
-        tsModuleDeclaration(id: any /* StringLiteral | Identifier | TSQualifiedName */, body?: any /* TSModuleBlock | TSModuleDeclaration | null */): TSModuleDeclaration;
+        tsModuleDeclaration(id: StringLiteral | Identifier | TSQualifiedName, body?: TSModuleBlock | TSModuleDeclaration | null): TSModuleDeclaration;
 
-        tsImportEqualsDeclaration(id: Identifier, moduleReference: any /* Identifier | TSQualifiedName | TSExternalModuleReference */): TSImportEqualsDeclaration;
+        tsImportEqualsDeclaration(id: Identifier, moduleReference: Identifier | TSQualifiedName | TSExternalModuleReference): TSImportEqualsDeclaration;
 
         tsExternalModuleReference(expression: StringLiteral): TSExternalModuleReference;
 
@@ -2470,13 +2470,13 @@ declare module 'ast-types' {
 
         tsNamespaceExportDeclaration(id: Identifier): TSNamespaceExportDeclaration;
 
-        tsInterfaceBody(body: any /* Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature> */): TSInterfaceBody;
+        tsInterfaceBody(body: Array<TSCallSignatureDeclaration | TSConstructSignatureDeclaration | TSIndexSignature | TSMethodSignature | TSPropertySignature>): TSInterfaceBody;
 
-        tsExpressionWithTypeArguments(expression: any /* Identifier | TSQualifiedName */, typeParameters?: any /* TSTypeParameterInstantiation | null */): TSExpressionWithTypeArguments;
+        tsExpressionWithTypeArguments(expression: Identifier | TSQualifiedName, typeParameters?: TSTypeParameterInstantiation | null): TSExpressionWithTypeArguments;
 
-        tsInterfaceDeclaration(id: any /* Identifier | TSQualifiedName */, body: TSInterfaceBody): TSInterfaceDeclaration;
+        tsInterfaceDeclaration(id: Identifier | TSQualifiedName, body: TSInterfaceBody): TSInterfaceDeclaration;
 
-        tsParameterProperty(parameter: any /* Identifier | AssignmentPattern */): TSParameterProperty;
+        tsParameterProperty(parameter: Identifier | AssignmentPattern): TSParameterProperty;
     }
     export interface NamedTypes {
         Printable: NamedType<Printable>;

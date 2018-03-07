@@ -196,6 +196,7 @@ class CodeModService {
                 }
             }
         );
+        this._invalidateAstTree(options.fileName);
         if (!result) {
             return options.source;
         }
@@ -215,6 +216,13 @@ class CodeModService {
             ast
         });
         return ast;
+    }
+
+    private _invalidateAstTree(fileName: string) {
+        const cache = this._astCache.get(fileName);
+        if (cache) {
+            this._astCache.delete(fileName);
+        }
     }
 }
 

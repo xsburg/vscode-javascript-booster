@@ -39,9 +39,9 @@ declare module 'ast-types' {
 
         insertAt(index: number, node: AstNode): Path;
 
-        insertBefore(index: number, node: AstNode): Path;
+        insertBefore(node: AstNode): Path;
 
-        insertAfter(index: number, node: AstNode): Path;
+        insertAfter(node: AstNode): Path;
 
         replace(replacement);
     }

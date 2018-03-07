@@ -47,11 +47,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         if (
             j.match<BinaryExpression>(node, {
                 type: 'BinaryExpression',
-                operator: '+',
-                extra: { parenthesized: false }
+                operator: '+'
             } as any)
         ) {
-            if (!(node as any).extra || !(node as any).extra.parenthesized) {
+            const parenthesized = (node as any).extra && (node as any).extra.parenthesized;
+            if (!parenthesized) {
                 // expressions in parenthesis must be ignored
                 buildTemplateLiteral(node.left);
                 buildTemplateLiteral(node.right);
@@ -109,7 +109,7 @@ codeMod.canRun = function(fileInfo, api, options) {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Remove redundant else';
+codeMod.title = 'Replace with template string';
 
 codeMod.description = '';
 
