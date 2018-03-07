@@ -121,13 +121,7 @@ function generateBuildersInterface(types, typeDefs) {
                 const field = all[param];
                 let typeStr = 'any';
                 if (field) {
-                    typeStr =
-                        typeof field.type.name === 'function' ? field.type.name() : field.type.name;
-                    // lack of information about the referenced type
-                    if (typeStr.includes(' ')) {
-                        typeStr = `any /* ${typeStr} */`;
-                    }
-                    typeStr = typeStr.replace('[', 'Array<').replace(']', '>');
+                    typeStr = getTypeFromField(field);
                     optional = optional || Boolean(field.defaultFn);
                 }
 
@@ -144,31 +138,32 @@ function generateBuildersInterface(types, typeDefs) {
     return `    export interface Builders {\n${builders}\n    }`;
 }
 
+function getTypeFromField(field) {
+    let typeStr = typeof field.type.name === 'function' ? field.type.name() : field.type.name;
+    // lack of information about the referenced type
+    if (typeStr.includes(' ')) {
+        if (typeStr.startsWith('number >=')) {
+            typeStr = 'number';
+        } else if (
+            typeStr.match(/([\-=>]|const|init|&&|constructor|minus|type|method|protected)/)
+        ) {
+            typeStr = `any /* ${typeStr} */`;
+        }
+    }
+    typeStr = typeStr.replace('[', 'Array<').replace(']', '>');
+    return typeStr;
+}
+
 function generateNamedTypes(types, typeDefs) {
     const interfaces = Object.values(typeDefs)
         .map(def => {
             const typeName = def.typeName;
             const fields = Object.values(def.ownFields).map(function(field, i) {
-                let typeStr =
-                    typeof field.type.name === 'function' ? field.type.name() : field.type.name;
-                // lack of information about the referenced type
-                if (typeStr.includes(' ')) {
-                    if (typeStr.startsWith('number >=')) {
-                        typeStr = 'number';
-                    } else if (
-                        typeStr.match(
-                            /([\-=>]|const|init|&&|constructor|minus|type|method|protected)/
-                        )
-                    ) {
-                        typeStr = `any /* ${typeStr} */`;
-                    }
-                }
-                typeStr = typeStr.replace('[', 'Array<').replace(']', '>');
                 /* if (field.name === 'type') {
                     typeStr = `'${typeName}'`;
                 } */
 
-                return `        ${field.name}: ${typeStr};`;
+                return `        ${field.name}: ${getTypeFromField(field)};`;
             });
 
             const supertypes = def.baseNames;

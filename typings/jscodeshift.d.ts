@@ -7,7 +7,8 @@ declare module 'jscodeshift' {
         AstTypes,
         Type,
         NamedType,
-        AstNode
+        AstNode,
+        TypeName
     } from 'ast-types';
     import { RecastPrinterOptions, Parser, RecastParserOptions } from 'recast';
 
@@ -339,7 +340,10 @@ declare module 'jscodeshift' {
          * @param {Object} filter
          * @return boolean
          */
-        match(path: AstNode | NodePath<any> | any, filter: any);
+        match<TFilter extends { type: TypeName }>(
+            path: AstNode | NodePath<any> | any,
+            filter: TFilter
+        );
 
         /**
          * Utility function for registering plugins.

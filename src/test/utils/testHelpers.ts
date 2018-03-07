@@ -44,7 +44,7 @@ function getSelection(options: { pos?: IPosition; startPos?: IPosition; endPos?:
     };
 }
 
-export function runInlineTest(
+export function runInlineTransformTest(
     modId: string,
     input: string,
     output: string,
@@ -87,8 +87,98 @@ export function runInlineCanRunTest(
     assert.equal(actualOutput, expected);
 }
 
-export function runTransformTest(
-    dirName,
+function extractPosition(source: string): IPosition & { source: string } {
+    const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
+    const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
+    const match = re.exec(source);
+    if (!match || !match[0]) {
+        throw new Error(`Failed to find positional information in the code:\n"${source}"`);
+    }
+    const posDef = eval('(' + match[1] + ')');
+    if (!Number.isFinite(posDef.pos)) {
+        throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
+    }
+    const column: number = posDef.pos;
+    const line: number = source.split('\n').findIndex(line => line.includes(match[0])) + 1;
+
+    const cleanSource = source.replace(reClean, '');
+
+    return {
+        source: cleanSource,
+        line,
+        column
+    };
+}
+
+function extractFixtures(
+    input: string,
+    fallbackFixtureName?: string,
+    searchPosition: boolean = true
+) {
+    const re = /\/\*\$\s*([^\$]+?)\s*\$\*\//g;
+    let match;
+    interface FixtureRawDef {
+        raw: any;
+        name: string;
+        inputStart: number;
+        inputEnd: number;
+    }
+    let fixtures: FixtureRawDef[] = [];
+    let activeFixture: FixtureRawDef | undefined;
+    while ((match = re.exec(input)) !== null) {
+        let fixtureDef = eval('(' + match[1] + ')');
+        if (activeFixture) {
+            activeFixture.inputEnd = re.lastIndex - match[0].length;
+            fixtures.push(activeFixture);
+        }
+        activeFixture = {
+            raw: fixtureDef,
+            name: fixtureDef.fixture as string,
+            inputStart: re.lastIndex,
+            inputEnd: input.length
+        };
+    }
+    if (activeFixture) {
+        fixtures.push(activeFixture);
+    }
+    let fullFixtures = fixtures.map(fx => {
+        const inputFragment = input.substring(fx.inputStart, fx.inputEnd);
+        let source = inputFragment.trim();
+        let pos;
+        if (searchPosition) {
+            pos = extractPosition(source);
+            source = pos.source;
+        } else {
+            pos = new Position(1, 1);
+        }
+        return {
+            raw: fx.raw,
+            name: fx.name,
+            source,
+            pos
+        };
+    });
+    if (fullFixtures.length === 0) {
+        let source = input.trim();
+        let pos;
+        if (searchPosition) {
+            pos = extractPosition(source);
+            source = pos.source;
+        } else {
+            pos = new Position(1, 1);
+        }
+        fullFixtures.push({
+            raw: {},
+            name: fallbackFixtureName || null,
+            source,
+            pos
+        });
+    }
+    return fullFixtures;
+}
+
+export function defineTransformTest(
+    dirName: string,
     modId: string,
     fixtureId: string | null = null,
     options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
@@ -105,13 +195,33 @@ export function runTransformTest(
     }
     const input = fs.readFileSync(path.join(fixDir, inputFile), 'utf8');
     const output = fs.readFileSync(path.join(fixDir, outputFile), 'utf8');
-    runInlineTest(modId, input, output, options);
+
+    const inputFixtures = extractFixtures(input, fixtureId, true);
+    const outputFixtures = extractFixtures(output, fixtureId, false);
+
+    suite(modId, () => {
+        inputFixtures.forEach(fx => {
+            const testName = fx.name
+                ? `"${modId}:${fx.name}" transforms correctly (pos ${fx.pos.line}:${fx.pos.column})`
+                : `"${modId}" transforms correctly (pos ${fx.pos.line}:${fx.pos.column})`;
+            const outputFx = outputFixtures.find(x => x.name === fx.name);
+            if (!outputFx) {
+                throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
+            }
+            test(testName, () => {
+                runInlineTransformTest(modId, fx.source, outputFx.source, {
+                    fileName: options.fileName,
+                    pos: fx.pos
+                });
+            });
+        });
+    });
 }
 
-export function runCanRunTest(
-    dirName,
+export function defineCanRunTest(
+    dirName: string,
     modId: string,
-    expected: boolean,
+    expected: boolean | null = null,
     fixtureId: string | null = null,
     options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
@@ -125,38 +235,24 @@ export function runCanRunTest(
         );
     }
     const input = fs.readFileSync(path.join(fixDir, inputFile), 'utf8');
-    runInlineCanRunTest(modId, input, expected, options);
-}
+    const inputFixtures = extractFixtures(input, fixtureId, true);
 
-export function defineTransformTest(
-    dirName: string,
-    modId: string,
-    fixtureId: string | null = null,
-    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
-) {
-    const testName = fixtureId
-        ? `"${modId}" transforms correctly using "${fixtureId}" data`
-        : `"${modId}" transforms correctly`;
     suite(modId, () => {
-        test(testName, () => {
-            runTransformTest(dirName, modId, fixtureId, options);
-        });
-    });
-}
-
-export function defineCanRunTest(
-    dirName: string,
-    modId: string,
-    expected: boolean,
-    fixtureId: string | null = null,
-    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
-) {
-    const testName = fixtureId
-        ? `"${modId}" transforms correctly using "${fixtureId}" data`
-        : `"${modId}" transforms correctly`;
-    suite(modId, () => {
-        test(testName, () => {
-            runCanRunTest(dirName, modId, expected, fixtureId, options);
+        inputFixtures.forEach(fx => {
+            const testName = fx.name
+                ? `"${modId}:${fx.name}" can run (pos ${fx.pos.line}:${fx.pos.column})`
+                : `"${modId}" can run (pos ${fx.pos.line}:${fx.pos.column})`;
+            if (typeof fx.raw.expected !== 'boolean') {
+                throw new Error(
+                    `Invalid type of 'expected' property in fixture ${fx.name}, mod ${modId}.`
+                );
+            }
+            test(testName, () => {
+                runInlineCanRunTest(modId, fx.source, fx.raw.expected, {
+                    fileName: options.fileName,
+                    pos: fx.pos
+                });
+            });
         });
     });
 }

@@ -90,6 +90,8 @@ declare module 'ast-types' {
     class NamedType<TNode> extends Type {
         constructor(check: (value: any) => boolean, name: string | Function);
 
+        check(value: any, deep?: any): value is TNode;
+
         name: string;
     }
 

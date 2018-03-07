@@ -1,7 +1,35 @@
 import { CodeModExports } from '../models/CodeMod';
-import { FunctionDeclaration, Printable, IfStatement } from 'ast-types';
+import {
+    FunctionDeclaration,
+    Printable,
+    IfStatement,
+    UnaryExpression,
+    Expression
+} from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { findNodeAtPosition } from '../utils';
+
+function negateExpression(j: JsCodeShift, expr: Expression) {
+    // 1. !a => a
+    if (j.match(expr, { type: 'UnaryExpression', operator: '!' })) {
+        return (expr as UnaryExpression).argument;
+    }
+
+    // 2. invert binary operators
+    const operatorMap = {
+        '<': '>=',
+        '>': '<=',
+        '>=': '<',
+        '<=': '>'
+    };
+    if (j.BinaryExpression.check(expr) && operatorMap[expr.operator]) {
+        expr.operator = operatorMap[expr.operator];
+        return expr;
+    }
+
+    // Fallback: a => !a
+    return j.unaryExpression('!', expr);
+}
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
@@ -9,15 +37,19 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const pos = options.selection.endPos;
 
     const target = findNodeAtPosition(j, src, pos);
-    const node = target.nodes()[0] as IfStatement;
+    let node = target.nodes()[0] as IfStatement;
 
-    const alternate = node.alternate || j.blockStatement([]);
     const consequent = node.consequent;
+    let alternate;
+    if (node.alternate) {
+        alternate = node.alternate;
+    } else {
+        alternate = j.blockStatement([j.debuggerStatement()]);
+    }
 
     node.consequent = alternate;
     node.alternate = consequent;
-
-    debugger;
+    node.test = negateExpression(j, node.test);
 
     let resultText = src.toSource();
     return resultText;
