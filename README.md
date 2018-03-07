@@ -14,13 +14,15 @@ A few codemods are already included into the extension. To extend this list, cre
 
 Refactorings:
 
-* Invert if
+* ~~Flip if~~
+* ~~Convert lambda expression to lambda statement~~
+* Convert to shorthand arrow fn
 * Remove else statement
 * Convert String to Template String
-* Convert lambda expression to lambda statement
 * Merge declaration and initialisation (for let & const)
 * Split into declaration and initialisation
 * Wrap value with {} (JSX attributes)
+* Replace if-else with ?:
 * Replace with template string ('foo' + bar => `${foo}bar`)
 
 Commands:

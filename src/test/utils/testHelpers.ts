@@ -13,6 +13,7 @@
 
 'use strict';
 
+import * as uniq from 'lodash/uniq';
 import { CodeModExports } from '../../models/CodeMod';
 import codeModService from '../../services/codeModService';
 import * as vscode from 'vscode';
@@ -177,7 +178,7 @@ function extractFixtures(
     return fullFixtures;
 }
 
-export function defineTransformTest(
+export function defineTransformTests(
     dirName: string,
     modId: string,
     fixtureId: string | null = null,
@@ -218,7 +219,7 @@ export function defineTransformTest(
     });
 }
 
-export function defineCanRunTest(
+export function defineCanRunTests(
     dirName: string,
     modId: string,
     expected: boolean | null = null,
@@ -254,5 +255,16 @@ export function defineCanRunTest(
                 });
             });
         });
+    });
+}
+
+export function defineCodeModTests(dirName: string) {
+    const fixDir = path.join(dirName, '__fixtures__');
+    const files = fs.readdirSync(fixDir);
+    const modIds = uniq(files.map(f => f.substring(0, f.indexOf('.'))));
+
+    modIds.forEach(modId => {
+        defineCanRunTests(dirName, modId);
+        defineTransformTests(dirName, modId);
     });
 }
