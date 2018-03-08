@@ -12,21 +12,17 @@ import {
     VariableDeclaration
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { findNodeAtPosition } from '../utils';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
 
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
-
-    while (path.parent && !j.VariableDeclaration.check(path.node)) {
-        path = path.parent;
-    }
-
-    const node = path.node as VariableDeclaration;
+    const path = src
+        .findNodeAtPosition(pos)
+        .thisOrClosest(j.VariableDeclaration)
+        .firstPath()!;
+    const node = path.node;
 
     const declarations = node.declarations
         .map(d => j.variableDeclaration(node.kind, [d]))
@@ -44,14 +40,11 @@ codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
-
-    while (path.parent && !j.VariableDeclaration.check(path.node)) {
-        path = path.parent;
-    }
-
-    return j.VariableDeclaration.check(path.node) && path.node.declarations.length > 1;
+    const path = src
+        .findNodeAtPosition(pos)
+        .thisOrClosest(j.VariableDeclaration)
+        .firstPath();
+    return path && path.node.declarations.length > 1;
 };
 
 codeMod.scope = 'cursor';

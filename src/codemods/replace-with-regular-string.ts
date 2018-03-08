@@ -12,20 +12,16 @@ import {
     TemplateLiteral
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { findNodeAtPosition } from '../utils';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
 
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
-
-    while (path.parent && !j.TemplateLiteral.check(path.node)) {
-        path = path.parent;
-    }
-
+    let path = src
+        .findNodeAtPosition(pos)
+        .thisOrClosest(j.TemplateLiteral)
+        .firstPath()!;
     const literal = path.node as TemplateLiteral;
 
     let expressions: Expression[] = [];
@@ -58,14 +54,12 @@ codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
+    let path = src
+        .findNodeAtPosition(pos)
+        .thisOrClosest(j.TemplateLiteral)
+        .firstPath();
 
-    while (path.parent && !j.TemplateLiteral.check(path.node)) {
-        path = path.parent;
-    }
-
-    return j.TemplateLiteral.check(path.node);
+    return Boolean(path);
 };
 
 codeMod.scope = 'cursor';

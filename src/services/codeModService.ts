@@ -6,6 +6,7 @@ import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeM
 import { Position } from '../utils/Position';
 import { Program } from 'ast-types';
 import { configIds, extensionId } from '../const';
+import { registerCollectionExtensions } from '../utils';
 
 // Hack to adjust default recast options
 // making it as close to Prettier as possible.
@@ -17,6 +18,8 @@ CollectionPrototype.toSource = function(options) {
         ...options
     });
 };
+
+registerCollectionExtensions(jscodeshift as jscodeshift.JsCodeShift);
 
 const codeshifts = {
     javascript: jscodeshift.withParser('babylon'),

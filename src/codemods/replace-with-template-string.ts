@@ -11,16 +11,13 @@ import {
     TemplateElement
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { findNodeAtPosition } from '../utils';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
 
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
-
+    let path = src.findNodeAtPosition(pos).firstPath();
     while (path.parent && path.parent.node.type === 'BinaryExpression') {
         path = path.parent;
     }
@@ -87,8 +84,11 @@ codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
+    let path = src.findNodeAtPosition(pos).firstPath();
+
+    while (path.parent && path.parent.node.type === 'BinaryExpression') {
+        path = path.parent;
+    }
 
     function hasStringLiteral(node: AstNode) {
         if (j.StringLiteral.check(node)) {
@@ -101,9 +101,6 @@ codeMod.canRun = function(fileInfo, api, options) {
         );
     }
 
-    while (path.parent && path.parent.node.type === 'BinaryExpression') {
-        path = path.parent;
-    }
     return hasStringLiteral(path.node);
 };
 

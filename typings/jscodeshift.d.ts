@@ -375,11 +375,11 @@ declare module 'jscodeshift' {
          * @param {Object} methods Methods to add to the prototype
          * @param {Type=} type Optional type to add the methods to
          */
-        registerMethods(
+        registerMethods<TNode>(
             methods: {
                 [methodName: string]: Function;
             },
-            type?: string
+            type?: NamedType<TNode>
         );
     }
 

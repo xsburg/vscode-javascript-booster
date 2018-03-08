@@ -59,7 +59,7 @@ declare module 'ast-types' {
         /**
          * Returns the parent AST-node (skips mediator objects on the way, compare with `parentPath` which does not).
          */
-        parent: NodePath<TNode>;
+        parent: NodePath<AstNode>;
 
         scope: Scope;
 

@@ -7,7 +7,6 @@ import {
     Expression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { findNodeAtPosition } from '../utils';
 
 function negateExpression(j: JsCodeShift, expr: Expression) {
     // 1. !a => a
@@ -40,7 +39,7 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
 
-    const target = findNodeAtPosition(j, src, pos);
+    const target = src.findNodeAtPosition(pos);
     let node = target.nodes()[0] as IfStatement;
 
     const consequent = node.consequent;
@@ -63,7 +62,7 @@ codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
-    const target = findNodeAtPosition(j, src, pos);
+    const target = src.findNodeAtPosition(pos);
     const node = target.nodes()[0] as IfStatement;
 
     return j.IfStatement.check(node);

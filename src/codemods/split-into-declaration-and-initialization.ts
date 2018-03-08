@@ -13,24 +13,19 @@ import {
     VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { findNodeAtPosition } from '../utils';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
 
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
-
-    while (path.parent && !j.VariableDeclaration.check(path.node)) {
-        path = path.parent;
-    }
-
-    const node = path.node as VariableDeclaration;
+    const path = src
+        .findNodeAtPosition(pos)
+        .thisOrClosest(j.VariableDeclaration)
+        .firstPath()!;
 
     let assignments = [];
-    node.declarations.forEach(d => {
+    path.node.declarations.forEach(d => {
         if (j.VariableDeclarator.check(d) && d.init) {
             assignments.push(j.expressionStatement(j.assignmentExpression('=', d.id, d.init)));
             d.init = null;
@@ -49,15 +44,13 @@ codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
-    const target = findNodeAtPosition(j, src, pos);
-    let path = target.paths()[0];
-
-    while (path.parent && !j.VariableDeclaration.check(path.node)) {
-        path = path.parent;
-    }
+    const path = src
+        .findNodeAtPosition(pos)
+        .thisOrClosest(j.VariableDeclaration)
+        .firstPath();
 
     return (
-        j.VariableDeclaration.check(path.node) &&
+        path &&
         path.node.kind !== 'const' &&
         path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
     );
