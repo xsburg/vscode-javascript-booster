@@ -88,12 +88,19 @@ export function runInlineCanRunTest(
     assert.equal(actualOutput, expected);
 }
 
-function extractPosition(source: string): IPosition & { source: string } {
+function extractPosition(
+    modId: string,
+    fixtureId: string | null,
+    source: string
+): IPosition & { source: string } {
     const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
     const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
     const match = re.exec(source);
     if (!match || !match[0]) {
-        throw new Error(`Failed to find positional information in the code:\n"${source}"`);
+        throw new Error(
+            `[${modId}][${fixtureId ||
+                ''}] Position is not provided, use '/*# { position: columnNumber } #*/'`
+        );
     }
     const posDef = eval('(' + match[1] + ')');
     if (!Number.isFinite(posDef.pos)) {
@@ -112,6 +119,7 @@ function extractPosition(source: string): IPosition & { source: string } {
 }
 
 function extractFixtures(
+    modId: string,
     input: string,
     fallbackFixtureName?: string,
     searchPosition: boolean = true
@@ -127,7 +135,12 @@ function extractFixtures(
     let fixtures: FixtureRawDef[] = [];
     let activeFixture: FixtureRawDef | undefined;
     while ((match = re.exec(input)) !== null) {
-        let fixtureDef = eval('(' + match[1] + ')');
+        let fixtureDef;
+        try {
+            fixtureDef = eval('(' + match[1] + ')');
+        } catch (e) {
+            throw new Error(`[${modId}] Failed to parse inline fixture definition.`);
+        }
         if (activeFixture) {
             activeFixture.inputEnd = re.lastIndex - match[0].length;
             fixtures.push(activeFixture);
@@ -147,7 +160,7 @@ function extractFixtures(
         let source = inputFragment.trim();
         let pos;
         if (searchPosition) {
-            pos = extractPosition(source);
+            pos = extractPosition(modId, fx.name, source);
             source = pos.source;
         } else {
             pos = new Position(1, 1);
@@ -163,7 +176,7 @@ function extractFixtures(
         let source = input.trim();
         let pos;
         if (searchPosition) {
-            pos = extractPosition(source);
+            pos = extractPosition(modId, fallbackFixtureName || null, source);
             source = pos.source;
         } else {
             pos = new Position(1, 1);
@@ -197,8 +210,8 @@ export function defineTransformTests(
     const input = fs.readFileSync(path.join(fixDir, inputFile), 'utf8');
     const output = fs.readFileSync(path.join(fixDir, outputFile), 'utf8');
 
-    const inputFixtures = extractFixtures(input, fixtureId, true);
-    const outputFixtures = extractFixtures(output, fixtureId, false);
+    const inputFixtures = extractFixtures(modId, input, fixtureId, true);
+    const outputFixtures = extractFixtures(modId, output, fixtureId, false);
 
     suite(`${modId} transform`, () => {
         inputFixtures.forEach(fx => {
@@ -236,7 +249,7 @@ export function defineCanRunTests(
         );
     }
     const input = fs.readFileSync(path.join(fixDir, inputFile), 'utf8');
-    const inputFixtures = extractFixtures(input, fixtureId, true);
+    const inputFixtures = extractFixtures(modId, input, fixtureId, true);
 
     suite(`${modId} can run`, () => {
         inputFixtures.forEach(fx => {

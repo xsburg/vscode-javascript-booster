@@ -14,24 +14,25 @@ A few codemods are already included into the extension. To extend this list, cre
 
 Refactorings:
 
-* ~~Flip if~~
-* ~~Convert lambda expression to lambda statement~~
-* ~~Convert to shorthand arrow fn~~
-* ~~Remove redundant else~~
-* ~~Convert String to Template String~~
-* ~~Replace with regular string~~
-* ~~Convert to let~~
-* ~~Convert to const~~
-* ~~Split into multiple declarations~~
-* ~~Split into declaration and initialisation~~
-* Merge declaration and initialisation (for let & const)
-* Wrap value with {} (JSX attributes)
-* Replace if-else with ?:
+* [x] Flip if
+* [x] Convert lambda expression to lambda statement
+* [x] Convert to shorthand arrow fn
+* [x] Remove redundant else
+* [x] Convert String to Template String
+* [x] Replace with regular string
+* [x] Convert to let
+* [x] Convert to const
+* [x] Split into multiple declarations
+* [x] Split into declaration and initialisation
+* [x] Merge declaration and initialisation
+* [x] Wrap value with {} (JSX attributes)
+* [x] Replace if-else with ?:
+* [ ] Flip ?:
 
 Commands:
 
-* Extend/Shrink selection
-* Duplicate line/selection
+* [ ] Extend/Shrink selection
+* [ ] Duplicate line/selection
 
 <!-- ## Extension Settings
 
