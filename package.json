@@ -2,13 +2,30 @@
     "name": "vscode-javascript-booster",
     "displayName": "JavaScript Booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
+    "icon": "images/icon.png",
     "version": "0.1.0",
     "publisher": "sburg",
+    "author": "Stepan Burguchev <me@sburg.net>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xsburg/vscode-javascript-booster.git"
+    },
+    "bugs": {
+        "url": "https://github.com/xsburg/vscode-javascript-booster/issues"
+    },
     "engines": {
-        "vscode": "^1.19.0"
+        "vscode": "^1.19.0",
+        "node": ">=8.0.0",
+        "npm": ">=5.3.0"
     },
     "categories": [
-        "Other"
+        "Other",
+        "Languages"
+    ],
+    "keywords": [
+        "javascript",
+        "refactoring"
     ],
     "activationEvents": [
         "onLanguage:javascript",
