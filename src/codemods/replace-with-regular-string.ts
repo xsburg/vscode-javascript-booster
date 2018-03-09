@@ -30,7 +30,8 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         expressions.push(j.stringLiteral(firstStrValue));
     }
     for (let i = 0; i < literal.expressions.length; i++) {
-        expressions.push(literal.expressions[i]);
+        const expr = literal.expressions[i];
+        expressions.push(expr);
         const strValue = literal.quasis[i + 1].value.cooked;
         if (strValue) {
             expressions.push(j.stringLiteral(strValue));

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import codeModService from './services/codeModService';
+import codeModService, { LanguageId } from './services/codeModService';
 import { commandIds } from './const';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
@@ -9,16 +9,13 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         context: vscode.CodeActionContext,
         token: vscode.CancellationToken
     ): Promise<vscode.Command[]> {
-        if (
-            ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'].indexOf(
-                document.languageId
-            ) === -1
-        ) {
+        if (!codeModService.isSupportedLanguage(document.languageId)) {
             return;
         }
 
         const source = document.getText();
         const codeMods = await codeModService.getCodeActionMods({
+            languageId: document.languageId as LanguageId,
             fileName: document.fileName,
             source,
             selection: {

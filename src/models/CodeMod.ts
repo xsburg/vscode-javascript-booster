@@ -37,6 +37,7 @@ export enum CodeModScope {
 }
 
 export interface CodeModDefinition {
+    id: string;
     name: string;
     description: string;
     detail?: string;

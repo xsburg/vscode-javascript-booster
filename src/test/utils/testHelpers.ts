@@ -15,7 +15,7 @@
 
 import * as uniq from 'lodash/uniq';
 import { CodeModExports } from '../../models/CodeMod';
-import codeModService from '../../services/codeModService';
+import codeModService, { LanguageId } from '../../services/codeModService';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs-extra';
@@ -46,6 +46,7 @@ function getSelection(options: { pos?: IPosition; startPos?: IPosition; endPos?:
 }
 
 export function runInlineTransformTest(
+    languageId: LanguageId,
     modId: string,
     input: string,
     output: string,
@@ -54,6 +55,7 @@ export function runInlineTransformTest(
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
+        languageId,
         fileName:
             (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
         source: input,
@@ -70,6 +72,7 @@ export function runInlineTransformTest(
 }
 
 export function runInlineCanRunTest(
+    languageId: LanguageId,
     modId: string,
     input: string,
     expected: boolean,
@@ -78,6 +81,7 @@ export function runInlineCanRunTest(
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
+        languageId,
         fileName:
             (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
         source: input,
@@ -86,6 +90,36 @@ export function runInlineCanRunTest(
 
     const actualOutput = codeModService.executeCanRun(mod, runOptions);
     assert.equal(actualOutput, expected);
+}
+
+function getLanguageIdByFileName(fileName: string): LanguageId {
+    const extensionMap: Array<{
+        extensions: string;
+        parser: LanguageId;
+    }> = [
+        {
+            extensions: '.js,.es,.es6',
+            parser: 'javascript'
+        },
+        {
+            extensions: '.jsx',
+            parser: 'javascriptreact'
+        },
+        {
+            extensions: '.ts',
+            parser: 'typescript'
+        },
+        {
+            extensions: '.tsx',
+            parser: 'typescriptreact'
+        }
+    ];
+    const fileExt = path.extname(fileName);
+    const def = extensionMap.find(x => x.extensions.split(',').indexOf(fileExt) !== -1);
+    if (!def) {
+        throw new Error(`Failed to match file extension of file '${fileName}' to languageId.`);
+    }
+    return def.parser;
 }
 
 function extractPosition(
@@ -223,10 +257,16 @@ export function defineTransformTests(
                 throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
             }
             test(testName, () => {
-                runInlineTransformTest(modId, fx.source, outputFx.source, {
-                    fileName: options.fileName,
-                    pos: fx.pos
-                });
+                runInlineTransformTest(
+                    getLanguageIdByFileName(inputFile),
+                    modId,
+                    fx.source,
+                    outputFx.source,
+                    {
+                        fileName: options.fileName,
+                        pos: fx.pos
+                    }
+                );
             });
         });
     });
@@ -267,10 +307,16 @@ export function defineCanRunTests(
                       fx.pos.column
                   })`;
             test(testName, () => {
-                runInlineCanRunTest(modId, fx.source, expected, {
-                    fileName: options.fileName,
-                    pos: fx.pos
-                });
+                runInlineCanRunTest(
+                    getLanguageIdByFileName(inputFile),
+                    modId,
+                    fx.source,
+                    expected,
+                    {
+                        fileName: options.fileName,
+                        pos: fx.pos
+                    }
+                );
             });
         });
     });

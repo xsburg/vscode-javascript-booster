@@ -1,24 +1,20 @@
 import { ExtensionContext, commands, window, workspace, Range, QuickPickItem, Uri } from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import codeModService from './services/codeModService';
+import codeModService, { LanguageId } from './services/codeModService';
 import { CodeModDefinition } from './models/CodeMod';
+import logService from './services/logService';
 
-export async function runCodeModCommand(codemod?: CodeModDefinition) {
+export async function runCodeModCommand(mod?: CodeModDefinition) {
     if (!window.activeTextEditor) {
         return;
     }
     const document = window.activeTextEditor.document;
-    if (
-        ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'].indexOf(
-            document.languageId
-        ) === -1
-    ) {
+    if (!codeModService.isSupportedLanguage(document.languageId)) {
         return;
     }
 
-    let selectedMod: CodeModDefinition;
-    if (!codemod) {
+    if (!mod) {
         const codeMods = await codeModService.getGlobalMods();
         const result = await window.showQuickPick(
             codeMods.map(mod => ({
@@ -31,25 +27,25 @@ export async function runCodeModCommand(codemod?: CodeModDefinition) {
         if (!result) {
             return;
         }
-        selectedMod = result.mod;
+        mod = result.mod;
     } else {
-        selectedMod = codemod;
+        mod = mod;
     }
 
     const source = document.getText();
     let result;
     try {
-        result = codeModService.executeTransform(selectedMod, {
+        result = codeModService.executeTransform(mod, {
+            languageId: document.languageId as LanguageId,
             fileName: document.fileName,
             source,
             selection: {
-                startPos: window.activeTextEditor.selection.start,
-                endPos: window.activeTextEditor.selection.end
+                startPos: document.offsetAt(window.activeTextEditor.selection.start),
+                endPos: document.offsetAt(window.activeTextEditor.selection.end)
             }
         });
     } catch (e) {
-        window.showErrorMessage(`Error while running codemod: ${e.message}`);
-        console.error(`Error while running codemod: ${e.toString()}`);
+        logService.outputError(`Error while executing ${mod.id}.transform(): ${e.toString()}`);
         return;
     }
 

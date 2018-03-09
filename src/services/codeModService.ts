@@ -7,6 +7,7 @@ import { Position } from '../utils/Position';
 import { Program } from 'ast-types';
 import { configIds, extensionId } from '../const';
 import { registerCollectionExtensions } from '../utils';
+import logService from './logService';
 
 // Hack to adjust default recast options
 // making it as close to Prettier as possible.
@@ -21,7 +22,16 @@ CollectionPrototype.toSource = function(options) {
 
 registerCollectionExtensions(jscodeshift as jscodeshift.JsCodeShift);
 
-const codeshifts = {
+export type LanguageId = 'javascript' | 'javascriptreact' | 'typescript' | 'typescriptreact';
+
+const supportedLanguages: LanguageId[] = [
+    'javascript',
+    'javascriptreact',
+    'typescript',
+    'typescriptreact'
+];
+
+const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
     javascript: jscodeshift.withParser('babylon'),
     javascriptreact: jscodeshift.withParser('babylon'),
     typescript: jscodeshift.withParser('typescript'),
@@ -41,29 +51,8 @@ class CodeModService {
 
     private _codeModsCache: CodeModDefinition[] | null = null;
 
-    private _shiftsByExtension: {
-        [extension: string]: jscodeshift.JsCodeShift;
-    } = {};
-
-    constructor() {
-        const config = vscode.workspace.getConfiguration(extensionId);
-        const extensionParserMap: any = config.get(configIds.extensionParser);
-        extensionParserMap.forEach(x => {
-            x.extensions.split(',').forEach(ext => {
-                this._shiftsByExtension[ext] = codeshifts[x.parser];
-            });
-        });
-    }
-
-    private _getCodeShift(fileName: string) {
-        const extension = path.extname(fileName);
-        const shift = this._shiftsByExtension[extension];
-        if (!shift) {
-            console.warn(
-                'File extension is not supported. Using default code shift (javascriptreact).'
-            );
-        }
-        return codeshifts.javascriptreact;
+    private _getCodeShift(languageId: LanguageId, fileName: string) {
+        return codeshifts[languageId];
     }
 
     private _parseCodeModFile(fileName: string): CodeModDefinition {
@@ -71,11 +60,12 @@ class CodeModService {
         try {
             modFn = require(fileName);
         } catch (e) {
-            console.error(`Failed to parse codemod '${fileName}: ${e.message}'`);
+            logService.outputError(`Failed to parse codemod '${fileName}: ${e.message}'`);
             return null;
         }
         const name = path.basename(fileName, path.extname(fileName));
         return {
+            id: name,
             name: modFn.title || name,
             description: modFn.description || '',
             detail: modFn.detail,
@@ -92,6 +82,12 @@ class CodeModService {
         await this.reloadAllCodeMods();
         return this._codeModsCache;
     }
+
+    public isSupportedLanguage(languageId: string): boolean {
+        return supportedLanguages.indexOf(languageId as any) !== -1;
+    }
+
+    constructor() {}
 
     public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
         // local code mods
@@ -139,6 +135,7 @@ class CodeModService {
     }
 
     public async getCodeActionMods(options: {
+        languageId: LanguageId;
         fileName: string;
         source: string;
         selection: { startPos: vscode.Position; endPos: vscode.Position };
@@ -151,7 +148,7 @@ class CodeModService {
             try {
                 return this.executeCanRun(mod, options);
             } catch (e) {
-                console.error(`Error while running codemod.canRun: ${e.toString()}`);
+                logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
                 return false;
             }
         });
@@ -160,6 +157,7 @@ class CodeModService {
     public executeCanRun(
         mod: CodeModDefinition,
         options: {
+            languageId: LanguageId;
             fileName: string;
             source: string;
             selection: { startPos: vscode.Position; endPos: vscode.Position };
@@ -172,13 +170,13 @@ class CodeModService {
                 ast: this._getAstTree(options)
             },
             {
-                jscodeshift: this._getCodeShift(options.fileName),
+                jscodeshift: this._getCodeShift(options.languageId, options.fileName),
                 stats: () => ({})
             },
             {
                 selection: {
-                    startPos: Position.fromLineCharacter(options.selection.startPos),
-                    endPos: Position.fromLineCharacter(options.selection.endPos)
+                    startPos: Position.fromZeroBased(options.selection.startPos),
+                    endPos: Position.fromZeroBased(options.selection.endPos)
                 }
             }
         );
@@ -187,9 +185,10 @@ class CodeModService {
     public executeTransform(
         mod: CodeModDefinition,
         options: {
+            languageId: LanguageId;
             fileName: string;
             source: string;
-            selection: { startPos: vscode.Position; endPos: vscode.Position };
+            selection: { startPos: number; endPos: number };
         }
     ): string {
         let result;
@@ -200,13 +199,13 @@ class CodeModService {
                 ast: this._getAstTree(options)
             },
             {
-                jscodeshift: this._getCodeShift(options.fileName),
+                jscodeshift: this._getCodeShift(options.languageId, options.fileName),
                 stats: () => ({})
             },
             {
                 selection: {
-                    startPos: Position.fromLineCharacter(options.selection.startPos),
-                    endPos: Position.fromLineCharacter(options.selection.endPos)
+                    startPos: options.selection.startPos,
+                    endPos: options.selection.endPos
                 }
             }
         );
@@ -217,14 +216,14 @@ class CodeModService {
         return result;
     }
 
-    private _getAstTree(options: { fileName: string; source: string }) {
+    private _getAstTree(options: { languageId: LanguageId; fileName: string; source: string }) {
         const cache = this._astCache.get(options.fileName);
         if (cache && cache.source === options.source) {
             return cache.ast;
         }
-        const ast = this._getCodeShift(options.fileName)(options.source) as jscodeshift.Collection<
-            Program
-        >;
+        const ast = this._getCodeShift(options.languageId, options.fileName)(
+            options.source
+        ) as jscodeshift.Collection<Program>;
         this._astCache.set(options.fileName, {
             source: options.source,
             ast
