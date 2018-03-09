@@ -18,3 +18,13 @@ const b = a + b + 'baz'; /*# { pos: 12 } #*/
 const a = 'foo';
 const b = 'bar';
 const b = a + b; /*# { pos: 12 } #*/
+
+/*$ { fixture: 'should-not-trigger-on-import', expected: false } $*/
+
+import React from 'react'; /*# { pos: 23 } #*/
+
+/*$ { fixture: 'should-not-trigger-on-jsx-attributes', expected: false } $*/
+
+import React from 'react';
+
+const data = <div className="foo"></div>  /*# { pos: 31 } #*/

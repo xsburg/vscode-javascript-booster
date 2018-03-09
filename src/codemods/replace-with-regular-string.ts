@@ -38,12 +38,17 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         }
     }
 
+    if (expressions.length === 0) {
+        expressions.push(j.stringLiteral(firstStrValue));
+    }
+
     function combineExpressions(rightIndex: number) {
         if (rightIndex === 0) {
             return expressions[0];
         }
         return j.binaryExpression('+', combineExpressions(rightIndex - 1), expressions[rightIndex]);
     }
+
     const combinedExpr = combineExpressions(expressions.length - 1);
     path.replace(combinedExpr);
 

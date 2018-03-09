@@ -86,6 +86,10 @@ codeMod.canRun = function(fileInfo, api, options) {
     const pos = options.selection.endPos;
     let path = src.findNodeAtPosition(pos).firstPath();
 
+    if (j.ImportDeclaration.check(path.parent.node) || j.JSXAttribute.check(path.parent.node)) {
+        return false;
+    }
+
     while (path.parent && path.parent.node.type === 'BinaryExpression') {
         path = path.parent;
     }

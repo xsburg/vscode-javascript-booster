@@ -18,3 +18,7 @@ const c = `baz${b}${a}`; /*# { pos: 14 } #*/
 const a = 'foo';
 const b = 'bar';
 const c = `${a}${b}baz`; /*# { pos: 14 } #*/
+
+/*$ { fixture: 'should-convert-empty-template' } $*/
+
+const a = ``; /*# { pos: 12 } #*/

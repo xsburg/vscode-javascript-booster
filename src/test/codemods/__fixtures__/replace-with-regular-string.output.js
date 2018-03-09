@@ -18,3 +18,7 @@ const c = 'baz' + b + a;
 const a = 'foo';
 const b = 'bar';
 const c = a + b + 'baz';
+
+/*$ { fixture: 'should-convert-empty-template' } $*/
+
+const a = '';
