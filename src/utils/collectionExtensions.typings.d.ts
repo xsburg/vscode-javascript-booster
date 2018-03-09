@@ -6,5 +6,6 @@ declare module 'jscodeshift' {
         firstPath(): NodePath<TNode> | null;
         findNodeAtPosition(pos: number): Collection;
         thisOrClosest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode>;
+        furthest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode>;
     }
 }

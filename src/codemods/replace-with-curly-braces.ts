@@ -33,7 +33,7 @@ codeMod.canRun = function(fileInfo, api, options) {
     const pos = options.selection.endPos;
     let path = src.findNodeAtPosition(pos).firstPath();
 
-    return j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node);
+    return path && j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node);
 };
 
 codeMod.scope = 'cursor';

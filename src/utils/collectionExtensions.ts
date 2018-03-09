@@ -38,6 +38,20 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                 }
                 return path || null;
             });
+        },
+
+        furthest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode> {
+            return this.map(function(path) {
+                let furthestPath = null;
+                path = path.parent;
+                while (path) {
+                    if (type.check(path.value) && (!filter || j.match(path.value, filter))) {
+                        furthestPath = path;
+                    }
+                    path = path.parent;
+                }
+                return furthestPath;
+            });
         }
     });
 }

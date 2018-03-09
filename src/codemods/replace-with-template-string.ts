@@ -84,10 +84,19 @@ codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
     const src = fileInfo.ast;
     const pos = options.selection.endPos;
-    let path = src.findNodeAtPosition(pos).firstPath();
+    const target = src.findNodeAtPosition(pos);
 
-    if (j.ImportDeclaration.check(path.parent.node) || j.JSXAttribute.check(path.parent.node)) {
+    let path = target.firstPath();
+    if (
+        !path ||
+        j.ImportDeclaration.check(path.parent.node) ||
+        j.JSXAttribute.check(path.parent.node)
+    ) {
         return false;
+    }
+
+    if (j.StringLiteral.check(path.node)) {
+        return true;
     }
 
     while (path.parent && path.parent.node.type === 'BinaryExpression') {
