@@ -19,8 +19,8 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
             fileName: document.fileName,
             source,
             selection: {
-                startPos: range.start,
-                endPos: range.end
+                startPos: document.offsetAt(range.start),
+                endPos: document.offsetAt(range.end)
             }
         });
         return codeMods.map(

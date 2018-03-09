@@ -40,6 +40,12 @@ const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
 
 const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
 
+// Zero-based offset
+type Selection = {
+    startPos: number;
+    endPos: number;
+};
+
 class CodeModService {
     private _astCache: Map<
         string, // cached by fileName
@@ -138,7 +144,7 @@ class CodeModService {
         languageId: LanguageId;
         fileName: string;
         source: string;
-        selection: { startPos: vscode.Position; endPos: vscode.Position };
+        selection: Selection;
     }) {
         const mods = await this._getAllCodeMods();
         return mods.filter(mod => {
@@ -160,7 +166,7 @@ class CodeModService {
             languageId: LanguageId;
             fileName: string;
             source: string;
-            selection: { startPos: vscode.Position; endPos: vscode.Position };
+            selection: Selection;
         }
     ) {
         return mod.canRun(
@@ -175,8 +181,8 @@ class CodeModService {
             },
             {
                 selection: {
-                    startPos: Position.fromZeroBased(options.selection.startPos),
-                    endPos: Position.fromZeroBased(options.selection.endPos)
+                    startPos: options.selection.startPos,
+                    endPos: options.selection.endPos
                 }
             }
         );
@@ -188,7 +194,7 @@ class CodeModService {
             languageId: LanguageId;
             fileName: string;
             source: string;
-            selection: { startPos: number; endPos: number };
+            selection: Selection;
         }
     ): string {
         let result;

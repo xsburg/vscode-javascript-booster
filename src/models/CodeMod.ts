@@ -1,14 +1,17 @@
 import { JsCodeShift, Collection } from 'jscodeshift';
 import { Position } from '../utils/Position';
 
+type Selection = {
+    // Zero-based offset
+    startPos: number;
+    endPos: number;
+};
+
 type CodeModTransform = (
     fileInfo: { path: string; source: string; ast: Collection },
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
-        selection: {
-            startPos: Position;
-            endPos: Position;
-        };
+        selection: Selection;
     }
 ) => string | undefined | null;
 
@@ -16,10 +19,7 @@ type CanRunFunction = (
     fileInfo: { path: string; source: string; ast: Collection },
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
-        selection: {
-            startPos: Position;
-            endPos: Position;
-        };
+        selection: Selection;
     }
 ) => boolean;
 
