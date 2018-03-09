@@ -93,6 +93,19 @@ class CodeModService {
         return supportedLanguages.indexOf(languageId as any) !== -1;
     }
 
+    public offsetAt(document: vscode.TextDocument, pos: vscode.Position) {
+        const input = document.getText();
+        let offset = 0;
+        let lines = input
+            .split('\r')
+            .join('')
+            .split('\n');
+        let prevLines = lines.slice(0, pos.line);
+        offset += prevLines.map(l => l.length + 1).reduce((s, a) => s + a, 0);
+        offset += pos.character;
+        return offset;
+    }
+
     constructor() {}
 
     public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {

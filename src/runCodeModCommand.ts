@@ -40,8 +40,11 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
             fileName: document.fileName,
             source,
             selection: {
-                startPos: document.offsetAt(window.activeTextEditor.selection.start),
-                endPos: document.offsetAt(window.activeTextEditor.selection.end)
+                startPos: codeModService.offsetAt(
+                    document,
+                    window.activeTextEditor.selection.start
+                ),
+                endPos: codeModService.offsetAt(document, window.activeTextEditor.selection.end)
             }
         });
     } catch (e) {

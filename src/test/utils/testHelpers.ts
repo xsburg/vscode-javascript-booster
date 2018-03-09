@@ -22,22 +22,37 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Position, IPosition } from '../../utils';
 
-function toVsPosition(pos: IPosition) {
+function toZeroBasedPosition(pos: IPosition) {
     return new vscode.Position(pos.line - 1, pos.column - 1);
 }
 
-function getSelection(options: { pos?: IPosition; startPos?: IPosition; endPos?: IPosition }) {
-    let startPos;
-    let endPos;
+function toOffsetFromStart(input: string, posOneBased: IPosition): number {
+    const pos = toZeroBasedPosition(posOneBased);
+    let offset = 0;
+    let lines = input.split('\n');
+    let prevLines = lines.slice(0, pos.line);
+    offset += prevLines.map(l => l.length + 1).reduce((s, a) => s + a, 0);
+    offset += pos.character;
+    return offset;
+}
+
+function getSelection(options: {
+    input: string;
+    pos?: IPosition;
+    startPos?: IPosition;
+    endPos?: IPosition;
+}) {
+    let startPos: number;
+    let endPos: number;
     if (options.pos) {
-        startPos = toVsPosition(options.pos);
-        endPos = toVsPosition(options.pos);
+        startPos = toOffsetFromStart(options.input, options.pos);
+        endPos = toOffsetFromStart(options.input, options.pos);
     } else if (options.startPos) {
-        startPos = toVsPosition(options.startPos);
-        endPos = toVsPosition(options.endPos);
+        startPos = toOffsetFromStart(options.input, options.startPos);
+        endPos = toOffsetFromStart(options.input, options.endPos);
     } else {
-        startPos = new vscode.Position(0, 0);
-        endPos = new vscode.Position(0, 0);
+        startPos = 0;
+        endPos = 0;
     }
     return {
         startPos,
@@ -59,7 +74,12 @@ export function runInlineTransformTest(
         fileName:
             (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
         source: input,
-        selection: getSelection(options)
+        selection: getSelection({
+            input,
+            pos: options.pos,
+            startPos: options.startPos,
+            endPos: options.endPos
+        })
     };
 
     const canRun = codeModService.executeCanRun(mod, runOptions);
@@ -85,7 +105,12 @@ export function runInlineCanRunTest(
         fileName:
             (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
         source: input,
-        selection: getSelection(options)
+        selection: getSelection({
+            input,
+            pos: options.pos,
+            startPos: options.startPos,
+            endPos: options.endPos
+        })
     };
 
     const actualOutput = codeModService.executeCanRun(mod, runOptions);
