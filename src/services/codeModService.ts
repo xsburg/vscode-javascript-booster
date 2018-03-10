@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs-extra';
+import * as os from 'os';
 import * as jscodeshift from 'jscodeshift';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeMod';
 import { Position } from '../utils/Position';
@@ -93,6 +94,13 @@ class CodeModService {
         return supportedLanguages.indexOf(languageId as any) !== -1;
     }
 
+    /**
+     * Compute zero-based offset for `Position` in the way Babylon parser does it.
+     * All new-line sequences are normalized to \r\n for Win and \n for Linux and 
+     * therefore treated as 1 or 2 characters depending on the OS.
+     * @param document 
+     * @param pos 
+     */
     public offsetAt(document: vscode.TextDocument, pos: vscode.Position) {
         const input = document.getText();
         let offset = 0;
@@ -100,8 +108,9 @@ class CodeModService {
             .split('\r')
             .join('')
             .split('\n');
-        let prevLines = lines.slice(0, pos.line);
-        offset += prevLines.map(l => l.length + 1).reduce((s, a) => s + a, 0);
+        const prevLines = lines.slice(0, pos.line);
+        const eolLength = os.EOL.length;
+        offset += prevLines.map(l => l.length + eolLength).reduce((s, a) => s + a, 0);
         offset += pos.character;
         return offset;
     }

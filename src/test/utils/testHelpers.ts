@@ -19,6 +19,7 @@ import codeModService, { LanguageId } from '../../services/codeModService';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs-extra';
+import * as os from 'os';
 import * as path from 'path';
 import { Position, IPosition } from '../../utils';
 
@@ -31,7 +32,7 @@ function toOffsetFromStart(input: string, posOneBased: IPosition): number {
     let offset = 0;
     let lines = input.split('\n');
     let prevLines = lines.slice(0, pos.line);
-    offset += prevLines.map(l => l.length + 1).reduce((s, a) => s + a, 0);
+    offset += prevLines.map(l => l.length + os.EOL.length).reduce((s, a) => s + a, 0);
     offset += pos.character;
     return offset;
 }
