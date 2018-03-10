@@ -148,6 +148,7 @@ class CodeModService {
         codeMods = codeMods.filter(c => c);
         codeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
         this._codeModsCache = codeMods;
+        logService.output(`${codeMods.length} code actions loaded.`);
         return codeMods;
     }
 
