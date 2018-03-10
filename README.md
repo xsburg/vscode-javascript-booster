@@ -6,6 +6,8 @@ This VS Code extension provides various code actions (quick fixes) when editing 
 
 You might want to reassign the default shortcut for the quick fix menu to `Alt+Enter` if you are moving from WebStorm. Search for `editor.action.quickFix` command.
 
+![Features](resources/features.gif)
+
 ## Installation
 
 Install through VS Code extensions. Search for `JavaScript Booster`
@@ -17,8 +19,6 @@ Can also be installed using
 ```
 ext install vscode-javascript-booster
 ```
-
-![Features](resources/features.gif)
 
 ## Supported code actions
 
