@@ -18,7 +18,8 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     let node = target.firstNode<ArrowFunctionExpression>();
 
     const returnStatement = (node.body as BlockStatement).body[0] as ReturnStatement;
-    node.body = returnStatement.argument;
+    const returnExpr = returnStatement.argument;
+    node.body = returnExpr;
 
     let resultText = ast.toSource();
     return resultText;

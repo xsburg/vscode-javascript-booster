@@ -60,6 +60,10 @@ function getSelection(options: {
     };
 }
 
+function normalizeLineEndings(text: string) {
+    return text.split('\r').join('');
+}
+
 export function runInlineTransformTest(
     languageId: LanguageId,
     modId: string,
@@ -67,6 +71,8 @@ export function runInlineTransformTest(
     output: string,
     options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
+    input = normalizeLineEndings(input);
+    output = normalizeLineEndings(output);
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
@@ -86,7 +92,8 @@ export function runInlineTransformTest(
     if (!canRun) {
         throw new Error('The transform cannot be run at this position.');
     }
-    const actualOutput = codeModService.executeTransform(mod, runOptions);
+    let actualOutput = codeModService.executeTransform(mod, runOptions);
+    actualOutput = normalizeLineEndings(actualOutput);
 
     assert.equal(actualOutput, output);
 }

@@ -62,11 +62,7 @@ This extension contributes the following settings:
 
 Calling out known issues can help limit users opening duplicate issues against your extension.
 
-* Extra `\n` and `;` symbols might appear at the end of the file
-* Target node (the one under the cursor) could be computed once rather than in every canRun() checker
-* To ease the pressure on the CPU while typings, the AST rebuild could be restricted to once per 100ms (needs checking if it's an issue)
-* canRun works differently: see code actions, can't execute it.
-* [! - position mismatch?] split into multiple declarations AND split into decl & initialization MUST be available on declarators
+* Possible issues on Windows machines, line endings again & position again?
 
 ## Release Notes
 
