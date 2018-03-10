@@ -2,7 +2,7 @@
     "name": "vscode-javascript-booster",
     "displayName": "JavaScript Booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
-    "icon": "images/icon.png",
+    "icon": "resources/icon.png",
     "version": "0.1.0",
     "publisher": "sburg",
     "author": "Stepan Burguchev <me@sburg.net>",

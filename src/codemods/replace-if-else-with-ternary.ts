@@ -88,7 +88,7 @@ codeMod.canRun = function(fileInfo, api, options) {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Merge declaration and initialization';
+codeMod.title = 'Replace if-else with ?:';
 
 codeMod.description = '';
 

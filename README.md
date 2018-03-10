@@ -1,10 +1,10 @@
 # VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg?style=flat)](https://travis-ci.org/xsburg/vscode-javascript-booster)
 
-Make your life easier, use code actions to do repetitive tasks for you! They can do a lot, just follow the light bulb [💡]!
+Make your life easier, use code actions to do repetitive tasks for you! They can help a lot, just follow the light bulb [💡]!
 
 This VS Code extension provides various code actions (quick fixes) when editing code in JavaScript (or TypeScript/Flow). Just note the light bulb at the left and press it to learn how you can transform the code under the cursor.
 
-It might worth assigning a shortcut to open the bulb, search for `editor.action.quickFix` command.
+You might want to reassign the default shortcut for the quick fix menu to `Alt+Enter` if you are moving from WebStorm. Search for `editor.action.quickFix` command.
 
 ## Installation
 

@@ -96,10 +96,10 @@ class CodeModService {
 
     /**
      * Compute zero-based offset for `Position` in the way Babylon parser does it.
-     * All new-line sequences are normalized to \r\n for Win and \n for Linux and 
+     * All new-line sequences are normalized to \r\n for Win and \n for Linux and
      * therefore treated as 1 or 2 characters depending on the OS.
-     * @param document 
-     * @param pos 
+     * @param document
+     * @param pos
      */
     public offsetAt(document: vscode.TextDocument, pos: vscode.Position) {
         const input = document.getText();
@@ -121,7 +121,7 @@ class CodeModService {
         // local code mods
         const files = await fs.readdir(embeddedCodeModDir);
         const fileNames = files.map(name => path.join(embeddedCodeModDir, name));
-        const predefinedMods = (await Promise.all(
+        let codeMods = (await Promise.all(
             fileNames.map(async fileName => {
                 if (!fileName.match(/(\.ts|\.js)$/)) {
                     return {
@@ -141,9 +141,10 @@ class CodeModService {
         // user-workspace code mods
         const config = vscode.workspace.getConfiguration(extensionId);
         const codemodDir = config.get(configIds.codemodDir);
-        const uris = await vscode.workspace.findFiles(`${codemodDir}/*.{ts,js}`);
-        let codeMods = uris.map(uri => this._parseCodeModFile(uri.fsPath));
-        codeMods.push(...predefinedMods);
+        if (vscode.workspace.name) {
+            const uris = await vscode.workspace.findFiles(`${codemodDir}/*.{ts,js}`);
+            codeMods.push(...uris.map(uri => this._parseCodeModFile(uri.fsPath)));
+        }
         codeMods = codeMods.filter(c => c);
         codeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
         this._codeModsCache = codeMods;
