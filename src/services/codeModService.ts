@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import * as jscodeshift from 'jscodeshift';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeMod';
 import { Position } from '../utils/Position';
-import { Program } from 'ast-types';
+import { Program, AstNode } from 'ast-types';
 import { configIds, extensionId } from '../const';
 import { registerCollectionExtensions } from '../utils';
 import logService from './logService';
@@ -41,19 +41,21 @@ const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
 const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
 
 // Zero-based offset
-type Selection = {
+interface Selection {
     startPos: number;
     endPos: number;
-};
+}
+
+interface AstCache {
+    source: string;
+    ast: jscodeshift.Collection<Program>;
+    modsByPosition: Map<number, CodeModDefinition[]>;
+    modsByTarget: Map<AstNode, CodeModDefinition[]>;
+}
 
 class CodeModService {
-    private _astCache: Map<
-        string, // cached by fileName
-        {
-            source: string;
-            ast: jscodeshift.Collection<Program>;
-        }
-    > = new Map();
+    // cached by fileName
+    private _astCache: Map<string, AstCache> = new Map();
 
     private _codeModsCache: CodeModDefinition[] | null = null;
 
@@ -109,6 +111,7 @@ class CodeModService {
     constructor() {}
 
     public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
+        this._invalidateAstTreeCache();
         // local code mods
         const files = await fs.readdir(embeddedCodeModDir);
         const fileNames = files.map(name => path.join(embeddedCodeModDir, name));
@@ -158,19 +161,59 @@ class CodeModService {
         fileName: string;
         source: string;
         selection: Selection;
-    }) {
-        const mods = await this._getAllCodeMods();
-        return mods.filter(mod => {
-            if (mod.scope !== CodeModScope.Cursor) {
-                return false;
-            }
-            try {
-                return this.executeCanRun(mod, options);
-            } catch (e) {
-                logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
-                return false;
-            }
-        });
+    }): Promise<CodeModDefinition[]> {
+        console.log(new Date().toISOString(), 'getCodeActionMods');
+        const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
+        const pos = options.selection.startPos;
+        let astCache = this._astCache.get(options.fileName);
+
+        // Level 1: AST cache
+        if (!astCache) {
+            astCache = {
+                source: options.source,
+                ast: jscodeshift(options.source) as jscodeshift.Collection<Program>,
+                modsByTarget: new Map(),
+                modsByPosition: new Map()
+            };
+        }
+
+        // Level 2: cache by position
+        let mods = astCache.modsByPosition.get(pos);
+        if (mods) {
+            return mods;
+        }
+
+        // Level 3: cache by target node
+        const target = astCache.ast.findNodeAtPosition(options.selection.startPos);
+        const targetNode = target.firstNode();
+        mods = astCache.modsByTarget.get(targetNode);
+        if (mods) {
+            // update cache
+            astCache.modsByPosition.set(pos, mods);
+            return mods;
+        }
+
+        if (targetNode) {
+            const allMods = await this._getAllCodeMods();
+            mods = allMods.filter(mod => {
+                if (mod.scope !== CodeModScope.Cursor) {
+                    return false;
+                }
+                try {
+                    return this.executeCanRun(mod, options);
+                } catch (e) {
+                    logService.outputError(
+                        `Error while executing ${mod.id}.canRun(): ${e.toString()}`
+                    );
+                    return false;
+                }
+            });
+        } else {
+            mods = [];
+        }
+        astCache.modsByPosition.set(pos, mods);
+        astCache.modsByTarget.set(targetNode, mods);
+        return mods;
     }
 
     public executeCanRun(
@@ -183,7 +226,7 @@ class CodeModService {
         }
     ) {
         const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
-        const ast = this._getAstTree(options);
+        const ast = this._getAstTreeCache(options);
         const target = ast.findNodeAtPosition(options.selection.startPos);
         return mod.canRun(
             {
@@ -211,7 +254,7 @@ class CodeModService {
         }
     ): string {
         const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
-        const ast = this._getAstTree(options);
+        const ast = this._getAstTreeCache(options);
         const target = ast.findNodeAtPosition(options.selection.startPos);
         let result;
         result = mod.modFn(
@@ -228,14 +271,18 @@ class CodeModService {
                 target
             }
         );
-        this._invalidateAstTree(options.fileName);
+        this._invalidateAstTreeCache(options.fileName);
         if (!result) {
             return options.source;
         }
         return result;
     }
 
-    private _getAstTree(options: { languageId: LanguageId; fileName: string; source: string }) {
+    private _getAstTreeCache(options: {
+        languageId: LanguageId;
+        fileName: string;
+        source: string;
+    }) {
         const cache = this._astCache.get(options.fileName);
         if (cache && cache.source === options.source) {
             return cache.ast;
@@ -245,12 +292,18 @@ class CodeModService {
         ) as jscodeshift.Collection<Program>;
         this._astCache.set(options.fileName, {
             source: options.source,
-            ast
+            ast,
+            modsByPosition: new Map(),
+            modsByTarget: new Map()
         });
         return ast;
     }
 
-    private _invalidateAstTree(fileName: string) {
+    private _invalidateAstTreeCache(fileName?: string) {
+        if (!fileName) {
+            this._astCache.clear();
+            return;
+        }
         const cache = this._astCache.get(fileName);
         if (cache) {
             this._astCache.delete(fileName);
