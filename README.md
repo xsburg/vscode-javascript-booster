@@ -18,30 +18,43 @@ Can also be installed using
 ext install vscode-javascript-booster
 ```
 
-<!-- ![Run CodeMod Command](images/runCodeMod.gif) -->
+![Features](resources/features.gif)
 
 ## Supported code actions
 
-* [x] Flip if-else
-* [x] Remove redundant else
-* [x] Replace if-else with ?:
-* [x] Convert shorthand arrow function to statement
-* [x] Convert to shorthand arrow function
-* [x] Replace string with template string
-* [x] Replace template string with regular string
-* [x] Wrap value with {} (JSX attributes)
-* [x] Convert var to let
-* [x] Convert var to const
-* [x] Split into multiple declarations
-* [x] Split into declaration and initialisation
-* [x] Merge declaration and initialisation
-* [ ] Flip ?:
+* 💥 Flip if-else
+* 💥 Remove redundant else
+* 💥 Replace if-else with ?:
+* 💥 Convert shorthand arrow function to statement
+* 💥 Convert to shorthand arrow function
+* 💥 Replace string with template string
+* 💥 Replace template string with regular string
+* 💥 Wrap value with {} (JSX attributes)
+* 💥 Convert var to let
+* 💥 Convert var to const
+* 💥 Split into multiple declarations
+* 💥 Split into declaration and initialisation
+* 💥 Merge declaration and initialisation
 
 ## Roadmap
 
-* [ ] Extend/Shrink selection
-* [ ] Duplicate line/selection
-* [ ] Support loading code actions from the workspace directory
+### More code actions
+
+* Flip ?:
+* Convert if-else-return -> return ?:
+* JSX: Collapse/Expand empty tag
+* TS: Convert alias to interface
+* ...?
+
+### New commands
+
+* Extend/Shrink selection (similar to what WebStorm provides)
+* Duplicate line/selection
+* Navigate to related files (Hello.jsx -> Hello.scss, Hello.spec.jsx)
+
+### Others
+
+* Support loading code actions from user workspace: users can create their own, project-related refactorings! 😅
 
 ## Inspiration
 
@@ -61,8 +74,6 @@ This extension contributes the following settings:
 ## Known Issues
 
 Calling out known issues can help limit users opening duplicate issues against your extension.
-
-* Possible issues on Windows machines, line endings again & position again?
 
 ## Release Notes
 
