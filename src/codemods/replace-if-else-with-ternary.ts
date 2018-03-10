@@ -35,12 +35,9 @@ function getSingleExpressionStatement(j: JsCodeShift, n: Node): ExpressionStatem
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const path = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.IfStatement)
-        .firstPath()!;
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const path = target.thisOrClosest(j.IfStatement).firstPath()!;
 
     const conExpr = getSingleExpressionStatement(j, path.node.consequent)
         .expression as AssignmentExpression;
@@ -58,18 +55,15 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     );
     path.replace(result);
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const node = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.IfStatement)
-        .firstNode();
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const node = target.thisOrClosest(j.IfStatement).firstNode();
 
     if (!node || !node.alternate) {
         return false;

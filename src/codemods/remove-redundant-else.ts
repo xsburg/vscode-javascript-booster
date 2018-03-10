@@ -10,21 +10,21 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
+    const ast = fileInfo.ast;
+    const target = options.target;
 
-    const node = src.findNodeAtPosition(pos).firstNode()! as IfStatement;
+    const node = target.firstNode<IfStatement>()!;
     node.alternate = null;
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const node = src.findNodeAtPosition(pos).firstNode();
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const node = target.firstNode();
 
     return Boolean(
         j.IfStatement.check(node) &&

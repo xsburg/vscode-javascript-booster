@@ -16,22 +16,22 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
+    const ast = fileInfo.ast;
+    const target = options.target;
 
-    let path = src.findNodeAtPosition(pos).firstPath() as NodePath<StringLiteral>;
+    let path = target.firstPath<StringLiteral>();
 
     path.replace(j.jsxExpressionContainer(j.stringLiteral(path.node.value)));
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    let path = src.findNodeAtPosition(pos).firstPath();
+    const ast = fileInfo.ast;
+    const target = options.target;
+    let path = target.firstPath();
 
     return path && j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node);
 };

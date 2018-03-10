@@ -182,21 +182,21 @@ class CodeModService {
             selection: Selection;
         }
     ) {
+        const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
+        const ast = this._getAstTree(options);
+        const target = ast.findNodeAtPosition(options.selection.startPos);
         return mod.canRun(
             {
                 path: options.fileName,
                 source: options.source,
-                ast: this._getAstTree(options)
+                ast
             },
             {
-                jscodeshift: this._getCodeShift(options.languageId, options.fileName),
-                stats: () => ({})
+                jscodeshift,
+                stats: () => {}
             },
             {
-                selection: {
-                    startPos: options.selection.startPos,
-                    endPos: options.selection.endPos
-                }
+                target
             }
         );
     }
@@ -210,22 +210,22 @@ class CodeModService {
             selection: Selection;
         }
     ): string {
+        const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
+        const ast = this._getAstTree(options);
+        const target = ast.findNodeAtPosition(options.selection.startPos);
         let result;
         result = mod.modFn(
             {
                 path: options.fileName,
                 source: options.source,
-                ast: this._getAstTree(options)
+                ast
             },
             {
-                jscodeshift: this._getCodeShift(options.languageId, options.fileName),
-                stats: () => ({})
+                jscodeshift,
+                stats: () => {}
             },
             {
-                selection: {
-                    startPos: options.selection.startPos,
-                    endPos: options.selection.endPos
-                }
+                target
             }
         );
         this._invalidateAstTree(options.fileName);

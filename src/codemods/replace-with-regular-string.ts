@@ -15,13 +15,10 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
+    const ast = fileInfo.ast;
+    const target = options.target;
 
-    let path = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.TemplateLiteral)
-        .firstPath()!;
+    let path = target.thisOrClosest(j.TemplateLiteral).firstPath()!;
     const literal = path.node as TemplateLiteral;
 
     let expressions: Expression[] = [];
@@ -52,18 +49,15 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const combinedExpr = combineExpressions(expressions.length - 1);
     path.replace(combinedExpr);
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    let path = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.TemplateLiteral)
-        .firstPath();
+    const ast = fileInfo.ast;
+    const target = options.target;
+    let path = target.thisOrClosest(j.TemplateLiteral).firstPath();
 
     return Boolean(path);
 };

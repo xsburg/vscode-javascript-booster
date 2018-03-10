@@ -15,23 +15,21 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const target = src.findNodeAtPosition(pos);
-    let node = target.nodes()[0] as VariableDeclaration;
+    const ast = fileInfo.ast;
+    const target = options.target;
+    let node = target.firstNode<VariableDeclaration>();
 
     node.kind = 'let';
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const target = src.findNodeAtPosition(pos);
-    let node = target.nodes()[0];
+    const ast = fileInfo.ast;
+    const target = options.target;
+    let node = target.firstNode();
 
     return j.VariableDeclaration.check(node) && node.kind === 'var';
 };

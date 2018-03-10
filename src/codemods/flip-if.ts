@@ -36,11 +36,10 @@ function negateExpression(j: JsCodeShift, expr: Expression) {
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
+    const ast = fileInfo.ast;
+    const target = options.target;
 
-    const target = src.findNodeAtPosition(pos);
-    let node = target.nodes()[0] as IfStatement;
+    let node = target.firstNode<IfStatement>();
 
     const consequent = node.consequent;
     let alternate;
@@ -54,16 +53,15 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     node.alternate = consequent;
     node.test = negateExpression(j, node.test);
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const target = src.findNodeAtPosition(pos);
-    const node = target.nodes()[0] as IfStatement;
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const node = target.firstNode<IfStatement>();
 
     return j.IfStatement.check(node);
 };

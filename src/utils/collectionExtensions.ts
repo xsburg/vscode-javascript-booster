@@ -3,11 +3,7 @@ import { Position } from './Position';
 import { Printable, NamedType, NodePath } from 'ast-types';
 
 function isPositionWithinNode(position: number, node: Printable) {
-    return node.start <= position && position <= node.end;
-}
-
-function isPositionWithinNodeStrict(position: number, node: Printable) {
-    return node.start < position && position < node.end;
+    return node.start <= position && position < node.end;
 }
 
 export function registerCollectionExtensions(j: JsCodeShift) {
@@ -21,9 +17,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
         },
 
         findNodeAtPosition<TNode>(this: Collection<TNode>, pos: number): Collection {
-            const matched = this.find(j.Node).filter(path =>
-                isPositionWithinNodeStrict(pos, path.node)
-            );
+            const matched = this.find(j.Node).filter(path => isPositionWithinNode(pos, path.node));
             const c = matched.at(-1);
             return c;
         },

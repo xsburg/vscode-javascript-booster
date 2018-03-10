@@ -14,10 +14,10 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
+    const ast = fileInfo.ast;
+    const target = options.target;
 
-    let path = src.findNodeAtPosition(pos).firstPath();
+    let path = target.firstPath();
     while (path.parent && path.parent.node.type === 'BinaryExpression') {
         path = path.parent;
     }
@@ -76,15 +76,14 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const templateLiteral = j.templateLiteral(templateElements, expressions);
     path.replace(templateLiteral);
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const target = src.findNodeAtPosition(pos);
+    const ast = fileInfo.ast;
+    const target = options.target;
 
     let path = target.firstPath();
     if (

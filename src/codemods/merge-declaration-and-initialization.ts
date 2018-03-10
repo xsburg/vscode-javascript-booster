@@ -19,12 +19,9 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const declarationPath = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.VariableDeclaration)
-        .firstPath()!;
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const declarationPath = target.thisOrClosest(j.VariableDeclaration).firstPath()!;
     const declarationNode = declarationPath.node;
     const blockStatementPath = declarationPath.parent as NodePath<BlockStatement>;
 
@@ -69,18 +66,15 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         declarationPath.prune();
     }
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const path = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.VariableDeclaration)
-        .firstPath();
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
     if (!path || !(j.BlockStatement.check(path.parent.node) || j.Program.check(path.parent.node))) {
         return false;
     }

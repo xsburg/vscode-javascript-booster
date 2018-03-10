@@ -15,13 +15,10 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 
 let codeMod: CodeModExports = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
+    const ast = fileInfo.ast;
+    const target = options.target;
 
-    const path = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.VariableDeclaration)
-        .firstPath()!;
+    const path = target.thisOrClosest(j.VariableDeclaration).firstPath()!;
     const node = path.node;
 
     const declarations = node.declarations
@@ -32,18 +29,15 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     });
     path.prune();
 
-    let resultText = src.toSource();
+    let resultText = ast.toSource();
     return resultText;
 };
 
 codeMod.canRun = function(fileInfo, api, options) {
     const j = api.jscodeshift;
-    const src = fileInfo.ast;
-    const pos = options.selection.endPos;
-    const path = src
-        .findNodeAtPosition(pos)
-        .thisOrClosest(j.VariableDeclaration)
-        .firstPath();
+    const ast = fileInfo.ast;
+    const target = options.target;
+    const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
     return path && path.node.declarations.length > 1;
 };
 
