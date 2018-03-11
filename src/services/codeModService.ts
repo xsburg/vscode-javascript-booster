@@ -157,10 +157,23 @@ class CodeModService {
         return this._parseCodeModFile(fileName);
     }
 
-    public async getGlobalMods() {
-        const mods = (await this._getAllCodeMods()).filter(
-            mod => mod.scope === CodeModScope.Global
-        );
+    public async getGlobalMods(options: {
+        languageId: LanguageId;
+        fileName: string;
+        source: string;
+        selection: Selection;
+    }) {
+        const mods = (await this._getAllCodeMods()).filter(mod => {
+            if (mod.scope !== CodeModScope.Global) {
+                return false;
+            }
+            try {
+                return this.executeCanRun(mod, options);
+            } catch (e) {
+                logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
+                return false;
+            }
+        });
         return mods;
     }
 

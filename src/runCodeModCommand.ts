@@ -14,8 +14,19 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         return;
     }
 
+    const source = document.getText();
+    const selection = {
+        startPos: codeModService.offsetAt(document, window.activeTextEditor.selection.start),
+        endPos: codeModService.offsetAt(document, window.activeTextEditor.selection.end)
+    };
+
     if (!mod) {
-        const codeMods = await codeModService.getGlobalMods();
+        const codeMods = await codeModService.getGlobalMods({
+            languageId: document.languageId as LanguageId,
+            fileName: document.fileName,
+            source,
+            selection
+        });
         const result = await window.showQuickPick(
             codeMods.map(mod => ({
                 label: mod.name,
@@ -32,20 +43,13 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         mod = mod;
     }
 
-    const source = document.getText();
     let result;
     try {
         result = codeModService.executeTransform(mod, {
             languageId: document.languageId as LanguageId,
             fileName: document.fileName,
             source,
-            selection: {
-                startPos: codeModService.offsetAt(
-                    document,
-                    window.activeTextEditor.selection.start
-                ),
-                endPos: codeModService.offsetAt(document, window.activeTextEditor.selection.end)
-            }
+            selection
         });
     } catch (e) {
         logService.outputError(`Error while executing ${mod.id}.transform(): ${e.toString()}`);

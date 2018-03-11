@@ -57,6 +57,7 @@ ext install vscode-javascript-booster
 
 ### Others
 
+* Highlight unused imports
 * Support loading code actions from user workspace: users can create their own, project-related refactorings! 😅
 
 ## Inspiration

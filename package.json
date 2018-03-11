@@ -38,11 +38,11 @@
         "commands": [
             {
                 "command": "javascriptBooster.runCodeMod",
-                "title": "[Booster] Run JS CodeMod"
+                "title": "[Booster] Run Global Code Action"
             },
             {
                 "command": "javascriptBooster.reloadCodeMods",
-                "title": "[Booster] Reload CodeMods"
+                "title": "[Booster] Reload Code Actions"
             }
         ],
         "configuration": [
