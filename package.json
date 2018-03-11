@@ -52,52 +52,7 @@
                     "javascriptBooster.codemodDir": {
                         "type": "string",
                         "default": "codemods",
-                        "description": "Specifies the directory containing workspace related codemods (Example: project related refactorings)"
-                    },
-                    "javascriptBooster.extensionParser": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "title": "Define extension to parser map.",
-                            "properties": {
-                                "extensions": {
-                                    "type": "string",
-                                    "pattern": "^(\\.[a-zA-Z0-9_]+)(,(\\.[a-zA-Z0-9_]+))*$"
-                                },
-                                "parser": {
-                                    "enum": [
-                                        "javascript",
-                                        "javascriptreact",
-                                        "typescript",
-                                        "typescriptreact"
-                                    ]
-                                }
-                            },
-                            "additionalProperties": false,
-                            "required": [
-                                "identifier",
-                                "order"
-                            ]
-                        },
-                        "default": [
-                            {
-                                "extensions": ".js,.es,.es6",
-                                "parser": "javascript"
-                            },
-                            {
-                                "extensions": ".jsx",
-                                "parser": "javascriptreact"
-                            },
-                            {
-                                "extensions": ".ts",
-                                "parser": "typescript"
-                            },
-                            {
-                                "extensions": ".tsx",
-                                "parser": "typescriptreact"
-                            }
-                        ],
-                        "description": "Specifies parsers that should be used to parse JavaScript or TypeScript files with certain extensions."
+                        "description": "Specifies the directory containing workspace related code actions."
                     }
                 }
             }

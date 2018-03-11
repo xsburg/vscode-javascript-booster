@@ -11,7 +11,7 @@ class LogService {
 
     public output(message: string) {
         console.log(`[LogService.output] ${message}`);
-        this._channel.appendLine(message);
+        this._channel.appendLine(`${new Date().toISOString()}: ${message}`);
     }
 
     public outputError(message: string) {

@@ -40,10 +40,13 @@ ext install vscode-javascript-booster
 
 ### More code actions
 
+* Convert const -> let
 * Flip ?:
 * Convert if-else-return -> return ?:
+* Convert if -> switch-case
 * JSX: Collapse/Expand empty tag
 * TS: Convert alias to interface
+* TS: Generate missing switch cases for enum
 * ...?
 
 ### New commands
@@ -74,6 +77,8 @@ This extension contributes the following settings:
 ## Known Issues
 
 Calling out known issues can help limit users opening duplicate issues against your extension.
+
+* Fix canRun() for string literals in enums
 
 ## Release Notes
 

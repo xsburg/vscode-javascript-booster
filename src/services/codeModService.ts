@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as jscodeshift from 'jscodeshift';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeMod';
 import { Position } from '../utils/Position';
-import { Program } from 'ast-types';
+import { Program, File } from 'ast-types';
 import { configIds, extensionId } from '../const';
 import { registerCollectionExtensions } from '../utils';
 import logService from './logService';
@@ -52,7 +52,7 @@ class CodeModService {
         string, // cached by fileName
         {
             source: string;
-            ast: jscodeshift.Collection<Program>;
+            ast: jscodeshift.Collection<File> | false;
         }
     > = new Map();
 
@@ -195,6 +195,9 @@ class CodeModService {
     ) {
         const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
         const ast = this._getAstTree(options);
+        if (!ast) {
+            return false;
+        }
         const target = ast.findNodeAtPosition(options.selection.startPos);
         return mod.canRun(
             {
@@ -223,6 +226,9 @@ class CodeModService {
     ): string {
         const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
         const ast = this._getAstTree(options);
+        if (!ast) {
+            throw new Error('Syntax error');
+        }
         const target = ast.findNodeAtPosition(options.selection.startPos);
         let result;
         result = mod.modFn(
@@ -246,14 +252,29 @@ class CodeModService {
         return result;
     }
 
-    private _getAstTree(options: { languageId: LanguageId; fileName: string; source: string }) {
+    private _getAstTree(options: {
+        languageId: LanguageId;
+        fileName: string;
+        source: string;
+    }): jscodeshift.Collection<File> | false {
         const cache = this._astCache.get(options.fileName);
         if (cache && cache.source === options.source) {
             return cache.ast;
         }
-        const ast = this._getCodeShift(options.languageId, options.fileName)(
-            options.source
-        ) as jscodeshift.Collection<Program>;
+        const codeshift = this._getCodeShift(options.languageId, options.fileName);
+        let ast: jscodeshift.Collection<File> | false;
+        try {
+            ast = codeshift(options.source) as jscodeshift.Collection<File>;
+        } catch (e) {
+            if (e.name === 'SyntaxError') {
+                logService.output(
+                    `Syntax error in file ${options.fileName} (${e.loc.line}:${e.loc.column}).`
+                );
+            } else {
+                logService.output(`Unknown error in file ${options.fileName}.`);
+            }
+            ast = false;
+        }
         this._astCache.set(options.fileName, {
             source: options.source,
             ast
