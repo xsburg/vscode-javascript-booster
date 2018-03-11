@@ -1,6 +1,3 @@
-import * as assert from 'assert';
-import * as vscode from 'vscode';
-import * as jscodeshift from 'jscodeshift';
-import { defineCodeModTests } from '../utils/testHelpers';
+import { defineCodeModTests } from '../utils/codeModHelpers';
 
 defineCodeModTests(__dirname);

@@ -5,6 +5,7 @@ declare module 'jscodeshift' {
         firstNode<TResultNode = TNode>(): TResultNode | null;
         firstPath<TResultNode = TNode>(): NodePath<TResultNode> | null;
         findNodeAtPosition(pos: number): Collection;
+        findNodeInRange(start: number, end: number): Collection;
         thisOrClosest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode>;
         furthest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode>;
     }

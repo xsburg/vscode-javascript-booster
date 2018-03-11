@@ -7,60 +7,13 @@ import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeM
 import { Position } from '../utils/Position';
 import { Program, File } from 'ast-types';
 import { configIds, extensionId } from '../const';
-import { registerCollectionExtensions } from '../utils';
 import logService from './logService';
-
-// Hack to adjust default recast options
-// making it as close to Prettier as possible.
-const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
-const toSource = CollectionPrototype.toSource;
-CollectionPrototype.toSource = function(options) {
-    return toSource.call(this, {
-        quote: 'single',
-        ...options
-    });
-};
-
-registerCollectionExtensions(jscodeshift as jscodeshift.JsCodeShift);
-
-export type LanguageId = 'javascript' | 'javascriptreact' | 'typescript' | 'typescriptreact';
-
-const supportedLanguages: LanguageId[] = [
-    'javascript',
-    'javascriptreact',
-    'typescript',
-    'typescriptreact'
-];
-
-const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
-    javascript: jscodeshift.withParser('babylon'),
-    javascriptreact: jscodeshift.withParser('babylon'),
-    typescript: jscodeshift.withParser('typescript'),
-    typescriptreact: jscodeshift.withParser('tsx')
-};
+import astService, { LanguageId, Selection } from './astService';
 
 const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
 
-// Zero-based offset
-type Selection = {
-    startPos: number;
-    endPos: number;
-};
-
 class CodeModService {
-    private _astCache: Map<
-        string, // cached by fileName
-        {
-            source: string;
-            ast: jscodeshift.Collection<File> | false;
-        }
-    > = new Map();
-
     private _codeModsCache: CodeModDefinition[] | null = null;
-
-    private _getCodeShift(languageId: LanguageId, fileName: string) {
-        return codeshifts[languageId];
-    }
 
     private _parseCodeModFile(fileName: string): CodeModDefinition {
         let modFn: CodeModExports;
@@ -88,33 +41,6 @@ class CodeModService {
         }
         await this.reloadAllCodeMods();
         return this._codeModsCache;
-    }
-
-    public readonly supportedlanguages = supportedLanguages;
-
-    public isSupportedLanguage(languageId: string): boolean {
-        return supportedLanguages.indexOf(languageId as any) !== -1;
-    }
-
-    /**
-     * Compute zero-based offset for `Position` in the way Babylon parser does it.
-     * All new-line sequences are normalized to \r\n for Win and \n for Linux and
-     * therefore treated as 1 or 2 characters depending on the OS.
-     * @param document
-     * @param pos
-     */
-    public offsetAt(document: vscode.TextDocument, pos: vscode.Position) {
-        const input = document.getText();
-        let offset = 0;
-        let lines = input
-            .split('\r')
-            .join('')
-            .split('\n');
-        const prevLines = lines.slice(0, pos.line);
-        const eolLength = os.EOL.length;
-        offset += prevLines.map(l => l.length + eolLength).reduce((s, a) => s + a, 0);
-        offset += pos.character;
-        return offset;
     }
 
     constructor() {}
@@ -208,12 +134,12 @@ class CodeModService {
             selection: Selection;
         }
     ) {
-        const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
-        const ast = this._getAstTree(options);
+        const jscodeshift = astService.getCodeShift(options.languageId);
+        const ast = astService.getAstTree(options);
         if (!ast) {
             return false;
         }
-        const target = ast.findNodeAtPosition(options.selection.startPos);
+        const target = ast.findNodeAtPosition(options.selection.active);
         return mod.canRun(
             {
                 path: options.fileName,
@@ -239,12 +165,12 @@ class CodeModService {
             selection: Selection;
         }
     ): string {
-        const jscodeshift = this._getCodeShift(options.languageId, options.fileName);
-        const ast = this._getAstTree(options);
+        const jscodeshift = astService.getCodeShift(options.languageId);
+        const ast = astService.getAstTree(options);
         if (!ast) {
             throw new Error('Syntax error');
         }
-        const target = ast.findNodeAtPosition(options.selection.startPos);
+        const target = ast.findNodeAtPosition(options.selection.active);
         let result;
         result = mod.modFn(
             {
@@ -260,48 +186,11 @@ class CodeModService {
                 target
             }
         );
-        this._invalidateAstTree(options.fileName);
+        astService.invalidateAstTree(options.fileName);
         if (!result) {
             return options.source;
         }
         return result;
-    }
-
-    private _getAstTree(options: {
-        languageId: LanguageId;
-        fileName: string;
-        source: string;
-    }): jscodeshift.Collection<File> | false {
-        const cache = this._astCache.get(options.fileName);
-        if (cache && cache.source === options.source) {
-            return cache.ast;
-        }
-        const codeshift = this._getCodeShift(options.languageId, options.fileName);
-        let ast: jscodeshift.Collection<File> | false;
-        try {
-            ast = codeshift(options.source) as jscodeshift.Collection<File>;
-        } catch (e) {
-            if (e.name === 'SyntaxError') {
-                logService.output(
-                    `Syntax error in file ${options.fileName} (${e.loc.line}:${e.loc.column}).`
-                );
-            } else {
-                logService.output(`Unknown error in file ${options.fileName}.`);
-            }
-            ast = false;
-        }
-        this._astCache.set(options.fileName, {
-            source: options.source,
-            ast
-        });
-        return ast;
-    }
-
-    private _invalidateAstTree(fileName: string) {
-        const cache = this._astCache.get(fileName);
-        if (cache) {
-            this._astCache.delete(fileName);
-        }
     }
 }
 

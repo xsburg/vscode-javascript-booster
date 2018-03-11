@@ -9,19 +9,16 @@
  *       actual or intended publication of such source code.
  */
 
-/* eslint-disable import/no-extraneous-dependencies */
-
-'use strict';
-
-import * as uniq from 'lodash/uniq';
-import { CodeModExports } from '../../models/CodeMod';
-import codeModService, { LanguageId } from '../../services/codeModService';
-import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs-extra';
+import * as uniq from 'lodash/uniq';
 import * as os from 'os';
 import * as path from 'path';
-import { Position, IPosition } from '../../utils';
+import * as vscode from 'vscode';
+
+import { LanguageId } from '../../services/astService';
+import codeModService from '../../services/codeModService';
+import { IPosition, Position } from '../../utils';
 
 function toZeroBasedPosition(pos: IPosition) {
     return new vscode.Position(pos.line - 1, pos.column - 1);
@@ -37,27 +34,10 @@ function toOffsetFromStart(input: string, posOneBased: IPosition): number {
     return offset;
 }
 
-function getSelection(options: {
-    input: string;
-    pos?: IPosition;
-    startPos?: IPosition;
-    endPos?: IPosition;
-}) {
-    let startPos: number;
-    let endPos: number;
-    if (options.pos) {
-        startPos = toOffsetFromStart(options.input, options.pos);
-        endPos = toOffsetFromStart(options.input, options.pos);
-    } else if (options.startPos) {
-        startPos = toOffsetFromStart(options.input, options.startPos);
-        endPos = toOffsetFromStart(options.input, options.endPos);
-    } else {
-        startPos = 0;
-        endPos = 0;
-    }
+function getSelection(options: { input: string; anchor?: IPosition; active: IPosition }) {
     return {
-        startPos,
-        endPos
+        anchor: toOffsetFromStart(options.input, options.anchor || options.active),
+        active: toOffsetFromStart(options.input, options.active)
     };
 }
 
@@ -65,12 +45,12 @@ function normalizeLineEndings(text: string) {
     return text.split('\r').join('');
 }
 
-export function runInlineTransformTest(
+function runInlineTransformTest(
     languageId: LanguageId,
     modId: string,
     input: string,
     output: string,
-    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
+    options: { fileName?: string; anchor?: IPosition; active: IPosition }
 ) {
     input = normalizeLineEndings(input);
     output = normalizeLineEndings(output);
@@ -83,9 +63,8 @@ export function runInlineTransformTest(
         source: input,
         selection: getSelection({
             input,
-            pos: options.pos,
-            startPos: options.startPos,
-            endPos: options.endPos
+            anchor: options.anchor,
+            active: options.active
         })
     };
 
@@ -99,12 +78,12 @@ export function runInlineTransformTest(
     assert.equal(actualOutput, output);
 }
 
-export function runInlineCanRunTest(
+function runInlineCanRunTest(
     languageId: LanguageId,
     modId: string,
     input: string,
     expected: boolean,
-    options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
+    options: { fileName?: string; anchor?: IPosition; active: IPosition }
 ) {
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
 
@@ -115,9 +94,8 @@ export function runInlineCanRunTest(
         source: input,
         selection: getSelection({
             input,
-            pos: options.pos,
-            startPos: options.startPos,
-            endPos: options.endPos
+            anchor: options.anchor,
+            active: options.active
         })
     };
 
@@ -258,7 +236,7 @@ function extractFixtures(
     return fullFixtures;
 }
 
-export function defineTransformTests(
+function defineTransformTests(
     dirName: string,
     modId: string,
     fixtureId: string | null = null,
@@ -297,7 +275,7 @@ export function defineTransformTests(
                     outputFx.source,
                     {
                         fileName: options.fileName,
-                        pos: fx.pos
+                        active: fx.pos
                     }
                 );
             });
@@ -305,7 +283,7 @@ export function defineTransformTests(
     });
 }
 
-export function defineCanRunTests(
+function defineCanRunTests(
     dirName: string,
     modId: string,
     expected: boolean | null = null,
@@ -347,7 +325,7 @@ export function defineCanRunTests(
                     expected,
                     {
                         fileName: options.fileName,
-                        pos: fx.pos
+                        active: fx.pos
                     }
                 );
             });

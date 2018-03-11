@@ -5,17 +5,19 @@ import { runCodeModCommand } from './runCodeModCommand';
 import { CodeModCodeActionProvider } from './CodeModCodeActionProvider';
 import { commandIds } from './const';
 import codeModService from './services/codeModService';
+import astService from './services/astService';
+import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
 export function activate(context: ExtensionContext) {
-    context.subscriptions.push(commands.registerCommand(commandIds.runCodeMod, runCodeModCommand));
     context.subscriptions.push(
+        commands.registerCommand(commandIds.extendSelection, extendSelectionCommand),
+        commands.registerCommand(commandIds.shrinkSelection, shrinkSelectionCommand),
+        commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
         commands.registerCommand(commandIds.reloadCodeMods, () => {
             codeModService.reloadAllCodeMods();
-        })
-    );
-    context.subscriptions.push(
+        }),
         languages.registerCodeActionsProvider(
-            codeModService.supportedlanguages,
+            astService.supportedlanguages,
             new CodeModCodeActionProvider()
         )
     );

@@ -22,6 +22,18 @@ export function registerCollectionExtensions(j: JsCodeShift) {
             return c;
         },
 
+        findNodeInRange<TNode>(this: Collection<TNode>, start: number, end: number): Collection {
+            if (start > end) {
+                [start, end] = [end, start];
+            }
+
+            const matched = this.find(j.Node).filter(
+                path => path.node.start <= start && end <= path.node.end
+            );
+            const c = matched.at(-1);
+            return c;
+        },
+
         thisOrClosest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode> {
             return this.map(function(path) {
                 while (

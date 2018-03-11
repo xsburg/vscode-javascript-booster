@@ -43,6 +43,14 @@
             {
                 "command": "javascriptBooster.reloadCodeMods",
                 "title": "[Booster] Reload Code Actions"
+            },
+            {
+                "command": "javascriptBooster.extendSelection",
+                "title": "[Booster] Extend selection"
+            },
+            {
+                "command": "javascriptBooster.shrinkSelection",
+                "title": "[Booster] Shrink selection"
             }
         ],
         "configuration": [

@@ -1,23 +1,24 @@
 import { ExtensionContext, commands, window, workspace, Range, QuickPickItem, Uri } from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import codeModService, { LanguageId } from './services/codeModService';
+import codeModService from './services/codeModService';
 import { CodeModDefinition } from './models/CodeMod';
 import logService from './services/logService';
+import astService, { LanguageId } from './services/astService';
 
 export async function runCodeModCommand(mod?: CodeModDefinition) {
     if (!window.activeTextEditor) {
         return;
     }
     const document = window.activeTextEditor.document;
-    if (!codeModService.isSupportedLanguage(document.languageId)) {
+    if (!astService.isSupportedLanguage(document.languageId)) {
         return;
     }
 
     const source = document.getText();
     const selection = {
-        startPos: codeModService.offsetAt(document, window.activeTextEditor.selection.start),
-        endPos: codeModService.offsetAt(document, window.activeTextEditor.selection.end)
+        anchor: astService.offsetAt(source, window.activeTextEditor.selection.anchor),
+        active: astService.offsetAt(source, window.activeTextEditor.selection.active)
     };
 
     if (!mod) {

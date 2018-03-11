@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import codeModService, { LanguageId } from './services/codeModService';
+import codeModService from './services/codeModService';
 import { commandIds } from './const';
+import astService, { LanguageId } from './services/astService';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
     public async provideCodeActions(
@@ -9,7 +10,7 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         context: vscode.CodeActionContext,
         token: vscode.CancellationToken
     ): Promise<vscode.Command[]> {
-        if (!codeModService.isSupportedLanguage(document.languageId)) {
+        if (!astService.isSupportedLanguage(document.languageId)) {
             return;
         }
 
@@ -19,14 +20,11 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
             fileName: document.fileName,
             source,
             selection: {
-                startPos: codeModService.offsetAt(
-                    document,
-                    vscode.window.activeTextEditor.selection.start
+                anchor: astService.offsetAt(
+                    source,
+                    vscode.window.activeTextEditor.selection.anchor
                 ),
-                endPos: codeModService.offsetAt(
-                    document,
-                    vscode.window.activeTextEditor.selection.end
-                )
+                active: astService.offsetAt(source, vscode.window.activeTextEditor.selection.active)
             }
         });
         return codeMods.map(

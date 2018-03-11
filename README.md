@@ -14,12 +14,6 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 [Visual Studio Code Market Place: JavaScript Booster](https://marketplace.visualstudio.com/items?itemName=sburg.vscode-javascript-booster)
 
-Can also be installed using
-
-```
-ext install vscode-javascript-booster
-```
-
 ## Supported code actions
 
 * 💥 Flip if-else
@@ -45,6 +39,7 @@ ext install vscode-javascript-booster
 * Convert if-else-return -> return ?:
 * Convert if -> switch-case
 * JSX: Collapse/Expand empty tag
+* TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
 * TS: Generate missing switch cases for enum
 * ...?
