@@ -13,19 +13,18 @@ install:
 - npm run vscode:prepublish
 script:
 - npm test --silent
-after_success:
+before_deploy:
+- npm version from-git --allow-same-version
 - npm install -g vsce
 - vsce package
 deploy:
 - provider: script
-  script: 
-    - npm version from-git --allow-same-version
-    - vsce package
-    - vsce publish -p $VS_TOKEN
+  script: vsce publish -p $VS_TOKEN
   skip_cleanup: true
   on:
     tags: true
     branch: master
+    condition: $TRAVIS_OS_NAME = linux
 notifications:
   email:
     on_success: change
