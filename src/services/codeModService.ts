@@ -90,6 +90,8 @@ class CodeModService {
         return this._codeModsCache;
     }
 
+    public readonly supportedlanguages = supportedLanguages;
+
     public isSupportedLanguage(languageId: string): boolean {
         return supportedLanguages.indexOf(languageId as any) !== -1;
     }

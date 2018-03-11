@@ -15,7 +15,7 @@ export function activate(context: ExtensionContext) {
     );
     context.subscriptions.push(
         languages.registerCodeActionsProvider(
-            ['typescript', 'typescriptreact', 'javascript', 'javascriptreact'],
+            codeModService.supportedlanguages,
             new CodeModCodeActionProvider()
         )
     );
