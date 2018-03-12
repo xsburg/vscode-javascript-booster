@@ -34,9 +34,32 @@ class SmartSelectionService {
                         start = targetNode.start;
                         end = targetNode.end;
                     } else {
-                        //
                         const value = (targetNode as StringLiteral).value;
-                        // TODO: split into [A-Za-z0-9_$]
+
+                        let startIndex = start - targetNode.start - 1;
+                        let endIndex = end - targetNode.start - 1;
+                        let expanded = false;
+                        while (startIndex > 0 && /[a-zA-Z0-9$_]/.test(value[startIndex - 1])) {
+                            startIndex--;
+                            expanded = true;
+                        }
+                        while (
+                            endIndex < value.length + 1 &&
+                            /[a-zA-Z0-9$_]/.test(value[endIndex])
+                        ) {
+                            endIndex++;
+                            expanded = true;
+                        }
+
+                        if (expanded) {
+                            // 'content is a se|nt|ence' => 'content is a |sentence|'
+                            start = startIndex + targetNode.start + 1;
+                            end = endIndex + targetNode.start + 1;
+                        } else {
+                            // 'content is a |sentence|' => '|content is a sentence|'
+                            start = targetNode.start + 1;
+                            end = targetNode.end - 1;
+                        }
                     }
                 default:
                     start = targetNode.start;
