@@ -24,21 +24,43 @@ function removeSelectionMarkers(code: string) {
     return code.replace('|', '').replace('|', '');
 }
 
+function applySelectionMarkers(code: string, selection: Selection) {
+    let start = selection.anchor;
+    let end = selection.active;
+    if (selection.active < selection.anchor) {
+        [start, end] = [end, start];
+    }
+    const result =
+        start === end
+            ? [code.substring(0, start), code.substring(end)]
+            : [code.substring(0, start), code.substring(start, end), code.substring(end)];
+    return result.join('|');
+}
+
 export function assertSmartSelectionExtend(
-    beforeCode: string,
-    afterCode: string,
+    inputFixture: string,
+    outputFixture: string,
     languageId: LanguageId = 'javascriptreact'
 ) {
-    const inputSelection = extractSelection(beforeCode);
-    const expectedSelection = extractSelection(afterCode);
+    inputFixture = inputFixture.trim();
+    outputFixture = outputFixture.trim();
+    const inputSelection = extractSelection(inputFixture);
+    const expectedSelection = extractSelection(outputFixture);
+    const cleanInputFixture = removeSelectionMarkers(inputFixture);
+    const cleanOutputFixture = removeSelectionMarkers(inputFixture);
+    assert.equal(
+        cleanInputFixture,
+        cleanOutputFixture,
+        'Source code in input and output fixtures must be the same.'
+    );
     const ast = astService.getAstTree({
         languageId,
         fileName: 'example.jsx',
-        source: removeSelectionMarkers(beforeCode)
+        source: cleanInputFixture
     });
     const actualSelection = smartSelectionService.extendSelection(languageId, ast, inputSelection);
-    assert.equal(actualSelection.anchor, expectedSelection.anchor);
-    assert.equal(actualSelection.active, expectedSelection.active);
+    const actualOutputFixture = applySelectionMarkers(cleanInputFixture, actualSelection);
+    assert.equal(actualOutputFixture, outputFixture, `Input fixture: ${inputFixture}`);
 }
 
 export function assertSmartSelectionShrink(beforeCode: string, afterCode: string) {}

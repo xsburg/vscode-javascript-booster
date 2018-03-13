@@ -6,7 +6,7 @@ suite(`Smart selection: extend`, () => {
             let fo|ob|ar;
         `;
         const after = `
-            let |asdasdasd|;
+            let |foobar|;
         `;
         assertSmartSelectionExtend(before, after);
     });

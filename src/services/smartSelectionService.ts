@@ -29,7 +29,7 @@ class SmartSelectionService {
                         // 'cont|ent'| => |'content'|
                         start = targetNode.start;
                         end = targetNode.end;
-                    } else if (targetNode.start === start + 1 && targetNode.end === end - 1) {
+                    } else if (targetNode.start + 1 === start && targetNode.end - 1 === end) {
                         // '|content|' => |'content'|
                         start = targetNode.start;
                         end = targetNode.end;
@@ -43,10 +43,7 @@ class SmartSelectionService {
                             startIndex--;
                             expanded = true;
                         }
-                        while (
-                            endIndex < value.length + 1 &&
-                            /[a-zA-Z0-9$_]/.test(value[endIndex])
-                        ) {
+                        while (endIndex < value.length && /[a-zA-Z0-9$_]/.test(value[endIndex])) {
                             endIndex++;
                             expanded = true;
                         }
@@ -61,6 +58,7 @@ class SmartSelectionService {
                             end = targetNode.end - 1;
                         }
                     }
+                    break;
                 default:
                     start = targetNode.start;
                     end = targetNode.end;
