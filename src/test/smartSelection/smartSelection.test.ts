@@ -1,4 +1,4 @@
-import { assertSmartSelectionExtend } from '../utils/smartSelectionHelpers';
+import { assertSmartSelection, assertSmartSelectionBulk } from '../utils/smartSelectionHelpers';
 
 suite(`Smart selection: extend`, () => {
     test('should extend to word', () => {
@@ -8,7 +8,7 @@ suite(`Smart selection: extend`, () => {
         const after = `
             let a = 'content is a |sentence|';
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to string value', () => {
@@ -18,7 +18,7 @@ suite(`Smart selection: extend`, () => {
         const after = `
             let a = '|content is a sentence|';
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to string literal', () => {
@@ -28,7 +28,7 @@ suite(`Smart selection: extend`, () => {
         const after = `
             let a = |'content is a sentence'|;
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to string literal 2', () => {
@@ -38,7 +38,7 @@ suite(`Smart selection: extend`, () => {
         const after = `
             let a = |'content is a sentence'|;
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to whole node: Identifier', () => {
@@ -48,7 +48,7 @@ suite(`Smart selection: extend`, () => {
         const after = `
             let |foobar|;
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to brackets within node: [ ]', () => {
@@ -64,7 +64,7 @@ suite(`Smart selection: extend`, () => {
                 'bar'
             |];
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to whole node: [ ]', () => {
@@ -80,7 +80,7 @@ suite(`Smart selection: extend`, () => {
                 'bar'
             ]|;
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to whole node 2: [ ]', () => {
@@ -96,7 +96,7 @@ suite(`Smart selection: extend`, () => {
                 'bar'
             ]|;
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to brackets within node: {} if', () => {
@@ -112,7 +112,7 @@ suite(`Smart selection: extend`, () => {
                 let b;
             |}
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to brackets within node: {} object', () => {
@@ -128,7 +128,7 @@ suite(`Smart selection: extend`, () => {
                 bar: 'bar'
             |};
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to siblings: object properties', () => {
@@ -144,7 +144,7 @@ suite(`Smart selection: extend`, () => {
                 bar: 'bar'|
             };
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
     });
 
     test('should extend to siblings: statements', () => {
@@ -162,6 +162,65 @@ suite(`Smart selection: extend`, () => {
                 let c;|
             }
         `;
-        assertSmartSelectionExtend(before, after);
+        assertSmartSelection(before, after);
+    });
+
+    test('should extend to CallExpression brackets', () => {
+        const before = `
+            let result = object.property(
+                |var1,
+                var2|
+            );
+        `;
+        const after = `
+            let result = object.property|(
+                var1,
+                var2
+            )|;
+        `;
+        assertSmartSelection(before, after);
+    });
+
+    test('should extend to FunctionDeclaration brackets', () => {
+        const before = `
+            function test(
+                |foo,
+                bar|) {
+            }
+        `;
+        const after = `
+            function test|(
+                foo,
+                bar)| {
+            }
+        `;
+        assertSmartSelection(before, after);
+    });
+
+    test('should extend from MemberExpression identifier to the left', () => {
+        const before = `
+            const company = selectors.company.|getCompanyById|(state, d.companyId);
+        `;
+        const after = `
+            const company = |selectors.company.getCompanyById|(state, d.companyId);
+        `;
+        assertSmartSelection(before, after);
+    });
+
+    test('should shrink when have passed a sequence of extensions', () => {
+        assertSmartSelectionBulk([
+            'const company = selectors.company.getCo|mpany|ById(state, d.companyId); /*# { action: `+` } #*/',
+            'const company = selectors.company.|getCompanyById|(state, d.companyId); /*# { action: `+` } #*/',
+            'const company = |selectors.company.getCompanyById|(state, d.companyId); /*# { action: `+` } #*/',
+            'const company = |selectors.company.getCompanyById(state, d.companyId)|; /*# { action: `+` } #*/',
+            'const |company = selectors.company.getCompanyById(state, d.companyId)|; /*# { action: `+` } #*/',
+            '|const company = selectors.company.getCompanyById(state, d.companyId);| /*# { action: `-` } #*/',
+            'const |company = selectors.company.getCompanyById(state, d.companyId)|; /*# { action: `-` } #*/',
+            'const company = |selectors.company.getCompanyById(state, d.companyId)|; /*# { action: `-` } #*/',
+            'const company = |selectors.company.getCompanyById|(state, d.companyId); /*# { action: `-` } #*/',
+            'const company = selectors.company.|getCompanyById|(state, d.companyId); /*# { action: `-` } #*/',
+            'const company = selectors.company.getCo|mpany|ById(state, d.companyId); /*# { action: `-` } #*/',
+            'const company = selectors.company.getCompany|ById(state, d.companyId);'
+        ]);
     });
 });

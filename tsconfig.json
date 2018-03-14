@@ -9,7 +9,6 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "allowUnreachableCode": true,
-        "baseUrl": "src",
         "rootDir": "src"
     },
     "exclude": ["node_modules", ".vscode-test"]

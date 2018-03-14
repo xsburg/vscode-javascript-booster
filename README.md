@@ -76,6 +76,7 @@ This extension contributes the following settings:
 Calling out known issues can help limit users opening duplicate issues against your extension.
 
 * Fix canRun() for string literals in enums
+* Allow Split declaration & initialization for const variables, makes little sense otherwise if const used everywhere
 
 ## Release Notes
 

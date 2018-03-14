@@ -37,13 +37,39 @@ function applySelectionMarkers(code: string, selection: Selection) {
     return result.join('|');
 }
 
-export function assertSmartSelectionExtend(
+/**
+ * Extracts /*# { action: '+/-' } #*\/ comment to determine smart action. Defaults to EXTEND if not found.
+ */
+function extractAction(text: string) {
+    const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
+    const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
+    const match = re.exec(text);
+    if (!match || !match[0]) {
+        return {
+            text,
+            action: true
+        };
+    }
+    // tslint:disable-next-line:no-eval
+    const posDef = eval('(' + match[1] + ')');
+    const action: string = posDef.action;
+    const cleanSource = text.replace(reClean, '');
+
+    return {
+        text: cleanSource,
+        action: action !== '-'
+    };
+}
+
+export function assertSmartSelection(
     inputFixture: string,
     outputFixture: string,
     languageId: LanguageId = 'javascriptreact'
 ) {
-    inputFixture = inputFixture.trim();
-    outputFixture = outputFixture.trim();
+    const extractedData1 = extractAction(inputFixture);
+    const extractedData2 = extractAction(outputFixture);
+    inputFixture = extractedData1.text.trim();
+    outputFixture = extractedData2.text.trim();
     const inputSelection = extractSelection(inputFixture);
     const expectedSelection = extractSelection(outputFixture);
     const cleanInputFixture = removeSelectionMarkers(inputFixture);
@@ -61,9 +87,37 @@ export function assertSmartSelectionExtend(
     if (!ast) {
         throw new Error('SyntaxError in input fixture.');
     }
-    const actualSelection = smartSelectionService.extendSelection(languageId, ast, inputSelection);
+
+    let actualSelection;
+    if (extractedData1.action) {
+        actualSelection = smartSelectionService.extendSelection({
+            languageId,
+            source: cleanInputFixture,
+            fileName: 'example.js',
+            ast,
+            selection: inputSelection
+        });
+    } else {
+        actualSelection = smartSelectionService.shrinkSelection({
+            languageId,
+            source: cleanInputFixture,
+            fileName: 'example.js',
+            ast,
+            selection: inputSelection
+        });
+    }
+
     const actualOutputFixture = applySelectionMarkers(cleanInputFixture, actualSelection);
     assert.equal(actualOutputFixture, outputFixture, `Input fixture: ${inputFixture}`);
 }
 
-export function assertSmartSelectionShrink(beforeCode: string, afterCode: string) {}
+export function assertSmartSelectionBulk(
+    fixtures: string[],
+    languageId: LanguageId = 'javascriptreact'
+) {
+    for (let i = 0; i < fixtures.length - 1; i++) {
+        const input = fixtures[i];
+        const output = fixtures[i + 1];
+        assertSmartSelection(input, output, languageId);
+    }
+}

@@ -84,6 +84,10 @@ class AstService {
         return offset;
     }
 
+    public normalizedText(text: string) {
+        return text.replace(/\r?\n/g, os.EOL);
+    }
+
     /**
      * Compute Position for zero-based offset provided by Babylon.
      * @param document

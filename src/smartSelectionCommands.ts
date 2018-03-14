@@ -1,5 +1,5 @@
-import { configIds, extensionId } from 'const';
 import { commands, Selection, window, workspace } from 'vscode';
+import { configIds, extensionId } from './const';
 import astService, { LanguageId } from './services/astService';
 import smartSelectionService from './services/smartSelectionService';
 
@@ -24,7 +24,7 @@ export async function extendSelectionCommand() {
         return;
     }
 
-    const source = document.getText();
+    const source = astService.normalizedText(document.getText());
     const ast = astService.getAstTree({
         languageId: document.languageId as LanguageId,
         fileName: document.fileName,
@@ -36,18 +36,56 @@ export async function extendSelectionCommand() {
     }
 
     window.activeTextEditor.selections = window.activeTextEditor.selections.map(selection => {
-        const result = smartSelectionService.extendSelection(
-            document.languageId as LanguageId,
+        const result = smartSelectionService.extendSelection({
+            languageId: document.languageId as LanguageId,
+            source,
+            fileName: document.fileName,
             ast,
-            {
+            selection: {
                 anchor: astService.offsetAt(source, window.activeTextEditor!.selection.anchor),
                 active: astService.offsetAt(source, window.activeTextEditor!.selection.active)
             }
-        );
+        });
         const anchor = astService.positionAt(source, result.anchor);
         const active = astService.positionAt(source, result.active);
         return new Selection(anchor, active);
     });
 }
 
-export async function shrinkSelectionCommand() {}
+export async function shrinkSelectionCommand() {
+    if (!window.activeTextEditor) {
+        return;
+    }
+    const document = window.activeTextEditor.document;
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        executeFallbackSelectionCommand(false);
+        return;
+    }
+
+    const source = astService.normalizedText(document.getText());
+    const ast = astService.getAstTree({
+        languageId: document.languageId as LanguageId,
+        fileName: document.fileName,
+        source
+    });
+    if (!ast) {
+        executeFallbackSelectionCommand(false);
+        return;
+    }
+
+    window.activeTextEditor.selections = window.activeTextEditor.selections.map(selection => {
+        const result = smartSelectionService.shrinkSelection({
+            languageId: document.languageId as LanguageId,
+            source,
+            fileName: document.fileName,
+            ast,
+            selection: {
+                anchor: astService.offsetAt(source, window.activeTextEditor!.selection.anchor),
+                active: astService.offsetAt(source, window.activeTextEditor!.selection.active)
+            }
+        });
+        const anchor = astService.positionAt(source, result.anchor);
+        const active = astService.positionAt(source, result.active);
+        return new Selection(anchor, active);
+    });
+}
