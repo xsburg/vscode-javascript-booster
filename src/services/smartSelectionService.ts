@@ -1,6 +1,6 @@
+import { Node, Printable, StringLiteral, TypeName } from 'ast-types';
 import * as vscode from 'vscode';
 import astService, { AstRoot, LanguageId, Selection } from './astService';
-import { Printable, Node, TypeName, StringLiteral } from 'ast-types';
 
 class SmartSelectionService {
     public extendSelection(languageId: LanguageId, ast: AstRoot, selection: Selection): Selection {
@@ -10,7 +10,8 @@ class SmartSelectionService {
             return selection;
         }
 
-        let start, end;
+        let start;
+        let end;
         if (selection.anchor > selection.active) {
             start = selection.active;
             end = selection.anchor;

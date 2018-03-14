@@ -10,6 +10,7 @@ class LogService {
     }
 
     public output(message: string) {
+        // tslint:disable-next-line:no-console
         console.log(`[LogService.output] ${message}`);
         this._channel.appendLine(`${new Date().toISOString()}: ${message}`);
     }

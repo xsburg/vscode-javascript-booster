@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import codeModService from './services/codeModService';
 import { commandIds } from './const';
 import astService, { LanguageId } from './services/astService';
+import codeModService from './services/codeModService';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
     public async provideCodeActions(

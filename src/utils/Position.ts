@@ -4,7 +4,13 @@ export interface IPosition {
 }
 
 export class Position implements IPosition {
-    static fromZeroBased({ line, character }: { line: number; character: number }): Position {
+    public static fromZeroBased({
+        line,
+        character
+    }: {
+        line: number;
+        character: number;
+    }): Position {
         return new Position(line + 1, character + 1);
     }
 

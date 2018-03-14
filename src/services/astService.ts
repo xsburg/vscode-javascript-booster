@@ -1,12 +1,14 @@
-import * as vscode from 'vscode';
-import * as os from 'os';
-import * as jscodeshift from 'jscodeshift';
-import { registerCollectionExtensions } from '../utils';
 import { File } from 'ast-types';
+import * as jscodeshift from 'jscodeshift';
+import * as os from 'os';
+import * as vscode from 'vscode';
+import { registerCollectionExtensions } from '../utils';
 import logService from './logService';
 
 // Hack to adjust default recast options
 // making it as close to Prettier as possible.
+
+// tslint:disable-next-line:variable-name
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
 CollectionPrototype.toSource = function(options) {
@@ -19,10 +21,10 @@ CollectionPrototype.toSource = function(options) {
 registerCollectionExtensions(jscodeshift as jscodeshift.JsCodeShift);
 
 // Zero-based offset
-export type Selection = {
+export interface Selection {
     anchor: number;
     active: number;
-};
+}
 
 export type LanguageId = 'javascript' | 'javascriptreact' | 'typescript' | 'typescriptreact';
 
@@ -43,6 +45,8 @@ const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
 export type AstRoot = jscodeshift.Collection<File>;
 
 class AstService {
+    public readonly supportedlanguages = supportedLanguages;
+
     private _astCache: Map<
         string, // cached by fileName
         {
@@ -50,8 +54,6 @@ class AstService {
             ast: AstRoot | null;
         }
     > = new Map();
-
-    public readonly supportedlanguages = supportedLanguages;
 
     public isSupportedLanguage(languageId: string): boolean {
         return supportedLanguages.indexOf(languageId as any) !== -1;
@@ -70,7 +72,7 @@ class AstService {
      */
     public offsetAt(text: string, pos: vscode.Position) {
         let offset = 0;
-        let lines = text
+        const lines = text
             .split('\r')
             .join('')
             .split('\n');
@@ -87,11 +89,11 @@ class AstService {
      * @param offset
      */
     public positionAt(text: string, offset: number): vscode.Position {
-        let lines = text.replace(/\r?\n/g, os.EOL).split(os.EOL);
+        const lines = text.replace(/\r?\n/g, os.EOL).split(os.EOL);
 
         let activeOffset = 0;
         for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
+            const line = lines[i];
             if (activeOffset + line.length >= offset) {
                 return new vscode.Position(i, offset - activeOffset);
             }

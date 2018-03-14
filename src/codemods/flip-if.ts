@@ -1,12 +1,12 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
+    Expression,
     FunctionDeclaration,
-    Printable,
     IfStatement,
-    UnaryExpression,
-    Expression
+    Printable,
+    UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
 function negateExpression(j: JsCodeShift, expr: Expression) {
     // 1. !a => a
@@ -34,12 +34,12 @@ function negateExpression(j: JsCodeShift, expr: Expression) {
     return j.unaryExpression('!', expr);
 }
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
 
-    let node = target.firstNode<IfStatement>();
+    const node = target.firstNode<IfStatement>();
 
     const consequent = node.consequent;
     let alternate;
@@ -53,11 +53,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     node.alternate = consequent;
     node.test = negateExpression(j, node.test);
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;

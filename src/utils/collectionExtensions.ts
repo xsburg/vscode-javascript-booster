@@ -1,6 +1,6 @@
-import { JsCodeShift, Collection } from 'jscodeshift';
+import { NamedType, NodePath, Printable } from 'ast-types';
+import { Collection, JsCodeShift } from 'jscodeshift';
 import { Position } from './Position';
-import { Printable, NamedType, NodePath } from 'ast-types';
 
 function isPositionWithinNode(position: number, node: Printable) {
     return node.start <= position && position < node.end;
@@ -35,7 +35,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
         },
 
         thisOrClosest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode> {
-            return this.map(function(path) {
+            return this.map(path => {
                 while (
                     path &&
                     !(type.check(path.value) && (!filter || j.match(path.value, filter)))
@@ -47,7 +47,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
         },
 
         furthest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode> {
-            return this.map(function(path) {
+            return this.map(path => {
                 let furthestPath = null;
                 path = path.parent;
                 while (path) {

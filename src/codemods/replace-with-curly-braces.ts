@@ -1,37 +1,37 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
     AstNode,
-    TemplateElement,
+    BinaryExpression,
+    Expression,
+    FunctionDeclaration,
+    IfStatement,
+    Node,
+    NodePath,
+    Printable,
     StringLiteral,
-    NodePath
+    TemplateElement,
+    UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
 
-    let path = target.firstPath<StringLiteral>();
+    const path = target.firstPath<StringLiteral>();
 
     path.replace(j.jsxExpressionContainer(j.stringLiteral(path.node.value)));
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    let path = target.firstPath();
+    const path = target.firstPath();
 
     return path && j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node);
 };

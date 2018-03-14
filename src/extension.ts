@@ -1,11 +1,11 @@
 'use strict';
 
 import { commands, ExtensionContext, languages } from 'vscode';
-import { runCodeModCommand } from './runCodeModCommand';
 import { CodeModCodeActionProvider } from './CodeModCodeActionProvider';
 import { commandIds } from './const';
-import codeModService from './services/codeModService';
+import { runCodeModCommand } from './runCodeModCommand';
 import astService from './services/astService';
+import codeModService from './services/codeModService';
 import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
 export function activate(context: ExtensionContext) {

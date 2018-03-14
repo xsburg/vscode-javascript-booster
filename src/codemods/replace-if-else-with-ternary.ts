@@ -1,23 +1,23 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
+    AssignmentExpression,
     AstNode,
-    TemplateElement,
-    VariableDeclaration,
-    Identifier,
-    VariableDeclarator,
+    BinaryExpression,
     BlockStatement,
-    NodePath,
+    Expression,
     ExpressionStatement,
-    AssignmentExpression
+    FunctionDeclaration,
+    Identifier,
+    IfStatement,
+    Node,
+    NodePath,
+    Printable,
+    TemplateElement,
+    UnaryExpression,
+    VariableDeclaration,
+    VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
 function getSingleExpressionStatement(j: JsCodeShift, n: Node): ExpressionStatement {
     if (j.ExpressionStatement.check(n)) {
@@ -33,7 +33,7 @@ function getSingleExpressionStatement(j: JsCodeShift, n: Node): ExpressionStatem
     return null;
 }
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -55,11 +55,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     );
     path.replace(result);
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;

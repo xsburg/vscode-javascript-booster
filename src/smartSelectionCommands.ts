@@ -1,4 +1,4 @@
-import { window, Selection } from 'vscode';
+import { Selection, window } from 'vscode';
 import astService, { LanguageId } from './services/astService';
 import smartSelectionService from './services/smartSelectionService';
 

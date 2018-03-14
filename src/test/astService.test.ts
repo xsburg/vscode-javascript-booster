@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { window, Position } from 'vscode';
 import * as os from 'os';
+import { Position, window } from 'vscode';
 import astService from '../services/astService';
 
 suite('astService', () => {

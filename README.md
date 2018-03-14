@@ -34,6 +34,7 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 ### More code actions
 
+* Convert function to arrow function
 * Convert const -> let
 * Flip ?:
 * Convert if-else-return -> return ?:

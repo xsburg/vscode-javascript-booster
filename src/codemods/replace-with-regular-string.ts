@@ -1,28 +1,28 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
     AstNode,
+    BinaryExpression,
+    Expression,
+    FunctionDeclaration,
+    IfStatement,
+    Node,
+    Printable,
     TemplateElement,
-    TemplateLiteral
+    TemplateLiteral,
+    UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
 
-    let path = target.thisOrClosest(j.TemplateLiteral).firstPath()!;
+    const path = target.thisOrClosest(j.TemplateLiteral).firstPath()!;
     const literal = path.node as TemplateLiteral;
 
-    let expressions: Expression[] = [];
-    let firstStrValue = literal.quasis[0].value.cooked;
+    const expressions: Expression[] = [];
+    const firstStrValue = literal.quasis[0].value.cooked;
     if (firstStrValue) {
         expressions.push(j.stringLiteral(firstStrValue));
     }
@@ -49,15 +49,15 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const combinedExpr = combineExpressions(expressions.length - 1);
     path.replace(combinedExpr);
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    let path = target.thisOrClosest(j.TemplateLiteral).firstPath();
+    const path = target.thisOrClosest(j.TemplateLiteral).firstPath();
 
     return Boolean(path);
 };

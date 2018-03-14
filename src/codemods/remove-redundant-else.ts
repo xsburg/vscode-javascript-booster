@@ -1,14 +1,14 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
+    Expression,
     FunctionDeclaration,
-    Printable,
     IfStatement,
-    UnaryExpression,
-    Expression
+    Printable,
+    UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -16,11 +16,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const node = target.firstNode<IfStatement>()!;
     node.alternate = null;
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;

@@ -1,23 +1,23 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
     AstNode,
-    TemplateElement,
-    VariableDeclaration,
-    Identifier,
-    VariableDeclarator,
+    BinaryExpression,
     BlockStatement,
-    NodePath
+    Expression,
+    FunctionDeclaration,
+    Identifier,
+    IfStatement,
+    Node,
+    NodePath,
+    Printable,
+    TemplateElement,
+    UnaryExpression,
+    VariableDeclaration,
+    VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -66,11 +66,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         declarationPath.prune();
     }
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -79,7 +79,7 @@ codeMod.canRun = function(fileInfo, api, options) {
         return false;
     }
 
-    let candidateIdentifiers: Identifier[] = [];
+    const candidateIdentifiers: Identifier[] = [];
     path.node.declarations.forEach(d => {
         if (j.Identifier.check(d)) {
             candidateIdentifiers.push(d);

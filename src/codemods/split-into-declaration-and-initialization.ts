@@ -1,27 +1,27 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
     AstNode,
+    BinaryExpression,
+    Expression,
+    FunctionDeclaration,
+    IfStatement,
+    Node,
+    Printable,
     TemplateElement,
+    UnaryExpression,
     VariableDeclaration,
     VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
 
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath()!;
 
-    let assignments = [];
+    const assignments = [];
     path.node.declarations.forEach(d => {
         if (j.VariableDeclarator.check(d) && d.init) {
             assignments.push(j.expressionStatement(j.assignmentExpression('=', d.id, d.init)));
@@ -33,11 +33,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         path.insertAfter(a);
     });
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;

@@ -1,35 +1,35 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
     AstNode,
+    BinaryExpression,
+    Expression,
+    FunctionDeclaration,
+    IfStatement,
+    Node,
+    Printable,
     TemplateElement,
+    UnaryExpression,
     VariableDeclaration
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    let node = target.firstNode<VariableDeclaration>();
+    const node = target.firstNode<VariableDeclaration>();
 
     node.kind = 'let';
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    let node = target.firstNode();
+    const node = target.firstNode();
 
     return j.VariableDeclaration.check(node) && node.kind === 'var';
 };

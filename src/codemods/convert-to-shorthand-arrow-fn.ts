@@ -1,31 +1,31 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
     ArrowFunctionExpression,
     BlockStatement,
-    ReturnStatement
+    Expression,
+    FunctionDeclaration,
+    IfStatement,
+    Printable,
+    ReturnStatement,
+    UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    let node = target.firstNode<ArrowFunctionExpression>();
+    const node = target.firstNode<ArrowFunctionExpression>();
 
     const returnStatement = (node.body as BlockStatement).body[0] as ReturnStatement;
     const returnExpr = returnStatement.argument;
     node.body = returnExpr;
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;

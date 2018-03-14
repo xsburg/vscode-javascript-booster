@@ -1,10 +1,10 @@
-import { ExtensionContext, commands, window, workspace, Range, QuickPickItem, Uri } from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
-import codeModService from './services/codeModService';
+import * as path from 'path';
+import { commands, ExtensionContext, QuickPickItem, Range, Uri, window, workspace } from 'vscode';
 import { CodeModDefinition } from './models/CodeMod';
-import logService from './services/logService';
 import astService, { LanguageId } from './services/astService';
+import codeModService from './services/codeModService';
+import logService from './services/logService';
 
 export async function runCodeModCommand(mod?: CodeModDefinition) {
     if (!window.activeTextEditor) {
@@ -28,18 +28,18 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
             source,
             selection
         });
-        const result = await window.showQuickPick(
-            codeMods.map(mod => ({
-                label: mod.name,
-                description: mod.description,
-                detail: mod.detail,
-                mod
+        const pickResult = await window.showQuickPick(
+            codeMods.map(m => ({
+                label: m.name,
+                description: m.description,
+                detail: m.detail,
+                mod: m
             }))
         );
-        if (!result) {
+        if (!pickResult) {
             return;
         }
-        mod = result.mod;
+        mod = pickResult.mod;
     } else {
         mod = mod;
     }

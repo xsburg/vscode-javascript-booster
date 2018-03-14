@@ -27,8 +27,8 @@ function toZeroBasedPosition(pos: IPosition) {
 function toOffsetFromStart(input: string, posOneBased: IPosition): number {
     const pos = toZeroBasedPosition(posOneBased);
     let offset = 0;
-    let lines = input.split('\n');
-    let prevLines = lines.slice(0, pos.line);
+    const lines = input.split('\n');
+    const prevLines = lines.slice(0, pos.line);
     offset += prevLines.map(l => l.length + os.EOL.length).reduce((s, a) => s + a, 0);
     offset += pos.character;
     return offset;
@@ -147,12 +147,13 @@ function extractPosition(
                 ''}] Position is not provided, use '/*# { position: columnNumber } #*/'`
         );
     }
+    // tslint:disable-next-line:no-eval
     const posDef = eval('(' + match[1] + ')');
     if (!Number.isFinite(posDef.pos)) {
         throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
     }
     const column: number = posDef.pos;
-    const line: number = source.split('\n').findIndex(line => line.includes(match[0])) + 1;
+    const line: number = source.split('\n').findIndex(l => l.includes(match[0])) + 1;
 
     const cleanSource = source.replace(reClean, '');
 
@@ -169,7 +170,7 @@ function extractFixtures(
     fallbackFixtureName?: string,
     searchPosition: boolean = true
 ) {
-    const re = /\/\*\$\s*([^\$]+?)\s*\$\*\//g;
+    const re = /\/\*\$\s*([^\$]+?)\s*\$\*\//g; // /*$ VALUE $*/
     let match;
     interface FixtureRawDef {
         raw: any;
@@ -177,11 +178,13 @@ function extractFixtures(
         inputStart: number;
         inputEnd: number;
     }
-    let fixtures: FixtureRawDef[] = [];
+    const fixtures: FixtureRawDef[] = [];
     let activeFixture: FixtureRawDef | undefined;
+    // tslint:disable-next-line:no-conditional-assignment
     while ((match = re.exec(input)) !== null) {
         let fixtureDef;
         try {
+            // tslint:disable-next-line:no-eval
             fixtureDef = eval('(' + match[1] + ')');
         } catch (e) {
             throw new Error(`[${modId}] Failed to parse inline fixture definition.`);
@@ -200,7 +203,7 @@ function extractFixtures(
     if (activeFixture) {
         fixtures.push(activeFixture);
     }
-    let fullFixtures = fixtures.map(fx => {
+    const fullFixtures = fixtures.map(fx => {
         const inputFragment = input.substring(fx.inputStart, fx.inputEnd);
         let source = inputFragment.trim();
         let pos;
@@ -286,7 +289,6 @@ function defineTransformTests(
 function defineCanRunTests(
     dirName: string,
     modId: string,
-    expected: boolean | null = null,
     fixtureId: string | null = null,
     options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {

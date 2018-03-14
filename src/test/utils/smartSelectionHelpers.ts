@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as os from 'os';
-import astService, { Selection, LanguageId } from '../../services/astService';
+import astService, { LanguageId, Selection } from '../../services/astService';
 import smartSelectionService from '../../services/smartSelectionService';
 
 function extractSelection(code: string): Selection {

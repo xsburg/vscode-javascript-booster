@@ -1,18 +1,18 @@
-import { CodeModExports } from '../models/CodeMod';
 import {
-    FunctionDeclaration,
-    Printable,
-    IfStatement,
-    UnaryExpression,
-    Expression,
-    BinaryExpression,
-    Node,
     AstNode,
-    TemplateElement
+    BinaryExpression,
+    Expression,
+    FunctionDeclaration,
+    IfStatement,
+    Node,
+    Printable,
+    TemplateElement,
+    UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { CodeModExports } from '../models/CodeMod';
 
-let codeMod: CodeModExports = function(fileInfo, api, options) {
+const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -22,10 +22,10 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
         path = path.parent;
     }
 
-    let expressions: Expression[] = [];
-    let templateElements: TemplateElement[] = [];
+    const expressions: Expression[] = [];
+    const templateElements: TemplateElement[] = [];
     let lastIsString: boolean = false;
-    j.templateLiteral;
+
     function buildTemplateLiteral(node: Expression) {
         if (j.StringLiteral.check(node)) {
             templateElements.push(
@@ -76,11 +76,11 @@ let codeMod: CodeModExports = function(fileInfo, api, options) {
     const templateLiteral = j.templateLiteral(templateElements, expressions);
     path.replace(templateLiteral);
 
-    let resultText = ast.toSource();
+    const resultText = ast.toSource();
     return resultText;
 };
 
-codeMod.canRun = function(fileInfo, api, options) {
+codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;

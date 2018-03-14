@@ -1,49 +1,18 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
+import { File, Program } from 'ast-types';
 import * as fs from 'fs-extra';
 import * as os from 'os';
-import * as jscodeshift from 'jscodeshift';
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { configIds, extensionId } from '../const';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../models/CodeMod';
 import { Position } from '../utils/Position';
-import { Program, File } from 'ast-types';
-import { configIds, extensionId } from '../const';
-import logService from './logService';
 import astService, { LanguageId, Selection } from './astService';
+import logService from './logService';
 
 const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
 
 class CodeModService {
     private _codeModsCache: CodeModDefinition[] | null = null;
-
-    private _parseCodeModFile(fileName: string): CodeModDefinition {
-        let modFn: CodeModExports;
-        try {
-            modFn = require(fileName);
-        } catch (e) {
-            logService.outputError(`Failed to parse codemod '${fileName}: ${e.message}'`);
-            return null;
-        }
-        const name = path.basename(fileName, path.extname(fileName));
-        return {
-            id: name,
-            name: modFn.title || name,
-            description: modFn.description || '',
-            detail: modFn.detail,
-            canRun: modFn.canRun || (() => true),
-            scope: (modFn.scope as CodeModScope) || CodeModScope.Global,
-            modFn
-        };
-    }
-
-    private async _getAllCodeMods() {
-        if (this._codeModsCache) {
-            return this._codeModsCache;
-        }
-        await this.reloadAllCodeMods();
-        return this._codeModsCache;
-    }
-
-    constructor() {}
 
     public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
         // local code mods
@@ -191,6 +160,34 @@ class CodeModService {
             return options.source;
         }
         return result;
+    }
+
+    private _parseCodeModFile(fileName: string): CodeModDefinition {
+        let modFn: CodeModExports;
+        try {
+            modFn = require(fileName);
+        } catch (e) {
+            logService.outputError(`Failed to parse codemod '${fileName}: ${e.message}'`);
+            return null;
+        }
+        const name = path.basename(fileName, path.extname(fileName));
+        return {
+            id: name,
+            name: modFn.title || name,
+            description: modFn.description || '',
+            detail: modFn.detail,
+            canRun: modFn.canRun || (() => true),
+            scope: (modFn.scope as CodeModScope) || CodeModScope.Global,
+            modFn
+        };
+    }
+
+    private async _getAllCodeMods() {
+        if (this._codeModsCache) {
+            return this._codeModsCache;
+        }
+        await this.reloadAllCodeMods();
+        return this._codeModsCache;
     }
 }
 

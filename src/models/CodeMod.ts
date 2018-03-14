@@ -1,4 +1,4 @@
-import { JsCodeShift, Collection } from 'jscodeshift';
+import { Collection, JsCodeShift } from 'jscodeshift';
 import { Position } from '../utils/Position';
 
 type CodeModTransform = (
