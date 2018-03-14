@@ -19,7 +19,12 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../models/CodeMod';
 
-function getSingleExpressionStatement(j: JsCodeShift, n: Node): ExpressionStatement {
+/**
+ * returns one expression when the parameter n is: "{ oneExpression; }" or "oneExpression;"
+ * @param j codeshift
+ * @param n node to check
+ */
+function getSingleExpressionStatement(j: JsCodeShift, n: Node): ExpressionStatement | null {
     if (j.ExpressionStatement.check(n)) {
         return n;
     }
@@ -39,9 +44,9 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const target = options.target;
     const path = target.thisOrClosest(j.IfStatement).firstPath()!;
 
-    const conExpr = getSingleExpressionStatement(j, path.node.consequent)
+    const conExpr = getSingleExpressionStatement(j, path.node.consequent)!
         .expression as AssignmentExpression;
-    const altExpr = getSingleExpressionStatement(j, path.node.alternate!)
+    const altExpr = getSingleExpressionStatement(j, path.node.alternate!)!
         .expression as AssignmentExpression;
 
     const name = (conExpr.left as Identifier).name;
@@ -83,7 +88,7 @@ codeMod.canRun = (fileInfo, api, options) => {
         j.AssignmentExpression.check(altStatement.expression) &&
         j.Identifier.check(altStatement.expression.left) &&
         altStatement.expression.left.name;
-    return conName && altName && conName === altName;
+    return Boolean(conName && altName && conName === altName);
 };
 
 codeMod.scope = 'cursor';

@@ -15,10 +15,10 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const node = target.firstNode<ArrowFunctionExpression>();
+    const node = target.firstNode<ArrowFunctionExpression>()!;
 
     const returnStatement = (node.body as BlockStatement).body[0] as ReturnStatement;
-    const returnExpr = returnStatement.argument;
+    const returnExpr = returnStatement.argument || j.identifier('undefined');
     node.body = returnExpr;
 
     const resultText = ast.toSource();

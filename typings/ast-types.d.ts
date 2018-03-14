@@ -2,7 +2,7 @@ declare module 'ast-types' {
     export interface NodeBase {}
 
     export class Path {
-        constructor(value, parentPath, name: string);
+        constructor(value: any, parentPath: Path, name: string);
 
         /**
          * Provides a fine-graned access to the hierarchy of AST.
@@ -29,13 +29,13 @@ declare module 'ast-types' {
 
         filter(callback: (childPath: Path) => boolean, context: any): Path[];
 
-        shift();
+        shift(): void;
 
-        unshift(node: AstNode);
+        unshift(node: AstNode): void;
 
-        push(node: AstNode);
+        push(node: AstNode): void;
 
-        pop(node: AstNode);
+        pop(node: AstNode): void;
 
         insertAt(index: number, node: AstNode): Path;
 
@@ -43,13 +43,13 @@ declare module 'ast-types' {
 
         insertAfter(node: AstNode): Path;
 
-        replace(replacement);
+        replace(replacement: any): void;
     }
 
     interface Scope {}
 
     export class NodePath<TNode> extends Path {
-        constructor(value, parentPath, name: string);
+        constructor(value: any, parentPath: Path, name: string);
 
         /**
          * Returns the AST-node the path is referring to (if the referred value is a node)

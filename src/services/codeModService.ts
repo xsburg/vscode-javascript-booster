@@ -18,7 +18,7 @@ class CodeModService {
         // local code mods
         const files = await fs.readdir(embeddedCodeModDir);
         const fileNames = files.map(name => path.join(embeddedCodeModDir, name));
-        let codeMods = (await Promise.all(
+        const codeMods = (await Promise.all(
             fileNames.map(async fileName => {
                 if (!fileName.match(/(\.ts|\.js)$/)) {
                     return {
@@ -42,14 +42,14 @@ class CodeModService {
             const uris = await vscode.workspace.findFiles(`${codemodDir}/*.{ts,js}`);
             codeMods.push(...uris.map(uri => this._parseCodeModFile(uri.fsPath)));
         }
-        codeMods = codeMods.filter(c => c);
-        codeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-        this._codeModsCache = codeMods;
-        logService.output(`${codeMods.length} code actions loaded.`);
-        return codeMods;
+        const validCodeMods = codeMods.filter(c => c) as CodeModDefinition[];
+        validCodeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        this._codeModsCache = validCodeMods;
+        logService.output(`${validCodeMods.length} code actions loaded.`);
+        return validCodeMods;
     }
 
-    public loadOneEmbeddedCodeMod(modId: string) {
+    public loadOneEmbeddedCodeMod(modId: string): CodeModDefinition | null {
         const fileName = path.join(embeddedCodeModDir, modId);
         return this._parseCodeModFile(fileName);
     }
@@ -61,6 +61,9 @@ class CodeModService {
         selection: Selection;
     }) {
         const mods = (await this._getAllCodeMods()).filter(mod => {
+            if (!mod) {
+                return false;
+            }
             if (mod.scope !== CodeModScope.Global) {
                 return false;
             }
@@ -162,7 +165,7 @@ class CodeModService {
         return result;
     }
 
-    private _parseCodeModFile(fileName: string): CodeModDefinition {
+    private _parseCodeModFile(fileName: string): CodeModDefinition | null {
         let modFn: CodeModExports;
         try {
             modFn = require(fileName);
@@ -182,12 +185,12 @@ class CodeModService {
         };
     }
 
-    private async _getAllCodeMods() {
+    private async _getAllCodeMods(): Promise<CodeModDefinition[]> {
         if (this._codeModsCache) {
             return this._codeModsCache;
         }
         await this.reloadAllCodeMods();
-        return this._codeModsCache;
+        return this._codeModsCache!;
     }
 }
 

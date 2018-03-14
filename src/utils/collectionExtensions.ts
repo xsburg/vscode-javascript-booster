@@ -19,7 +19,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
         findNodeAtPosition<TNode>(this: Collection<TNode>, pos: number): Collection {
             const matched = this.find(j.Node).filter(path => isPositionWithinNode(pos, path.node));
             const c = matched.at(-1);
-            return c;
+            return c as Collection;
         },
 
         findNodeInRange<TNode>(this: Collection<TNode>, start: number, end: number): Collection {
@@ -31,30 +31,35 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                 path => path.node.start <= start && end <= path.node.end
             );
             const c = matched.at(-1);
-            return c;
+            return c as Collection;
         },
 
-        thisOrClosest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode> {
+        thisOrClosest<TNode>(
+            this: Collection<TNode>,
+            type: NamedType<TNode>,
+            filter?: any
+        ): Collection {
             return this.map(path => {
+                let target = path as NodePath<any>;
                 while (
-                    path &&
-                    !(type.check(path.value) && (!filter || j.match(path.value, filter)))
+                    target &&
+                    !(type.check(target.value) && (!filter || j.match(target.value, filter)))
                 ) {
-                    path = path.parent;
+                    target = target.parent;
                 }
-                return path || null;
+                return target || null;
             });
         },
 
-        furthest<TNode>(type: NamedType<TNode>, filter?: any): Collection<TNode> {
+        furthest<TNode>(this: Collection<TNode>, type: NamedType<TNode>, filter?: any): Collection {
             return this.map(path => {
                 let furthestPath = null;
-                path = path.parent;
-                while (path) {
-                    if (type.check(path.value) && (!filter || j.match(path.value, filter))) {
-                        furthestPath = path;
+                let target = path.parent;
+                while (target) {
+                    if (type.check(target.value) && (!filter || j.match(target.value, filter))) {
+                        furthestPath = target;
                     }
-                    path = path.parent;
+                    target = target.parent;
                 }
                 return furthestPath;
             });

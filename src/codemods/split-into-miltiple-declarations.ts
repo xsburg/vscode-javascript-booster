@@ -38,7 +38,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
-    return path && path.node.declarations.length > 1;
+    return Boolean(path && path.node.declarations.length > 1);
 };
 
 codeMod.scope = 'cursor';

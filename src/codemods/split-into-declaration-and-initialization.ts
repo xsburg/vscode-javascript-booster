@@ -2,6 +2,7 @@ import {
     AstNode,
     BinaryExpression,
     Expression,
+    ExpressionStatement,
     FunctionDeclaration,
     IfStatement,
     Node,
@@ -21,7 +22,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath()!;
 
-    const assignments = [];
+    const assignments: ExpressionStatement[] = [];
     path.node.declarations.forEach(d => {
         if (j.VariableDeclarator.check(d) && d.init) {
             assignments.push(j.expressionStatement(j.assignmentExpression('=', d.id, d.init)));
@@ -43,10 +44,10 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
 
-    return (
+    return Boolean(
         path &&
-        path.node.kind !== 'const' &&
-        path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
+            path.node.kind !== 'const' &&
+            path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
     );
 };
 

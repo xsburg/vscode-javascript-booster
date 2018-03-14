@@ -1,8 +1,9 @@
+import { File } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { Position } from '../utils/Position';
 
 type CodeModTransform = (
-    fileInfo: { path: string; source: string; ast: Collection },
+    fileInfo: { path: string; source: string; ast: Collection<File> },
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
@@ -10,7 +11,7 @@ type CodeModTransform = (
 ) => string | undefined | null;
 
 type CanRunFunction = (
-    fileInfo: { path: string; source: string; ast: Collection },
+    fileInfo: { path: string; source: string; ast: Collection<File> },
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
@@ -37,5 +38,5 @@ export interface CodeModDefinition {
     detail?: string;
     scope: CodeModScope;
     modFn: CodeModTransform;
-    canRun?: CanRunFunction;
+    canRun: CanRunFunction;
 }

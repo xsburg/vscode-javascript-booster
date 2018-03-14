@@ -17,7 +17,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    let path = target.firstPath();
+    let path = target.firstPath()!;
     while (path.parent && path.parent.node.type === 'BinaryExpression') {
         path = path.parent;
     }
@@ -102,7 +102,7 @@ codeMod.canRun = (fileInfo, api, options) => {
         path = path.parent;
     }
 
-    function hasStringLiteral(node: AstNode) {
+    function hasStringLiteral(node: AstNode): boolean {
         if (j.StringLiteral.check(node)) {
             return true;
         }

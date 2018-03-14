@@ -11,20 +11,18 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         token: vscode.CancellationToken
     ): Promise<vscode.Command[]> {
         if (!astService.isSupportedLanguage(document.languageId)) {
-            return;
+            return [];
         }
 
         const source = document.getText();
+        const activeTextEditor = vscode.window.activeTextEditor!;
         const codeMods = await codeModService.getCodeActionMods({
             languageId: document.languageId as LanguageId,
             fileName: document.fileName,
             source,
             selection: {
-                anchor: astService.offsetAt(
-                    source,
-                    vscode.window.activeTextEditor.selection.anchor
-                ),
-                active: astService.offsetAt(source, vscode.window.activeTextEditor.selection.active)
+                anchor: astService.offsetAt(source, activeTextEditor.selection.anchor),
+                active: astService.offsetAt(source, activeTextEditor.selection.active)
             }
         });
         return codeMods.map(

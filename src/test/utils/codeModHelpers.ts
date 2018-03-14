@@ -11,7 +11,7 @@
 
 import * as assert from 'assert';
 import * as fs from 'fs-extra';
-import * as uniq from 'lodash/uniq';
+import * as _ from 'lodash';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -55,6 +55,9 @@ function runInlineTransformTest(
     input = normalizeLineEndings(input);
     output = normalizeLineEndings(output);
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
+    if (!mod) {
+        throw new Error(`Failed to load code mod ${modId}. Syntax error.`);
+    }
 
     const runOptions = {
         languageId,
@@ -86,6 +89,9 @@ function runInlineCanRunTest(
     options: { fileName?: string; anchor?: IPosition; active: IPosition }
 ) {
     const mod = codeModService.loadOneEmbeddedCodeMod(modId);
+    if (!mod) {
+        throw new Error(`Failed to load code mod ${modId}. Syntax error.`);
+    }
 
     const runOptions = {
         languageId,
@@ -167,7 +173,7 @@ function extractPosition(
 function extractFixtures(
     modId: string,
     input: string,
-    fallbackFixtureName?: string,
+    fallbackFixtureName: string | null = null,
     searchPosition: boolean = true
 ) {
     const re = /\/\*\$\s*([^\$]+?)\s*\$\*\//g; // /*$ VALUE $*/
@@ -203,7 +209,12 @@ function extractFixtures(
     if (activeFixture) {
         fixtures.push(activeFixture);
     }
-    const fullFixtures = fixtures.map(fx => {
+    const fullFixtures: Array<{
+        raw: any;
+        name: string | null;
+        source: string;
+        pos: IPosition;
+    }> = fixtures.map(fx => {
         const inputFragment = input.substring(fx.inputStart, fx.inputEnd);
         let source = inputFragment.trim();
         let pos;
@@ -224,14 +235,14 @@ function extractFixtures(
         let source = input.trim();
         let pos;
         if (searchPosition) {
-            pos = extractPosition(modId, fallbackFixtureName || null, source);
+            pos = extractPosition(modId, fallbackFixtureName, source);
             source = pos.source;
         } else {
             pos = new Position(1, 1);
         }
         fullFixtures.push({
             raw: {},
-            name: fallbackFixtureName || null,
+            name: fallbackFixtureName,
             source,
             pos
         });
@@ -338,7 +349,7 @@ function defineCanRunTests(
 export function defineCodeModTests(dirName: string) {
     const fixDir = path.join(dirName, '__fixtures__');
     const files = fs.readdirSync(fixDir);
-    const modIds = uniq(files.map(f => f.substring(0, f.indexOf('.'))));
+    const modIds = _.uniq(files.map(f => f.substring(0, f.indexOf('.'))));
 
     modIds.forEach(modId => {
         defineCanRunTests(dirName, modId);

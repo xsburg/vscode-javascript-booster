@@ -17,7 +17,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const node = target.firstNode<VariableDeclaration>();
+    const node = target.firstNode<VariableDeclaration>()!;
 
     node.kind = 'let';
 

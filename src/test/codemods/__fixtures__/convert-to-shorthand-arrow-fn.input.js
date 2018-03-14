@@ -15,3 +15,11 @@ function test() {
         };
     };
 }
+
+/*$ { fixture: 'should-transform-empty-return' } $*/
+
+function test() {
+    const a = () => { /*# { pos: 19 } #*/
+        return;
+    };
+}

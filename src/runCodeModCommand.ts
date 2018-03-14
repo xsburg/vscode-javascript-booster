@@ -44,7 +44,7 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         mod = mod;
     }
 
-    let result;
+    let result: string;
     try {
         result = codeModService.executeTransform(mod, {
             languageId: document.languageId as LanguageId,

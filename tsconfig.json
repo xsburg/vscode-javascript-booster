@@ -3,14 +3,14 @@
         "module": "commonjs",
         "target": "es6",
         "outDir": "out",
-        "lib": [
-            "es6"
-        ],
+        "lib": ["es2015", "es2017"],
         "sourceMap": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "allowUnreachableCode": true,
+        "baseUrl": "src",
         "rootDir": "src"
     },
-    "exclude": [
-        "node_modules",
-        ".vscode-test"
-    ]
+    "exclude": ["node_modules", ".vscode-test"]
 }

@@ -13,7 +13,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const node = target.firstNode<ArrowFunctionExpression>();
+    const node = target.firstNode<ArrowFunctionExpression>()!;
 
     const expr = node.body;
     node.body = j.blockStatement([j.returnStatement(expr)]);

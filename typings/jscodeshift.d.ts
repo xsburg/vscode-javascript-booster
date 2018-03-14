@@ -57,7 +57,7 @@ declare module 'jscodeshift' {
                 i: number,
                 paths: NodePath<TNode>[]
             ) => NodePath<TReturnNode> | NodePath<TReturnNode>[] | null,
-            type?: string
+            type?: TypeName
         ): Collection;
 
         /**
@@ -300,7 +300,7 @@ declare module 'jscodeshift' {
          *  have in common. If not passed, it will be inferred from the paths.
          * @return {Collection}
          */
-        new (paths: NodePath<TNode>[], parent: Collection, types?: string[]);
+        new (paths: NodePath<TNode>[], parent: Collection, types?: string[]): Collection<TNode>;
     }
 
     export interface JsCodeShift extends Builders, NamedTypes {
@@ -356,7 +356,7 @@ declare module 'jscodeshift' {
          * @static
          * @param {Function} plugin
          */
-        use(plugin: (core: JsCodeShift) => void);
+        use(plugin: (core: JsCodeShift) => void): void;
 
         /**
          * Returns a version of the core jscodeshift function "bound" to a specific
@@ -380,7 +380,7 @@ declare module 'jscodeshift' {
                 [methodName: string]: Function;
             },
             type?: NamedType<TNode>
-        );
+        ): void;
     }
 
     /**

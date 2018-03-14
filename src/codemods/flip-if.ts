@@ -15,7 +15,9 @@ function negateExpression(j: JsCodeShift, expr: Expression) {
     }
 
     // 2. invert binary operators
-    const operatorMap = {
+    const operatorMap: {
+        [operator: string]: string | undefined;
+    } = {
         '<': '>=',
         '>': '<=',
         '>=': '<',
@@ -39,7 +41,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    const node = target.firstNode<IfStatement>();
+    const node = target.firstNode<IfStatement>()!;
 
     const consequent = node.consequent;
     let alternate;

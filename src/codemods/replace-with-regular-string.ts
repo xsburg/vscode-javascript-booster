@@ -39,7 +39,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         expressions.push(j.stringLiteral(firstStrValue));
     }
 
-    function combineExpressions(rightIndex: number) {
+    function combineExpressions(rightIndex: number): Expression {
         if (rightIndex === 0) {
             return expressions[0];
         }

@@ -58,6 +58,9 @@ export function assertSmartSelectionExtend(
         fileName: 'example.jsx',
         source: cleanInputFixture
     });
+    if (!ast) {
+        throw new Error('SyntaxError in input fixture.');
+    }
     const actualSelection = smartSelectionService.extendSelection(languageId, ast, inputSelection);
     const actualOutputFixture = applySelectionMarkers(cleanInputFixture, actualSelection);
     assert.equal(actualOutputFixture, outputFixture, `Input fixture: ${inputFixture}`);

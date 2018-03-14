@@ -1,6 +1,7 @@
 import { File } from 'ast-types';
 import * as jscodeshift from 'jscodeshift';
 import * as os from 'os';
+import { RecastPrinterOptions } from 'recast';
 import * as vscode from 'vscode';
 import { registerCollectionExtensions } from '../utils';
 import logService from './logService';
@@ -11,7 +12,7 @@ import logService from './logService';
 // tslint:disable-next-line:variable-name
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
-CollectionPrototype.toSource = function(options) {
+CollectionPrototype.toSource = function(options: RecastPrinterOptions) {
     return toSource.call(this, {
         quote: 'single',
         ...options
@@ -102,6 +103,9 @@ class AstService {
         return new vscode.Position(0, 0);
     }
 
+    /**
+     * @returns AstRoot or null if the source code is invalid
+     */
     public getAstTree(options: {
         languageId: LanguageId;
         fileName: string;

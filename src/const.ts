@@ -9,5 +9,6 @@ export const commandIds = {
 
 export const configIds = {
     codemodDir: 'codemodDir',
-    extensionParser: 'extensionParser'
+    smartExtendFallbackCommand: 'smartExtendFallbackCommand',
+    smartShrinkFallbackCommand: 'smartShrinkFallbackCommand'
 };

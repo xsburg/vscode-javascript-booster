@@ -3,6 +3,6 @@ declare module 'recast' {
     export type RecastPrinterOptions = any;
 
     export interface Parser {
-        parse(source: string, options?: RecastParserOptions);
+        parse(source: string, options?: RecastParserOptions): any;
     }
 }

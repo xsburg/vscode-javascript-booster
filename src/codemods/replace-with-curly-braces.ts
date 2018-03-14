@@ -19,7 +19,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    const path = target.firstPath<StringLiteral>();
+    const path = target.firstPath<StringLiteral>()!;
 
     path.replace(j.jsxExpressionContainer(j.stringLiteral(path.node.value)));
 
@@ -33,7 +33,9 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const path = target.firstPath();
 
-    return path && j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node);
+    return Boolean(
+        path && j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node)
+    );
 };
 
 codeMod.scope = 'cursor';

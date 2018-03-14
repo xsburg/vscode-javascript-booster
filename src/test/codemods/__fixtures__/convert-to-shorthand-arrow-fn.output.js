@@ -11,3 +11,9 @@ function test() {
         foo: 'bar'
     });
 }
+
+/*$ { fixture: 'should-transform-empty-return' } $*/
+
+function test() {
+    const a = () => undefined;
+}

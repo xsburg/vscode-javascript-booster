@@ -20,8 +20,8 @@ class SmartSelectionService {
             end = selection.active;
         }
 
-        const targetNode = target.firstNode<Node>();
-        const targetPath = target.firstPath<Node>();
+        const targetNode = target.firstNode<Node>()!;
+        const targetPath = target.firstPath<Node>()!;
         const incompleteCoverage = start > targetNode.start || end < targetNode.end;
         if (incompleteCoverage) {
             switch (targetNode.type as TypeName) {

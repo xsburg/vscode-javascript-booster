@@ -61,6 +61,16 @@
                         "type": "string",
                         "default": "codemods",
                         "description": "Specifies the directory containing workspace related code actions."
+                    },
+                    "javascriptBooster.smartExtendFallbackCommand": {
+                        "type": "string",
+                        "default": "editor.action.smartSelect.grow",
+                        "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    },
+                    "javascriptBooster.smartShrinkFallbackCommand": {
+                        "type": "string",
+                        "default": "editor.action.smartSelect.shrink",
+                        "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
                     }
                 }
             }
@@ -86,11 +96,12 @@
         "tslint": "^5.9.1",
         "tslint-config-prettier": "^1.10.0",
         "tslint-react": "^3.5.1",
-        "typescript": "^2.6.1",
+        "typescript": "^2.7.2",
         "vscode": "^1.1.6"
     },
     "dependencies": {
         "@types/fs-extra": "^5.0.1",
+        "@types/lodash": "^4.14.104",
         "@types/prettier": "^1.10.0",
         "babylon": "^7.0.0-beta.39",
         "fs-extra": "^5.0.0",
