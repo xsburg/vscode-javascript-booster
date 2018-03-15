@@ -14,7 +14,9 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 [Visual Studio Code Market Place: JavaScript Booster](https://marketplace.visualstudio.com/items?itemName=sburg.vscode-javascript-booster)
 
-## Supported code actions
+## Features
+
+### Code actions
 
 * 💥 Flip if-else
 * 💥 Remove redundant else
@@ -29,6 +31,18 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 * 💥 Split into multiple declarations
 * 💥 Split into declaration and initialisation
 * 💥 Merge declaration and initialisation
+
+### Extend/Shrink selections
+
+These two commands allow you to successively select blocks of code so that it's easier to select what you want. Just look at the animation, rather than read this text 🤓. Unlike VS Code's embedded commands (`editor.action.smartSelect.*`), this extension uses an abstract syntax tree under the hood, which provides much more accurate results.
+
+![Smart extend/shrink selection](resources/smartSelection.gif)
+
+As this feature is only supported in JavaScript and TypeScript for now, you can configure fallback commands that will be called for other file types instead (VS Code's `smartSelect.*` by default). They will also be called if the file has fatal syntax errors.
+
+<!-- ### Run your own code actions (beta)
+
+You can easily load and run your own code actions. -->
 
 ## Roadmap
 
@@ -47,7 +61,6 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 ### New commands
 
-* Extend/Shrink selection (similar to what WebStorm provides)
 * Duplicate line/selection
 * Navigate to related files (Hello.jsx -> Hello.scss, Hello.spec.jsx)
 
@@ -62,7 +75,17 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ## Release Notes
 
-## 0.2.0 (Initial release)
+### 0.3.0
+
+* Added new smart selection commands for JavaScript and TypeScript (with behavior very close to those in WebStorm). When used in other languages, the fallback commands defined in settings are used.
+
+    * `javascriptBooster.extendSelection`
+    * `javascriptBooster.shrinkSelection`
+
+* Added a command to run global code actions.
+* Added support for external code actions that should be located in a directory inside your workspace (the directory path is defined is settings, `codemods` by default).
+
+### 0.2.0 (Initial release)
 
 Added the following inline code actions. The list will keep expanding in later releases.
 

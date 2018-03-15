@@ -4,7 +4,6 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
 
-<!--
 ## 0.3.0
 
 * Added new smart selection commands for JavaScript and TypeScript (with behavior very close to those in WebStorm). When used in other languages, the fallback commands defined in settings are used.
@@ -14,7 +13,6 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 
 * Added a command to run global code actions.
 * Added support for external code actions that should be located in a directory inside your workspace (the directory path is defined is settings, `codemods` by default).
- -->
 
 ## 0.2.0 (Initial release)
 
