@@ -60,6 +60,26 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its variety of code refactorings. The extension uses [Babylon](https://github.com/babel/babel/tree/master/packages/babylon) to parse the code and then manipulates the abstract syntax tree using [jscodeshift](https://github.com/facebook/jscodeshift).
 
+## Release Notes
+
+## 0.2.0 (Initial release)
+
+Added the following inline code actions. The list will keep expanding in later releases.
+
+* Flip if-else
+* Remove redundant else
+* Replace if-else with ?:
+* Convert shorthand arrow function to statement
+* Convert to shorthand arrow function
+* Replace string with template string
+* Replace template string with regular string
+* Wrap value with {} (JSX attributes)
+* Convert var to let
+* Convert var to const
+* Split into multiple declarations
+* Split into declaration and initialisation
+* Merge declaration and initialisation
+
 <!-- ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.

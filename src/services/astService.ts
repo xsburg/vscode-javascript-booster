@@ -1,7 +1,7 @@
 import { File } from 'ast-types';
 import * as jscodeshift from 'jscodeshift';
 import * as os from 'os';
-import { RecastPrinterOptions } from 'recast';
+import { PrinterOptions } from 'recast';
 import * as vscode from 'vscode';
 import { registerCollectionExtensions } from '../utils';
 import logService from './logService';
@@ -12,7 +12,7 @@ import logService from './logService';
 // tslint:disable-next-line:variable-name
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
-CollectionPrototype.toSource = function(options: RecastPrinterOptions) {
+CollectionPrototype.toSource = function(options: PrinterOptions) {
     return toSource.call(this, {
         quote: 'single',
         ...options

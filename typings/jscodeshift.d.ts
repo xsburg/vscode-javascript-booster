@@ -10,7 +10,7 @@ declare module 'jscodeshift' {
         AstNode,
         TypeName
     } from 'ast-types';
-    import { RecastPrinterOptions, Parser, RecastParserOptions } from 'recast';
+    import { PrinterOptions, Parser, ParserOptions } from 'recast';
 
     interface CollectionBase<TNode> {
         /**
@@ -96,7 +96,7 @@ declare module 'jscodeshift' {
         /**
          * Returns printed representation of the whole AST (goes to the top-most ancestor and prints from there)
          */
-        toSource(options?: RecastPrinterOptions): string;
+        toSource(options?: PrinterOptions): string;
 
         /**
          * Returns a new collection containing only the element at position index.
@@ -322,7 +322,7 @@ declare module 'jscodeshift' {
          */
         <TNode>(
             source: string | TNode | NodePath<TNode> | TNode[] | NodePath<TNode>[],
-            options?: RecastParserOptions
+            options?: ParserOptions
         ): Collection;
 
         /**
