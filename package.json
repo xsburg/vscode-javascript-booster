@@ -41,6 +41,10 @@
                 "title": "[Booster] Run Global Code Action"
             },
             {
+                "command": "javascriptBooster.runCodeModOverDir",
+                "title": "[Booster] Run Code Actions Over Selected Folder"
+            },
+            {
                 "command": "javascriptBooster.reloadCodeMods",
                 "title": "[Booster] Reload Code Actions"
             },
@@ -53,6 +57,15 @@
                 "title": "[Booster] Shrink selection"
             }
         ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "javascriptBooster.runCodeModOverDir",
+                    "group": "1_modification"
+                }
+            ]
+        },
         "configuration": [
             {
                 "title": "JavaScript Booster",

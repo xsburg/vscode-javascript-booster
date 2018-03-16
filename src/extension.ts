@@ -1,6 +1,6 @@
 'use strict';
 
-import { commands, ExtensionContext, languages } from 'vscode';
+import { commands, ExtensionContext, languages, RelativePattern, workspace } from 'vscode';
 import { CodeModCodeActionProvider } from './CodeModCodeActionProvider';
 import { commandIds } from './const';
 import { runCodeModCommand } from './runCodeModCommand';
@@ -13,6 +13,18 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand(commandIds.extendSelection, extendSelectionCommand),
         commands.registerCommand(commandIds.shrinkSelection, shrinkSelectionCommand),
         commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
+        commands.registerCommand(commandIds.runCodeModOverDir, async uri => {
+            const files = await workspace.findFiles(
+                new RelativePattern(uri.path, '**/*.{js,ts,jsx,tsx}')
+            );
+            const mod = codeModService.loadOneEmbeddedCodeMod('g-simplify-redux-actions');
+            await Promise.all(
+                files.map(async f => {
+                    await workspace.openTextDocument(f.fsPath);
+                    await commands.executeCommand(commandIds.runCodeMod, mod);
+                })
+            );
+        }),
         commands.registerCommand(commandIds.reloadCodeMods, () => {
             codeModService.reloadAllCodeMods();
         }),

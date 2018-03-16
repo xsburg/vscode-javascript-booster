@@ -22,6 +22,7 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import * as _ from 'lodash';
 import { CodeModExports } from '../models/CodeMod';
+import logService from '../services/logService';
 
 let j: JsCodeShift;
 let ast: Collection<File>;
@@ -41,6 +42,8 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         } catch (e) {
             // tslint:disable-next-line:no-debugger
             debugger;
+            logService.outputError(`While transforming ${fileInfo.path}:`);
+            logService.outputError(e.toString());
         }
 
         try {
@@ -50,6 +53,8 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         } catch (e) {
             // tslint:disable-next-line:no-debugger
             debugger;
+            logService.outputError(`While transforming ${fileInfo.path}:`);
+            logService.outputError(e.toString());
         }
     });
 
