@@ -1,0 +1,255 @@
+/*$ { fixture: 'should-transform-simplest-case' } $*/
+
+function createAction(...args: any[]) {
+}
+
+export const UPDATE_ENTITIES = 'REACT_COMMON/UPDATE_ENTITIES'; /*# { pos: 17 } #*/
+export interface UpdateEntitiesAction {
+    type: typeof UPDATE_ENTITIES;
+    entities: {};
+}
+export function updateEntities(entities: {}): UpdateEntitiesAction {
+    return {
+        type: UPDATE_ENTITIES,
+        entities
+    };
+}
+
+/*$ { fixture: 'should-transform-options-destruction' } $*/
+
+export const SHOW_FANCY_POPUP = 'REACT_COMMON/SHOW_FANCY_POPUP'; /*# { pos: 17 } #*/
+interface ShowFancyPopupAction {
+    type: typeof SHOW_FANCY_POPUP;
+    payload: number;
+}
+export function showFancyPopup({
+    payload
+}: {
+    payload: number;
+}): ShowFancyPopupAction {
+    return {
+        type: SHOW_FANCY_POPUP,
+        payload
+    };
+}
+
+/*$ { fixture: 'should-transform-async-action' } $*/
+
+// tslint:disable-next-line:no-namespace
+namespace actionTypes {
+    export type AsyncRequestAction<T> = any;
+    export type AsyncResponseAction<T> = any;
+    export type AsyncFailureAction<T> = any;
+    export type Dispatch<T> = any;
+    export type GetState<T> = any;
+}
+function doNothing() {
+}
+function doApiRequest(args: any): any {
+}
+function createAsyncAction(args: any) {
+}
+type State = any;
+
+export const LOAD_DATA_REQUEST = 'REACT_COMMON/LOAD_DATA_REQUEST'; /*# { pos: 17 } #*/
+export const LOAD_DATA_RESPONSE = 'REACT_COMMON/LOAD_DATA_RESPONSE';
+export const LOAD_DATA_FAILURE = 'REACT_COMMON/LOAD_DATA_FAILURE';
+interface LoadDataRequestData {
+    integrationId: string;
+}
+interface LoadDataRequestAction
+    extends actionTypes.AsyncRequestAction<LoadDataRequestData> {
+    type: typeof LOAD_DATA_REQUEST;
+}
+interface LoadDataResponseAction
+    extends actionTypes.AsyncResponseAction<LoadDataRequestData> {
+    type: typeof LOAD_DATA_RESPONSE;
+}
+interface LoadDataFailureAction
+    extends actionTypes.AsyncFailureAction<LoadDataRequestData> {
+    type: typeof LOAD_DATA_FAILURE;
+}
+export function loadData(companyId: string, integrationId: string) {
+    return doApiRequest({
+        types: [
+            LOAD_DATA_REQUEST,
+            LOAD_DATA_RESPONSE,
+            LOAD_DATA_FAILURE
+        ],
+        data: {
+            integrationId
+        },
+        requestFn: data => Promise.resolve()
+    });
+}
+
+/*$ { fixture: 'should-transform-async-action-with-data-arrow' } $*/
+
+export const LOAD_DATA_2_REQUEST = 'REACT_COMMON/LOAD_DATA_2_REQUEST'; /*# { pos: 17 } #*/
+export const LOAD_DATA_2_RESPONSE = 'REACT_COMMON/LOAD_DATA_2_RESPONSE';
+export const LOAD_DATA_2_FAILURE = 'REACT_COMMON/LOAD_DATA_2_FAILURE';
+interface LoadData2RequestData {
+    integrationId: string;
+}
+interface LoadData2RequestAction
+    extends actionTypes.AsyncRequestAction<LoadData2RequestData> {
+    type: typeof LOAD_DATA_2_REQUEST;
+}
+interface LoadData2ResponseAction
+    extends actionTypes.AsyncResponseAction<LoadData2RequestData> {
+    type: typeof LOAD_DATA_2_RESPONSE;
+}
+interface LoadData2FailureAction
+    extends actionTypes.AsyncFailureAction<LoadData2RequestData> {
+    type: typeof LOAD_DATA_2_FAILURE;
+}
+export function loadData2(companyId: string, integrationId: string) {
+    return doApiRequest({
+        types: [
+            LOAD_DATA_2_REQUEST,
+            LOAD_DATA_2_RESPONSE,
+            LOAD_DATA_2_FAILURE
+        ],
+        data: () => {
+            return {
+                integrationId
+            }
+        },
+        requestFn: data => Promise.resolve()
+    });
+}
+
+/*$ { fixture: 'should-add-on-callbacks' } $*/
+
+export const LOAD_DATA_3_REQUEST = 'REACT_COMMON/LOAD_DATA_3_REQUEST'; /*# { pos: 17 } #*/
+export const LOAD_DATA_3_RESPONSE = 'REACT_COMMON/LOAD_DATA_3_RESPONSE';
+export const LOAD_DATA_3_FAILURE = 'REACT_COMMON/LOAD_DATA_3_FAILURE';
+interface LoadData3RequestData {
+    integrationId: string;
+}
+interface LoadData3RequestAction
+    extends actionTypes.AsyncRequestAction<LoadData3RequestData> {
+    type: typeof LOAD_DATA_3_REQUEST;
+}
+interface LoadData3ResponseAction
+    extends actionTypes.AsyncResponseAction<LoadData3RequestData> {
+    type: typeof LOAD_DATA_3_RESPONSE;
+}
+interface LoadData3FailureAction
+    extends actionTypes.AsyncFailureAction<LoadData3RequestData> {
+    type: typeof LOAD_DATA_3_FAILURE;
+}
+export function loadData3(companyId: string, integrationId: string) {
+    return doApiRequest({
+        types: [
+            LOAD_DATA_3_REQUEST,
+            LOAD_DATA_3_RESPONSE,
+            LOAD_DATA_3_FAILURE
+        ],
+        data: () => {
+            return {
+                integrationId
+            }
+        },
+        requestFn: data => Promise.resolve(),
+        parseFn: (response) => {
+            return {
+                foo: 'foo'
+            };
+        },
+        responseFn: () => {
+            doNothing();
+        },
+        afterResponseFn: () => {
+            doNothing();
+        },
+        schema: {},
+        errorFn: error => doNothing()
+    });
+}
+
+/*$ { fixture: 'should-transform-preconditioned' } $*/
+
+export const LOAD_DATA_4_REQUEST = 'REACT_COMMON/LOAD_DATA_4_REQUEST'; /*# { pos: 17 } #*/
+export const LOAD_DATA_4_RESPONSE = 'REACT_COMMON/LOAD_DATA_4_RESPONSE';
+export const LOAD_DATA_4_FAILURE = 'REACT_COMMON/LOAD_DATA_4_FAILURE';
+interface LoadData4RequestData {
+    integrationId: string;
+}
+interface LoadData4RequestAction
+    extends actionTypes.AsyncRequestAction<LoadData4RequestData> {
+    type: typeof LOAD_DATA_4_REQUEST;
+}
+interface LoadData4ResponseAction
+    extends actionTypes.AsyncResponseAction<LoadData4RequestData> {
+    type: typeof LOAD_DATA_4_RESPONSE;
+}
+interface LoadData4FailureAction
+    extends actionTypes.AsyncFailureAction<LoadData4RequestData> {
+    type: typeof LOAD_DATA_4_FAILURE;
+}
+export function loadData4(companyId: string, integrationId: string) {
+    if (true) {
+        return;
+    }
+    if (false) {
+        return;
+    }
+    return doApiRequest({
+        types: [
+            LOAD_DATA_4_REQUEST,
+            LOAD_DATA_4_RESPONSE,
+            LOAD_DATA_4_FAILURE
+        ],
+        data: () => {
+            return {
+                integrationId
+            }
+        },
+        requestFn: data => Promise.resolve()
+    });
+}
+
+/*$ { fixture: 'should-transform-thunk' } $*/
+
+export const LOAD_DATA_5_REQUEST = 'REACT_COMMON/LOAD_DATA_5_REQUEST'; /*# { pos: 17 } #*/
+export const LOAD_DATA_5_RESPONSE = 'REACT_COMMON/LOAD_DATA_5_RESPONSE';
+export const LOAD_DATA_5_FAILURE = 'REACT_COMMON/LOAD_DATA_5_FAILURE';
+interface LoadData5RequestData {
+    integrationId: string;
+}
+interface LoadData5RequestAction
+    extends actionTypes.AsyncRequestAction<LoadData5RequestData> {
+    type: typeof LOAD_DATA_5_REQUEST;
+}
+interface LoadData5ResponseAction
+    extends actionTypes.AsyncResponseAction<LoadData5RequestData> {
+    type: typeof LOAD_DATA_5_RESPONSE;
+}
+interface LoadData5FailureAction
+    extends actionTypes.AsyncFailureAction<LoadData5RequestData> {
+    type: typeof LOAD_DATA_5_FAILURE;
+}
+export function loadData5(companyId: string, integrationId: string) {
+    return (dispatch: actionTypes.Dispatch<State>, getState: actionTypes.GetState<State>) => {
+        if (true) {
+            return;
+        }
+        if (false) {
+            return;
+        }
+        return doApiRequest({
+            types: [
+                LOAD_DATA_5_REQUEST,
+                LOAD_DATA_5_RESPONSE,
+                LOAD_DATA_5_FAILURE
+            ],
+            data: () => {
+                return {
+                    integrationId
+                }
+            },
+            requestFn: data => Promise.resolve()
+        })(dispatch, getState);
+    };
+}

@@ -1,0 +1,164 @@
+/*$ { fixture: 'should-transform-simplest-case' } $*/
+
+function createAction(...args: any[]) {
+}
+
+export const UPDATE_ENTITIES = 'REACT_COMMON/UPDATE_ENTITIES';
+export const updateEntities = (entities: {}) => createAction(UPDATE_ENTITIES, {
+    entities
+});
+
+/*$ { fixture: 'should-transform-options-destruction' } $*/
+
+export const SHOW_FANCY_POPUP = 'REACT_COMMON/SHOW_FANCY_POPUP';
+export const showFancyPopup = (
+    options: {
+        payload: number;
+    }
+) => createAction(SHOW_FANCY_POPUP, {
+    payload: options.payload
+});
+
+/*$ { fixture: 'should-transform-async-action' } $*/
+
+// tslint:disable-next-line:no-namespace
+namespace actionTypes {
+    export type AsyncRequestAction<T> = any;
+    export type AsyncResponseAction<T> = any;
+    export type AsyncFailureAction<T> = any;
+    export type Dispatch<T> = any;
+    export type GetState<T> = any;
+}
+function doNothing() {
+}
+function doApiRequest(args: any): any {
+}
+function createAsyncAction(args: any) {
+}
+type State = any;
+
+export const LOAD_DATA = 'REACT_COMMON/LOAD_DATA';
+export const LOAD_DATA_RESPONSE = 'REACT_COMMON/LOAD_DATA_RESPONSE';
+export const LOAD_DATA_FAILURE = 'REACT_COMMON/LOAD_DATA_FAILURE';
+export const loadData = (companyId: string, integrationId: string) => createAsyncAction({
+    request: (state: State) => createAction(LOAD_DATA, {
+        integrationId
+    }),
+
+    response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_RESPONSE, {
+        request
+    })),
+
+    failure: error => createAction(LOAD_DATA_FAILURE, error)
+});
+
+/*$ { fixture: 'should-transform-async-action-with-data-arrow' } $*/
+
+export const LOAD_DATA_2 = 'REACT_COMMON/LOAD_DATA_2';
+export const LOAD_DATA_2_RESPONSE = 'REACT_COMMON/LOAD_DATA_2_RESPONSE';
+export const LOAD_DATA_2_FAILURE = 'REACT_COMMON/LOAD_DATA_2_FAILURE';
+export const loadData2 = (companyId: string, integrationId: string) => createAsyncAction({
+    request: (state: State) => {
+        return createAction(LOAD_DATA_2, {
+            integrationId
+        });
+    },
+
+    response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_2_RESPONSE, {
+        request
+    })),
+
+    failure: error => createAction(LOAD_DATA_2_FAILURE, error)
+});
+
+/*$ { fixture: 'should-add-on-callbacks' } $*/
+
+export const LOAD_DATA_3 = 'REACT_COMMON/LOAD_DATA_3';
+export const LOAD_DATA_3_RESPONSE = 'REACT_COMMON/LOAD_DATA_3_RESPONSE';
+export const LOAD_DATA_3_FAILURE = 'REACT_COMMON/LOAD_DATA_3_FAILURE';
+export const loadData3 = (companyId: string, integrationId: string) => createAsyncAction({
+    request: (state: State) => {
+        return createAction(LOAD_DATA_3, {
+            integrationId
+        });
+    },
+
+    response: request => Promise.resolve(Promise.resolve()).then((response) => {
+        return {
+            foo: 'foo'
+        };
+    }).then((response: any) => createAction(LOAD_DATA_3_RESPONSE, {
+        request
+    })),
+
+    failure: error => createAction(LOAD_DATA_3_FAILURE, error),
+    schema: {},
+
+    willDispatchResponse: () => {
+        doNothing();
+    },
+
+    didDispatchResponse: (response, request, state, dispatch) => {
+        doNothing();
+    },
+
+    willDispatchError: (response, error) => doNothing()
+});
+
+/*$ { fixture: 'should-transform-preconditioned' } $*/
+
+export const LOAD_DATA_4 = 'REACT_COMMON/LOAD_DATA_4';
+export const LOAD_DATA_4_RESPONSE = 'REACT_COMMON/LOAD_DATA_4_RESPONSE';
+export const LOAD_DATA_4_FAILURE = 'REACT_COMMON/LOAD_DATA_4_FAILURE';
+export const loadData4 = (companyId: string, integrationId: string) => createAsyncAction({
+    shouldSendRequest: (state, dispatch) => {
+        throw new Error('PLEASE VALIDATE ME');
+        if (true) {
+            return;
+        }
+        if (false) {
+            return;
+        }
+    },
+
+    request: (state: State) => {
+        return createAction(LOAD_DATA_4, {
+            integrationId
+        });
+    },
+
+    response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_4_RESPONSE, {
+        request
+    })),
+
+    failure: error => createAction(LOAD_DATA_4_FAILURE, error)
+});
+
+/*$ { fixture: 'should-transform-thunk' } $*/
+
+export const LOAD_DATA_5 = 'REACT_COMMON/LOAD_DATA_5';
+export const LOAD_DATA_5_RESPONSE = 'REACT_COMMON/LOAD_DATA_5_RESPONSE';
+export const LOAD_DATA_5_FAILURE = 'REACT_COMMON/LOAD_DATA_5_FAILURE';
+export const loadData5 = (companyId: string, integrationId: string) => createAsyncAction({
+    shouldSendRequest: (state, dispatch) => {
+        throw new Error('PLEASE VALIDATE ME');
+        if (true) {
+            return;
+        }
+        if (false) {
+            return;
+        }
+    },
+
+    request: (state: State) => {
+        return createAction(LOAD_DATA_5, {
+            integrationId
+        });
+    },
+
+    response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_5_RESPONSE, {
+        request
+    })),
+
+    failure: error => createAction(LOAD_DATA_5_FAILURE, error)
+});

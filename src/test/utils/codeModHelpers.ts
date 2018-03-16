@@ -123,11 +123,13 @@ function getLanguageIdByFileName(fileName: string): LanguageId {
             parser: 'javascriptreact'
         },
         {
-            extensions: '.ts',
+            // .tts is used to avoid TypeScript compilation
+            extensions: '.ts,.tts',
             parser: 'typescript'
         },
         {
-            extensions: '.tsx',
+            // .ttsx is used to avoid TypeScript compilation
+            extensions: '.tsx,.ttsx',
             parser: 'typescriptreact'
         }
     ];
