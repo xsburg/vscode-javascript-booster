@@ -12,7 +12,7 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
     * `javascriptBooster.shrinkSelection`
 
 * Added a command to run global code actions.
-* Added support for external code actions that should be located in a directory inside your workspace (the directory path is defined is settings, `codemods` by default).
+* Added support for external code actions, you can run them from a directory inside your workspace (the directory path is defined is settings, `/codemods` by default).
 
 ## 0.2.0 (Initial release)
 

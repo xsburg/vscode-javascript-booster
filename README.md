@@ -63,6 +63,7 @@ You can easily load and run your own code actions. -->
 
 ### New commands
 
+* Support milticursors in smart selection
 * Duplicate line/selection
 * Navigate to related files (Hello.jsx -> Hello.scss, Hello.spec.jsx)
 
@@ -85,7 +86,7 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
     * `javascriptBooster.shrinkSelection`
 
 * Added a command to run global code actions.
-* Added support for external code actions that should be located in a directory inside your workspace (the directory path is defined is settings, `codemods` by default).
+* Added support for external code actions, you can run them from a directory inside your workspace (the directory path is defined is settings, `/codemods` by default).
 
 ### 0.2.0 (Initial release)
 
