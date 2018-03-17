@@ -51,6 +51,7 @@ You can easily load and run your own code actions. -->
 ### More code actions
 
 * Convert function to arrow function
+* Add parens to arrow function parameter
 * Convert const -> let
 * Flip ?:
 * Convert if-else-return -> return ?:
