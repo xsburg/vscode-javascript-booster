@@ -33,6 +33,28 @@ export function showFancyPopup({
     };
 }
 
+/*$ { fixture: 'should-transform-with-body' } $*/
+
+export const SHOW_FANCY_2_POPUP = 'REACT_COMMON/SHOW_FANCY_2_POPUP'; /*# { pos: 17 } #*/
+interface ShowFancy2PopupAction {
+    type: typeof SHOW_FANCY_2_POPUP;
+    data: number;
+}
+export function showFancy2Popup(options: {
+    data: number;
+}): ShowFancy2PopupAction {
+    if (true) {
+        return;
+    }
+    if (false) {
+        const a = 1;
+    }
+    return {
+        type: SHOW_FANCY_2_POPUP,
+        data: options.data
+    };
+}
+
 /*$ { fixture: 'should-transform-async-action' } $*/
 
 // tslint:disable-next-line:no-namespace

@@ -1,4 +1,5 @@
 import {
+    ArrayExpression,
     ArrowFunctionExpression,
     BlockStatement,
     CallExpression,
@@ -26,10 +27,14 @@ import logService from '../services/logService';
 
 let j: JsCodeShift;
 let ast: Collection<File>;
+let constActionCreators: Identifier[];
+let asyncActionCreators: Identifier[];
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     j = api.jscodeshift;
     ast = fileInfo.ast;
+    constActionCreators = [];
+    asyncActionCreators = [];
     // const target = options.target;
     // const path = target.firstPath<Identifier>()!;
 
@@ -42,8 +47,9 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         } catch (e) {
             // tslint:disable-next-line:no-debugger
             debugger;
-            logService.outputError(`While transforming ${fileInfo.path}:`);
+            logService.outputError(`While transforming Const ${fileInfo.path}:`);
             logService.outputError(e.toString());
+            return;
         }
 
         try {
@@ -53,10 +59,72 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         } catch (e) {
             // tslint:disable-next-line:no-debugger
             debugger;
-            logService.outputError(`While transforming ${fileInfo.path}:`);
+            logService.outputError(`While transforming Async ${fileInfo.path}:`);
             logService.outputError(e.toString());
+            return;
         }
     });
+
+    // add actions const
+    const constDeclarator = ast.find(j.VariableDeclarator, { id: { name: 'constActions' } });
+    if (constDeclarator.length === 0) {
+        const exportedAction = ast.find(j.ExportNamedDeclaration, {
+            declaration: {
+                type: 'TSTypeAliasDeclaration',
+                id: { name: 'Action' }
+            }
+        });
+        exportedAction.remove();
+
+        const header = j(`
+            import { $call } from 'modules/react-types';
+            import { createAction, createAsyncAction } from 'modules/react-redux';
+        `);
+        const footer = j(`
+            const constActions = [];
+            const asyncActions = [];
+
+            const constActionsData = constActions.map($call);
+            const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
+            const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
+            const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+            export type Action =
+                | typeof constActionsData[number]
+                | typeof asyncActionRequests[number]
+                | typeof asyncActionResponses[number]
+                | typeof asyncActionErrors[number];`);
+        const statements = footer.firstNode<File>()!.program.body;
+        const programStatements = ast.firstNode<File>()!.program.body;
+        let headerComment;
+        if (programStatements[0].comments) {
+            headerComment = programStatements[0].comments![0];
+            programStatements[0].comments!.splice(0, 1);
+        }
+        programStatements.push(...statements);
+        programStatements.unshift(...header.firstNode<File>()!.program.body);
+        if (headerComment) {
+            if (j.CommentBlock.check(headerComment)) {
+                programStatements[0].comments = [j.commentBlock(headerComment.value, true)];
+            }
+        }
+    }
+
+    const constArrayElements = (ast
+        .find(j.VariableDeclarator, { id: { name: 'constActions' } })
+        .firstNode()!.init as ArrayExpression).elements;
+    const asyncArrayElements = (ast
+        .find(j.VariableDeclarator, { id: { name: 'asyncActions' } })
+        .firstNode()!.init as ArrayExpression).elements;
+
+    function addMissingIds(arrayElements: Identifier[], creatorIdentifiers: Identifier[]) {
+        const newElements = creatorIdentifiers.filter(
+            y => !arrayElements.some(x => x.name === y.name)
+        );
+        arrayElements.push(...newElements);
+    }
+
+    addMissingIds(constArrayElements as Identifier[], constActionCreators);
+    addMissingIds(asyncArrayElements as Identifier[], asyncActionCreators);
 
     const resultText = ast.toSource();
     return resultText;
@@ -94,38 +162,61 @@ function transformConstAction(path: NodePath<FunctionDeclaration>) {
     }
 
     const actionFnNode = $actionFn.firstNode()!;
-    const objectProperties = ((((actionFnNode.body as BlockStatement).body[0] as ReturnStatement)
-        .argument as ObjectExpression).properties as ObjectProperty[]).filter(
-        p => (p.key as Identifier).name !== 'type'
-    );
+    const bodyStatements = (actionFnNode.body as BlockStatement).body;
+    const lastStatement = bodyStatements[bodyStatements.length - 1];
+    if (
+        !j.match<ReturnStatement>(lastStatement, {
+            argument: {
+                type: 'ObjectExpression'
+            } as any
+        })
+    ) {
+        return;
+    }
+
+    const objectProperties = (((lastStatement as ReturnStatement).argument as ObjectExpression)
+        .properties as ObjectProperty[]).filter(p => (p.key as Identifier).name !== 'type');
+
     let params = actionFnNode.params;
     if (params.length === 1 && j.ObjectPattern.check(params[0])) {
         const optionsId = j.identifier('options');
         optionsId.typeAnnotation = (params[0] as ObjectPattern).typeAnnotation;
         params = [optionsId];
-        objectProperties.forEach(prop => {
+        /* objectProperties.forEach(prop => {
             if (j.Identifier.check(prop.value)) {
                 prop.value = j.memberExpression(j.identifier('options'), prop.value);
                 (prop as any).shorthand = false;
             }
-        });
+        }); */
+    }
+
+    let creatorBody;
+    if (bodyStatements.length > 1) {
+        creatorBody = j.blockStatement([
+            ...bodyStatements.slice(0, -1),
+            j.returnStatement(
+                j.callExpression(j.identifier('createAction'), [
+                    j.identifier(actionConstantName),
+                    j.objectExpression(objectProperties)
+                ])
+            )
+        ]);
+    } else {
+        creatorBody = j.callExpression(j.identifier('createAction'), [
+            j.identifier(actionConstantName),
+            j.objectExpression(objectProperties)
+        ]);
     }
 
     const replacement = j.variableDeclaration('const', [
         j.variableDeclarator(
             j.identifier(actionFnName),
-            j.arrowFunctionExpression(
-                params,
-                j.callExpression(j.identifier('createAction'), [
-                    j.identifier(actionConstantName),
-                    j.objectExpression(objectProperties)
-                ]),
-                true
-            )
+            j.arrowFunctionExpression(params, creatorBody)
         )
     ]);
     removeNode($interface);
     $actionFn.replaceWith(replacement);
+    constActionCreators.push(id(actionFnName));
     return true;
 }
 
@@ -235,11 +326,19 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
         );
     }
 
+    const doApiRequestProps = ((lastStatement.argument as CallExpression)
+        .arguments[0] as ObjectExpression).properties as ObjectProperty[];
+    const requestFn = doApiRequestProps.find(x => (x.key as Identifier).name === 'requestFn')!;
+    const requestFnBody = (requestFn.value as ArrowFunctionExpression).body;
+    if (!j.Expression.check(requestFnBody)) {
+        throw new Error('requestFn not an expression');
+    }
+
     removeNode($interfaceRequest);
     removeNode($interfaceResponse);
     removeNode($interfaceFailure);
     removeNode($interfaceRequestData);
-    removeNode($interfaceResponseData);
+    // removeNode($interfaceResponseData);
 
     ($constRequest.firstNode()!.id as Identifier).name = ($constRequest.firstNode()!
         .id as Identifier).name.replace('_REQUEST', '');
@@ -253,14 +352,6 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
         params = [optionsId];
     }
 
-    const doApiRequestProps = ((lastStatement.argument as CallExpression)
-        .arguments[0] as ObjectExpression).properties as ObjectProperty[];
-    const requestFn = doApiRequestProps.find(x => (x.key as Identifier).name === 'requestFn')!;
-    const requestFnBody = (requestFn.value as ArrowFunctionExpression).body;
-    if (!j.Expression.check(requestFnBody)) {
-        throw new Error('requestFn not an expression');
-    }
-
     const data = doApiRequestProps.find(x => (x.key as Identifier).name === 'data')!;
     let requestArrowBody: Expression | BlockStatement;
     if (j.Identifier.check(data.key)) {
@@ -272,8 +363,10 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
                     $constRequest.firstNode()!.id,
                     retNode.argument!
                 ]);
+                requestArrowBody = data.value.body;
+            } else {
+                throw new Error('data() can`t return expression');
             }
-            requestArrowBody = data.value.body;
         } else if (j.ObjectExpression.check(data.value)) {
             requestArrowBody = j.callExpression(id('createAction'), [
                 $constRequest.firstNode()!.id,
@@ -413,6 +506,7 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
         )
     ]);
     $actionFn.replaceWith(replacement);
+    asyncActionCreators.push(id(actionFnName));
     return true;
 }
 
