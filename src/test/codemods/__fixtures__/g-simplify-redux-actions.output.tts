@@ -1,7 +1,7 @@
 /*$ { fixture: 'should-transform-simplest-case' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 function createAction(...args: any[]) {
 }
 
@@ -13,19 +13,19 @@ const constActions = [updateEntities];
 const asyncActions = [];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-transform-options-destruction' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 export const SHOW_FANCY_POPUP = 'REACT_COMMON/SHOW_FANCY_POPUP';
 export const showFancyPopup = (
     {
@@ -40,19 +40,19 @@ const constActions = [showFancyPopup];
 const asyncActions = [];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-transform-with-body' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 export const SHOW_FANCY_2_POPUP = 'REACT_COMMON/SHOW_FANCY_2_POPUP';
 export const showFancy2Popup = (
     options: {
@@ -74,19 +74,19 @@ const constActions = [showFancy2Popup];
 const asyncActions = [];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-transform-async-action' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 namespace actionTypes {
     {
         export type AsyncRequestAction<T> = any;
@@ -113,28 +113,29 @@ export const loadData = (companyId: string, integrationId: string) => createAsyn
     }),
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_RESPONSE, {
-        request
+        request,
+        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
     })),
 
-    failure: error => createAction(LOAD_DATA_FAILURE, error)
+    failure: error => createAction(LOAD_DATA_FAILURE, {})
 });
 const constActions = [];
 const asyncActions = [loadData];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-transform-async-action-with-data-arrow' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 export const LOAD_DATA_2 = 'REACT_COMMON/LOAD_DATA_2';
 export const LOAD_DATA_2_RESPONSE = 'REACT_COMMON/LOAD_DATA_2_RESPONSE';
 export const LOAD_DATA_2_FAILURE = 'REACT_COMMON/LOAD_DATA_2_FAILURE';
@@ -146,28 +147,29 @@ export const loadData2 = (companyId: string, integrationId: string) => createAsy
     },
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_2_RESPONSE, {
-        request
+        request,
+        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
     })),
 
-    failure: error => createAction(LOAD_DATA_2_FAILURE, error)
+    failure: error => createAction(LOAD_DATA_2_FAILURE, {})
 });
 const constActions = [];
 const asyncActions = [loadData2];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-add-on-callbacks' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 export const LOAD_DATA_3 = 'REACT_COMMON/LOAD_DATA_3';
 export const LOAD_DATA_3_RESPONSE = 'REACT_COMMON/LOAD_DATA_3_RESPONSE';
 export const LOAD_DATA_3_FAILURE = 'REACT_COMMON/LOAD_DATA_3_FAILURE';
@@ -183,10 +185,11 @@ export const loadData3 = (companyId: string, integrationId: string) => createAsy
             foo: 'foo'
         };
     }).then((response: any) => createAction(LOAD_DATA_3_RESPONSE, {
-        request
+        request,
+        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
     })),
 
-    failure: error => createAction(LOAD_DATA_3_FAILURE, error),
+    failure: error => createAction(LOAD_DATA_3_FAILURE, {}),
     schema: {},
 
     willDispatchResponse: () => {
@@ -203,19 +206,19 @@ const constActions = [];
 const asyncActions = [loadData3];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-transform-preconditioned' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 export const LOAD_DATA_4 = 'REACT_COMMON/LOAD_DATA_4';
 export const LOAD_DATA_4_RESPONSE = 'REACT_COMMON/LOAD_DATA_4_RESPONSE';
 export const LOAD_DATA_4_FAILURE = 'REACT_COMMON/LOAD_DATA_4_FAILURE';
@@ -237,28 +240,29 @@ export const loadData4 = (companyId: string, integrationId: string) => createAsy
     },
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_4_RESPONSE, {
-        request
+        request,
+        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
     })),
 
-    failure: error => createAction(LOAD_DATA_4_FAILURE, error)
+    failure: error => createAction(LOAD_DATA_4_FAILURE, {})
 });
 const constActions = [];
 const asyncActions = [loadData4];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];
 
 /*$ { fixture: 'should-transform-thunk' } $*/
 
 import { $call } from 'modules/react-types';
-import { createAction, createAsyncAction } from 'modules/react-redux';
+import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
 export const LOAD_DATA_5 = 'REACT_COMMON/LOAD_DATA_5';
 export const LOAD_DATA_5_RESPONSE = 'REACT_COMMON/LOAD_DATA_5_RESPONSE';
 export const LOAD_DATA_5_FAILURE = 'REACT_COMMON/LOAD_DATA_5_FAILURE';
@@ -280,20 +284,21 @@ export const loadData5 = (companyId: string, integrationId: string) => createAsy
     },
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_5_RESPONSE, {
-        request
+        request,
+        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
     })),
 
-    failure: error => createAction(LOAD_DATA_5_FAILURE, error)
+    failure: error => createAction(LOAD_DATA_5_FAILURE, {})
 });
 const constActions = [];
 const asyncActions = [loadData5];
 
 const constActionsData = constActions.map($call);
-const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+const asyncActionFailures = asyncActions.map(getAsyncFailureType);
 export type Action =
     | typeof constActionsData[number]
     | typeof asyncActionRequests[number]
     | typeof asyncActionResponses[number]
-    | typeof asyncActionErrors[number];
+    | typeof asyncActionFailures[number];

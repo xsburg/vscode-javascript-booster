@@ -83,9 +83,9 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
             const asyncActions = [];
 
             const constActionsData = constActions.map($call);
-            const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
-            const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-            const asyncActionFailures = asyncActions.map($call).map(x => x.async.types.failure);
+            const asyncActionRequests = asyncActions.map(getAsyncRequestType);
+            const asyncActionResponses = asyncActions.map(getAsyncResponseType);
+            const asyncActionFailures = asyncActions.map(getAsyncFailureType);
             export type Action =
                 | typeof constActionsData[number]
                 | typeof asyncActionRequests[number]
@@ -425,7 +425,7 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
                                     op('request'),
                                     j.objectProperty(
                                         id('TODO'),
-                                        id(
+                                        j.stringLiteral(
                                             'CHECK `schemas` property and provide data through `raw` property.'
                                         )
                                     )
