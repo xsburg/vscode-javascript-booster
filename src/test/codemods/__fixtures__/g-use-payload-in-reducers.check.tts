@@ -1,0 +1,3 @@
+/*$ { fixture: 'should-run-everywhere', expected: true } $*/
+
+export const UPDATE_ENTITIES = 'REACT_COMMON/UPDATE_ENTITIES'; /*# { pos: 17 } #*/

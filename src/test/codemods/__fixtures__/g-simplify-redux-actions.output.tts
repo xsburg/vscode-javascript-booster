@@ -28,7 +28,9 @@ import { $call } from 'modules/react-types';
 import { createAction, createAsyncAction } from 'modules/react-redux';
 export const SHOW_FANCY_POPUP = 'REACT_COMMON/SHOW_FANCY_POPUP';
 export const showFancyPopup = (
-    options: {
+    {
+        payload
+    }: {
         payload: number;
     }
 ) => createAction(SHOW_FANCY_POPUP, {

@@ -1,0 +1,38 @@
+/*$ { fixture: 'should-rename-imports-and-actions' } $*/
+
+import {
+    RESPOND_TO_INVITATION_REQUEST,
+    RESPOND_TO_INVITATION_RESPONSE,
+    RESPOND_TO_INVITATION_FAILURE
+} from '../actions'; /*# { pos: 4 } #*/
+
+export default function(
+    state = INITIAL_STATE,
+    action: Action
+): ImmutableObject<stateTree.Entities> {
+    switch (action.type) {
+        case LOAD_INITIAL_APP_DATA:
+            return mergeDeep(state, action.entities);
+        case UPDATE_INTEGRATION_STATUS: {
+            if (!action.firstTimeConnection) {
+                return state.setIn(['integrations', action.integrationId, 'status'], action.status);
+            } else {
+                return mergeDeep(state, {
+                    integrations: {
+                        [action.integrationId]: {
+                            id: action.integrationId,
+                            companyId: action.companyId,
+                            integrationType: action.integrationType,
+                            status: action.status,
+                            firstTimeConnection: action.firstTimeConnection,
+                            isSyncing: false,
+                            isNew: true
+                        }
+                    }
+                });
+            }
+        }
+        default:
+            return state;
+    }
+}

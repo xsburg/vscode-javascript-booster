@@ -35,8 +35,6 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     ast = fileInfo.ast;
     constActionCreators = [];
     asyncActionCreators = [];
-    // const target = options.target;
-    // const path = target.firstPath<Identifier>()!;
 
     const $functionDeclarations = ast.find(j.FunctionDeclaration, { id: { type: 'Identifier' } });
     $functionDeclarations.forEach(path => {
@@ -78,7 +76,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
         const header = j(`
             import { $call } from 'modules/react-types';
-            import { createAction, createAsyncAction } from 'modules/react-redux';
+            import { createAction, createAsyncAction, getAsyncRequestType, getAsyncResponseType, getAsyncFailureType } from 'modules/react-redux';
         `);
         const footer = j(`
             const constActions = [];
@@ -87,12 +85,12 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
             const constActionsData = constActions.map($call);
             const asyncActionRequests = asyncActions.map($call).map(x => x.async.types.request);
             const asyncActionResponses = asyncActions.map($call).map(x => x.async.types.response);
-            const asyncActionErrors = asyncActions.map($call).map(x => x.async.types.failure);
+            const asyncActionFailures = asyncActions.map($call).map(x => x.async.types.failure);
             export type Action =
                 | typeof constActionsData[number]
                 | typeof asyncActionRequests[number]
                 | typeof asyncActionResponses[number]
-                | typeof asyncActionErrors[number];`);
+                | typeof asyncActionFailures[number];`);
         const statements = footer.firstNode<File>()!.program.body;
         const programStatements = ast.firstNode<File>()!.program.body;
         let headerComment;
@@ -177,18 +175,18 @@ function transformConstAction(path: NodePath<FunctionDeclaration>) {
     const objectProperties = (((lastStatement as ReturnStatement).argument as ObjectExpression)
         .properties as ObjectProperty[]).filter(p => (p.key as Identifier).name !== 'type');
 
-    let params = actionFnNode.params;
-    if (params.length === 1 && j.ObjectPattern.check(params[0])) {
-        const optionsId = j.identifier('options');
-        optionsId.typeAnnotation = (params[0] as ObjectPattern).typeAnnotation;
-        params = [optionsId];
-        /* objectProperties.forEach(prop => {
-            if (j.Identifier.check(prop.value)) {
-                prop.value = j.memberExpression(j.identifier('options'), prop.value);
-                (prop as any).shorthand = false;
-            }
-        }); */
-    }
+    const params = actionFnNode.params;
+    // if (params.length === 1 && j.ObjectPattern.check(params[0])) {
+    //     const optionsId = j.identifier('options');
+    //     optionsId.typeAnnotation = (params[0] as ObjectPattern).typeAnnotation;
+    //     params = [optionsId];
+    //     /* objectProperties.forEach(prop => {
+    //         if (j.Identifier.check(prop.value)) {
+    //             prop.value = j.memberExpression(j.identifier('options'), prop.value);
+    //             (prop as any).shorthand = false;
+    //         }
+    //     }); */
+    // }
 
     let creatorBody;
     if (bodyStatements.length > 1) {
@@ -345,12 +343,12 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
     ($constRequest.firstNode()!.init as StringLiteral).value = ($constRequest.firstNode()!
         .init as StringLiteral).value.replace('_REQUEST', '');
 
-    let params = actionFnNode.params;
-    if (params.length === 1 && j.ObjectPattern.check(params[0])) {
-        const optionsId = j.identifier('options');
-        optionsId.typeAnnotation = (params[0] as ObjectPattern).typeAnnotation;
-        params = [optionsId];
-    }
+    const params = actionFnNode.params;
+    // if (params.length === 1 && j.ObjectPattern.check(params[0])) {
+    //     const optionsId = j.identifier('options');
+    //     optionsId.typeAnnotation = (params[0] as ObjectPattern).typeAnnotation;
+    //     params = [optionsId];
+    // }
 
     const data = doApiRequestProps.find(x => (x.key as Identifier).name === 'data')!;
     let requestArrowBody: Expression | BlockStatement;
@@ -423,7 +421,15 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
                             [id('response', j.tsTypeAnnotation(j.tsAnyKeyword()))],
                             j.callExpression(id('createAction'), [
                                 $constResponse.firstNode()!.id,
-                                j.objectExpression([op('request')])
+                                j.objectExpression([
+                                    op('request'),
+                                    j.objectProperty(
+                                        id('TODO'),
+                                        id(
+                                            'CHECK `schemas` property and provide data through `raw` property.'
+                                        )
+                                    )
+                                ])
                                 // response must be parsed by hand
                             ]),
                             true
@@ -439,7 +445,7 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
                 [j.identifier('error')],
                 j.callExpression(j.identifier('createAction'), [
                     $constFailure.firstNode()!.id,
-                    j.identifier('error')
+                    j.objectExpression([])
                 ]),
                 true
             )
