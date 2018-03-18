@@ -31,7 +31,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const node = target.firstNode();
 
-    return j.VariableDeclaration.check(node) && node.kind === 'var';
+    return j.VariableDeclaration.check(node) && (node.kind === 'var' || node.kind === 'const');
 };
 
 codeMod.scope = 'cursor';

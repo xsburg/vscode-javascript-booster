@@ -10,6 +10,7 @@ Added new inline code actions.
 
 * Flip ?:
 * Convert function to arrow function
+* Convert const -> let
 
 ## 0.3.0
 

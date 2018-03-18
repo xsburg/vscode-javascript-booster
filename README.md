@@ -28,7 +28,7 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 * 💥 Replace string with template string
 * 💥 Replace template string with regular string
 * 💥 Wrap value with {} (JSX attributes)
-* 💥 Convert var to let
+* 💥 Convert var/const to let
 * 💥 Convert var to const
 * 💥 Split into multiple declarations
 * 💥 Split into declaration and initialisation
@@ -53,7 +53,6 @@ You can easily load and run your own code actions. -->
 ### More code actions
 
 * Add parens to arrow function parameter
-* Convert const -> let
 * Convert if-else-return -> return ?:
 * Convert if -> switch-case
 * JSX: Collapse/Expand empty tag
@@ -85,6 +84,7 @@ Added new inline code actions.
 
 * Flip ?:
 * Convert function to arrow function
+* Convert const -> let
 
 ### 0.3.0
 
