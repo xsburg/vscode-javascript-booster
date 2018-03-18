@@ -1,7 +1,7 @@
 import {
+    ConditionalExpression,
     Expression,
     FunctionDeclaration,
-    IfStatement,
     Printable,
     UnaryExpression
 } from 'ast-types';
@@ -14,15 +14,10 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    const node = target.firstNode<IfStatement>()!;
+    const node = target.firstNode<ConditionalExpression>()!;
 
     const consequent = node.consequent;
-    let alternate;
-    if (node.alternate) {
-        alternate = node.alternate;
-    } else {
-        alternate = j.blockStatement([j.debuggerStatement()]);
-    }
+    const alternate = node.alternate;
 
     node.consequent = alternate;
     node.alternate = consequent;
@@ -36,14 +31,14 @@ codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const node = target.firstNode<IfStatement>();
+    const node = target.firstNode<ConditionalExpression>();
 
-    return j.IfStatement.check(node);
+    return j.ConditionalExpression.check(node);
 };
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Flip if-else';
+codeMod.title = 'Flip ?:';
 
 codeMod.description = '';
 
