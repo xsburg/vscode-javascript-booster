@@ -492,7 +492,7 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
             j.objectProperty(
                 id('didDispatchResponse'),
                 j.arrowFunctionExpression(
-                    [id('response'), id('request'), id('state'), id('dispatch')],
+                    [id('request'), id('response'), id('state'), id('dispatch')],
                     afterResponseFnBody
                 )
             )

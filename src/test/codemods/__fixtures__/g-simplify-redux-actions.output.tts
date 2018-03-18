@@ -200,7 +200,7 @@ export const loadData3 = (companyId: string, integrationId: string) => createAsy
         doNothing();
     },
 
-    didDispatchResponse: (response, request, state, dispatch) => {
+    didDispatchResponse: (request, response, state, dispatch) => {
         doNothing();
     },
 
