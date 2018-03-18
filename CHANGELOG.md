@@ -4,6 +4,13 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
 
+### 0.4.0
+
+Added new inline code actions.
+
+* Flip ?:
+* Convert function to arrow function
+
 ## 0.3.0
 
 * Added new smart selection commands for JavaScript and TypeScript (with behavior very close to those in WebStorm). When used in other languages, the fallback commands defined in settings are used.
