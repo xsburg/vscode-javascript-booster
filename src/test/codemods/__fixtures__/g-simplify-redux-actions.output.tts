@@ -114,7 +114,7 @@ export const loadData = (companyId: string, integrationId: string) => createAsyn
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_RESPONSE, {
         request,
-        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
+        TODO: 'CHECK that all the necessary properties are passed. Pay particular attention if there`s a `schema`.'
     })),
 
     failure: error => createAction(LOAD_DATA_FAILURE, {})
@@ -148,7 +148,7 @@ export const loadData2 = (companyId: string, integrationId: string) => createAsy
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_2_RESPONSE, {
         request,
-        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
+        TODO: 'CHECK that all the necessary properties are passed. Pay particular attention if there`s a `schema`.'
     })),
 
     failure: error => createAction(LOAD_DATA_2_FAILURE, {})
@@ -186,11 +186,15 @@ export const loadData3 = (companyId: string, integrationId: string) => createAsy
         };
     }).then((response: any) => createAction(LOAD_DATA_3_RESPONSE, {
         request,
-        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
+        raw: response,
+        TODO: 'CHECK that all the necessary properties are passed. Pay particular attention if there`s a `schema`.'
     })),
 
     failure: error => createAction(LOAD_DATA_3_FAILURE, {}),
-    schema: {},
+
+    schema: {
+        raw: {}
+    },
 
     willDispatchResponse: () => {
         doNothing();
@@ -200,7 +204,7 @@ export const loadData3 = (companyId: string, integrationId: string) => createAsy
         doNothing();
     },
 
-    willDispatchError: (response, error) => doNothing()
+    willDispatchError: (request, error) => doNothing()
 });
 const constActions = [];
 const asyncActions = [loadData3];
@@ -241,7 +245,7 @@ export const loadData4 = (companyId: string, integrationId: string) => createAsy
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_4_RESPONSE, {
         request,
-        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
+        TODO: 'CHECK that all the necessary properties are passed. Pay particular attention if there`s a `schema`.'
     })),
 
     failure: error => createAction(LOAD_DATA_4_FAILURE, {})
@@ -285,7 +289,7 @@ export const loadData5 = (companyId: string, integrationId: string) => createAsy
 
     response: request => Promise.resolve(Promise.resolve()).then((response: any) => createAction(LOAD_DATA_5_RESPONSE, {
         request,
-        TODO: 'CHECK `schemas` property and provide data through `raw` property.'
+        TODO: 'CHECK that all the necessary properties are passed. Pay particular attention if there`s a `schema`.'
     })),
 
     failure: error => createAction(LOAD_DATA_5_FAILURE, {})

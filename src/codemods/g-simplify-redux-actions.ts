@@ -390,6 +390,8 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
         );
     }
 
+    const schema = doApiRequestProps.find(x => (x.key as Identifier).name === 'schema');
+
     const createAsyncActionProps = [
         j.objectProperty(
             j.identifier('request'),
@@ -421,15 +423,20 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
                             [id('response', j.tsTypeAnnotation(j.tsAnyKeyword()))],
                             j.callExpression(id('createAction'), [
                                 $constResponse.firstNode()!.id,
-                                j.objectExpression([
-                                    op('request'),
-                                    j.objectProperty(
-                                        id('TODO'),
-                                        j.stringLiteral(
-                                            'CHECK `schemas` property and provide data through `raw` property.'
+                                j.objectExpression(
+                                    [
+                                        op('request'),
+                                        schema
+                                            ? j.objectProperty(id('raw'), id('response'))
+                                            : (null as any),
+                                        j.objectProperty(
+                                            id('TODO'),
+                                            j.stringLiteral(
+                                                'CHECK that all the necessary properties are passed. Pay particular attention if there`s a `schema`.'
+                                            )
                                         )
-                                    )
-                                ])
+                                    ].filter(x => x)
+                                )
                                 // response must be parsed by hand
                             ]),
                             true
@@ -456,9 +463,13 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
         createAsyncActionProps.unshift(shouldSendRequestFn);
     }
 
-    const schema = doApiRequestProps.find(x => (x.key as Identifier).name === 'schema');
     if (schema) {
-        createAsyncActionProps.push(j.objectProperty(schema.key, schema.value));
+        createAsyncActionProps.push(
+            j.objectProperty(
+                schema.key,
+                j.objectExpression([j.objectProperty(id('raw'), schema.value)])
+            )
+        );
     }
 
     const responseFn = doApiRequestProps.find(x => (x.key as Identifier).name === 'responseFn');
@@ -494,7 +505,7 @@ function transformAsyncAction(path: NodePath<FunctionDeclaration>) {
         createAsyncActionProps.push(
             j.objectProperty(
                 id('willDispatchError'),
-                j.arrowFunctionExpression([id('response'), id('error')], errorFnBody)
+                j.arrowFunctionExpression([id('request'), id('error')], errorFnBody)
             )
         );
     }
