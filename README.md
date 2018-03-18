@@ -27,7 +27,8 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 * 💥 Convert function to arrow function
 * 💥 Replace string with template string
 * 💥 Replace template string with regular string
-* 💥 Wrap value with {} (JSX attributes)
+* 💥 JSX: Wrap value with {} (JSX attributes)
+    <!-- * 💥 JSX: Remove unnecessary braces (JSX attributes) -->
 * 💥 Convert var/const to let
 * 💥 Convert var to const
 * 💥 Split into multiple declarations
@@ -56,6 +57,7 @@ You can easily load and run your own code actions. -->
 * Convert if-else-return -> return ?:
 * Convert if -> switch-case
 * JSX: Collapse/Expand empty tag
+* JSX: Remove braces
 * TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
 * TS: Generate missing switch cases for enum
