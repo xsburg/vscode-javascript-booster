@@ -24,3 +24,8 @@ const c = a + b + 'baz'; /*# { pos: 21 } #*/
 const a = 'foo';
 const b = 'bar';
 const c = (a + b) + 'baz'; /*# { pos: 21 } #*/
+
+/*$ { fixture: 'should-handle-two-literal-expressions' } $*/
+
+const a = 'foo';
+const test = 'Hello' + ',' + a; /*# { pos: 26 } #*/

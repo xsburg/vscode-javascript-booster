@@ -24,3 +24,8 @@ const c = `${a}${b}baz`;
 const a = 'foo';
 const b = 'bar';
 const c = `${a + b}baz`;
+
+/*$ { fixture: 'should-handle-two-literal-expressions' } $*/
+
+const a = 'foo';
+const test = `Hello,${a}`;

@@ -28,16 +28,23 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
     function buildTemplateLiteral(node: Expression) {
         if (j.StringLiteral.check(node)) {
-            templateElements.push(
-                j.templateElement(
-                    {
-                        cooked: node.value,
-                        raw: node.value
-                    },
-                    false
-                )
-            );
-            lastIsString = true;
+            if (lastIsString) {
+                // 'a' + 'b' => 'ab'
+                const value = templateElements[templateElements.length - 1].value;
+                value.cooked += node.value;
+                value.raw += node.value;
+            } else {
+                templateElements.push(
+                    j.templateElement(
+                        {
+                            cooked: node.value,
+                            raw: node.value
+                        },
+                        false
+                    )
+                );
+                lastIsString = true;
+            }
             return;
         }
 
