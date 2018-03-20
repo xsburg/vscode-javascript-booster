@@ -28,7 +28,7 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 * 💥 Replace string with template string
 * 💥 Replace template string with regular string
 * 💥 JSX: Wrap value with {} (JSX attributes)
-    <!-- * 💥 JSX: Remove unnecessary braces (JSX attributes) -->
+* 💥 JSX: Collapse/Expand empty tag
 * 💥 Convert var/const to let
 * 💥 Convert var to const
 * 💥 Split into multiple declarations
@@ -56,7 +56,6 @@ You can easily load and run your own code actions. -->
 * Add parens to arrow function parameter
 * Convert if-else-return -> return ?:
 * Convert if -> switch-case
-* JSX: Collapse/Expand empty tag
 * JSX: Remove braces
 * TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
@@ -82,11 +81,16 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ### 0.4.0
 
-Added new inline code actions.
+* Added new inline code actions.
 
-* Flip ?:
-* Convert function to arrow function
-* Convert const -> let
+    * Flip ?:
+    * Convert function to arrow function
+    * Convert const -> let
+    * JSX: Collapse/Expand empty tag
+
+* Changed `Split into declaration and initialization` action: it can now split const declarations.
+
+* Fixed #1: Sequence of string literals doesn't convert properly when transforming to template literal.
 
 ### 0.3.0
 
@@ -100,21 +104,21 @@ Added new inline code actions.
 
 ### 0.2.0 (Initial release)
 
-Added the following inline code actions. The list will keep expanding in later releases.
+* Added the following inline code actions. The list will keep expanding in later releases.
 
-* Flip if-else
-* Remove redundant else
-* Replace if-else with ?:
-* Convert shorthand arrow function to statement
-* Convert to shorthand arrow function
-* Replace string with template string
-* Replace template string with regular string
-* Wrap value with {} (JSX attributes)
-* Convert var to let
-* Convert var to const
-* Split into multiple declarations
-* Split into declaration and initialisation
-* Merge declaration and initialisation
+    * Flip if-else
+    * Remove redundant else
+    * Replace if-else with ?:
+    * Convert shorthand arrow function to statement
+    * Convert to shorthand arrow function
+    * Replace string with template string
+    * Replace template string with regular string
+    * Wrap value with {} (JSX attributes)
+    * Convert var to let
+    * Convert var to const
+    * Split into multiple declarations
+    * Split into declaration and initialisation
+    * Merge declaration and initialisation
 
 <!-- ## Extension Settings
 

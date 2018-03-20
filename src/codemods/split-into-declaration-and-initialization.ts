@@ -22,6 +22,10 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath()!;
 
+    if (path.node.kind === 'const') {
+        path.node.kind = 'let';
+    }
+
     const assignments: ExpressionStatement[] = [];
     path.node.declarations.forEach(d => {
         if (j.VariableDeclarator.check(d) && d.init) {
@@ -45,9 +49,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
 
     return Boolean(
-        path &&
-            path.node.kind !== 'const' &&
-            path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
+        path && path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
     );
 };
 

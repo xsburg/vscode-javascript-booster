@@ -3,6 +3,11 @@
 let a;
 a = 'foo';
 
+/*$ { fixture: 'should-split-const' } $*/
+
+let a;
+a = 'foo';
+
 /*$ { fixture: 'should-split-when-no-initializer' } $*/
 
 let a, b;

@@ -2,6 +2,10 @@
 
 let a = 'foo'; /*# { pos: 3 } #*/
 
+/*$ { fixture: 'should-split-const' } $*/
+
+const a = 'foo'; /*# { pos: 3 } #*/
+
 /*$ { fixture: 'should-split-when-no-initializer' } $*/
 
 let a = 'foo', b; /*# { pos: 3 } #*/

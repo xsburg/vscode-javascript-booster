@@ -6,6 +6,10 @@ let a = 'foo', b = 'bar'; /*# { pos: 3 } #*/
 
 let b = 'bar'; /*# { pos: 12 } #*/
 
-/*$ { fixture: 'should-not-trigger-at-const', expected: false } $*/
+/*$ { fixture: 'should-trigger-at-const-as-well', expected: true } $*/
 
 const a = 'foo'; /*# { pos: 12 } #*/
+
+/*$ { fixture: 'should-not-trigger-when-no-init', expected: false } $*/
+
+let a; /*# { pos: 5 } #*/
