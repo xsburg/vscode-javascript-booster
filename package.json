@@ -3,7 +3,7 @@
     "displayName": "JavaScript Booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
     "icon": "resources/icon.png",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "publisher": "sburg",
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
