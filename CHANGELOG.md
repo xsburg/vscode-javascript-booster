@@ -19,6 +19,8 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 
 * Fixed #1: Sequence of string literals doesn't convert properly when transforming to template literal.
 
+* Fixed smart selection extension for collapsed JSX elements.
+
 ### 0.3.0
 
 * Added new smart selection commands for JavaScript and TypeScript (with behavior very close to those in WebStorm). When used in other languages, the fallback commands defined in settings are used.
