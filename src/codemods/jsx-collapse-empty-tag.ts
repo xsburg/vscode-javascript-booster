@@ -40,7 +40,7 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Expand empty tag';
+codeMod.title = 'Collapse empty tag';
 
 codeMod.description = '';
 

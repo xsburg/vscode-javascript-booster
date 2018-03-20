@@ -56,6 +56,7 @@ You can easily load and run your own code actions. -->
 * Add parens to arrow function parameter
 * Convert if-else-return -> return ?:
 * Convert if -> switch-case
+* convert const -> let in-place at the point of var assignment
 * JSX: Remove braces
 * TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
@@ -88,9 +89,13 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
     * Convert const -> let
     * JSX: Collapse/Expand empty tag
 
+* Added support for TypeScript 2.7 (definite assignment assertion modifier in class property definitions) through upgrading to the latest Babylon.
+
 * Changed `Split into declaration and initialization` action: it can now split const declarations.
 
 * Fixed #1: Sequence of string literals doesn't convert properly when transforming to template literal.
+
+* Fixed smart selection extension for collapsed JSX elements.
 
 ### 0.3.0
 

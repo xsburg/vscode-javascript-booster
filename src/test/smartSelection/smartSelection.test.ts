@@ -207,6 +207,16 @@ suite(`Smart selection: extend`, () => {
         assertSmartSelection(before, after);
     });
 
+    test('should extend from JSXOpenElement when tag is collapsed', () => {
+        const before = `
+            const company = <div>|<div />|</div>;
+        `;
+        const after = `
+            const company = |<div><div /></div>|;
+        `;
+        assertSmartSelection(before, after);
+    });
+
     test('should shrink when have passed a sequence of extensions', () => {
         assertSmartSelectionBulk([
             'const company = selectors.company.getCo|mpany|ById(state, d.companyId); /*# { action: `+` } #*/',

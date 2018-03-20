@@ -13,6 +13,8 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
     * Convert const -> let
     * JSX: Collapse/Expand empty tag
 
+* Added support for TypeScript 2.7 (definite assignment assertion modifier in class property definitions) through upgrading to the latest Babylon.
+
 * Changed `Split into declaration and initialization` action: it can now split const declarations.
 
 * Fixed #1: Sequence of string literals doesn't convert properly when transforming to template literal.

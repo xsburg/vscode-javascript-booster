@@ -98,8 +98,9 @@ class SmartSelectionService {
         };
         let targetNode = target.firstNode<Node>()!;
         let targetPath = target.firstPath<Node>()!;
-        const completeCoverage = start === targetNode.start && end === targetNode.end;
-        if (completeCoverage) {
+
+        // If a node is covered completely, switch to its parent as the target node
+        while (start === targetNode.start && end === targetNode.end) {
             if (!targetPath.parentPath) {
                 // root object achieved -> no change
                 return selection;
