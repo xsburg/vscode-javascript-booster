@@ -4,6 +4,7 @@ import {
     Expression,
     FunctionDeclaration,
     IfStatement,
+    JSXExpressionContainer,
     Node,
     NodePath,
     Printable,
@@ -19,9 +20,13 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    const path = target.firstPath<StringLiteral>()!;
+    const $jsxExprContainer = target.thisOrClosest(j.JSXExpressionContainer, {
+        expression: { type: 'StringLiteral' }
+    });
+    const stringLiteral = $jsxExprContainer.firstPath<JSXExpressionContainer>()!.node
+        .expression as StringLiteral;
 
-    path.replace(j.jsxExpressionContainer(j.stringLiteral(path.node.value)));
+    $jsxExprContainer.replaceWith(j.stringLiteral(stringLiteral.value));
 
     const resultText = ast.toSource();
     return resultText;
@@ -31,16 +36,20 @@ codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const path = target.firstPath();
+    const $jsxExprContainer = target.thisOrClosest(j.JSXExpressionContainer, {
+        expression: { type: 'StringLiteral' }
+    });
 
-    return Boolean(
-        path && j.StringLiteral.check(path.node) && j.JSXAttribute.check(path.parent.node)
-    );
+    if ($jsxExprContainer.length === 0) {
+        return false;
+    }
+
+    return Boolean(j.JSXAttribute.check($jsxExprContainer.firstPath()!.parent.node));
 };
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Replace with {}';
+codeMod.title = 'Remove braces';
 
 codeMod.description = '';
 
