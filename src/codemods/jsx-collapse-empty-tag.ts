@@ -28,14 +28,19 @@ codeMod.canRun = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    const el = target.thisOrClosest(j.JSXElement).firstNode();
-    if (!el || !el.closingElement) {
-        return false;
+    let elementNode: JSXElement | null = null;
+    for (const node of target.thisAndParents()) {
+        if (j.JSXAttribute.check(node)) {
+            // False if over an attribute
+            return false;
+        }
+        if (j.JSXElement.check(node)) {
+            elementNode = node;
+            break;
+        }
     }
 
-    const notAnAttribute = target.thisOrClosest(j.JSXAttribute).length === 0;
-    const empty = el.children.length === 0;
-    return notAnAttribute && empty;
+    return Boolean(elementNode && elementNode.closingElement && elementNode.children.length === 0);
 };
 
 codeMod.scope = 'cursor';

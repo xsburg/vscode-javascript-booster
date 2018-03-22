@@ -1,5 +1,5 @@
 import { Expression, UnaryExpression } from 'ast-types';
-import { JsCodeShift } from 'jscodeshift';
+import { Collection, JsCodeShift } from 'jscodeshift';
 
 export function negateExpression(j: JsCodeShift, expr: Expression) {
     // 1. !a => a

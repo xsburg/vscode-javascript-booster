@@ -30,13 +30,19 @@ codeMod.canRun = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
 
-    const openingTag = target.thisOrClosest(j.JSXOpeningElement).firstNode();
-    if (!openingTag || !openingTag.selfClosing) {
-        return false;
+    let openingNode: JSXOpeningElement | null = null;
+    for (const node of target.thisAndParents()) {
+        if (j.JSXAttribute.check(node)) {
+            // False if over an attribute
+            return false;
+        }
+        if (j.JSXOpeningElement.check(node)) {
+            openingNode = node;
+            break;
+        }
     }
 
-    const notAnAttribute = target.thisOrClosest(j.JSXAttribute).length === 0;
-    return notAnAttribute;
+    return Boolean(openingNode && openingNode.selfClosing);
 };
 
 codeMod.scope = 'cursor';

@@ -1,4 +1,4 @@
-import { NamedType, NodePath, Printable } from 'ast-types';
+import { AstNode, NamedType, NodePath, Printable } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { Position } from './Position';
 
@@ -14,6 +14,27 @@ export function registerCollectionExtensions(j: JsCodeShift) {
 
         firstPath<TNode>(this: Collection<TNode>): NodePath<TNode> | null {
             return this.paths()[0] || null;
+        },
+
+        parents<TNode>(this: Collection<TNode>): AstNode[] {
+            return this.thisAndParents().slice(1);
+        },
+
+        thisAndParents<TNode extends AstNode>(this: Collection<TNode>): AstNode[] {
+            if (this.length > 1) {
+                throw new Error('The operation is only available for single-node collections.');
+            }
+            const path = this.firstPath();
+            if (!path) {
+                return [];
+            }
+            const result: AstNode[] = [path.node];
+            let parent = path.parent;
+            while (parent) {
+                result.push(parent.node);
+                parent = parent.parent;
+            }
+            return result;
         },
 
         findNodeAtPosition<TNode>(this: Collection<TNode>, pos: number): Collection {
