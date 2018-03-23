@@ -54,10 +54,7 @@ You can easily load and run your own code actions. -->
 ### More code actions
 
 * Add parens to arrow function parameter
-* Convert if-else-return -> return ?:
 * Convert if -> switch-case
-* convert const -> let in-place at the point of var assignment
-* JSX: Remove braces
 * TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
 * TS: Generate missing switch cases for enum
@@ -79,6 +76,12 @@ You can easily load and run your own code actions. -->
 Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its variety of code refactorings. The extension uses [Babylon](https://github.com/babel/babel/tree/master/packages/babylon) to parse the code and then manipulates the abstract syntax tree using [jscodeshift](https://github.com/facebook/jscodeshift).
 
 ## Release Notes
+
+### 0.5.0 (Upcoming changes)
+
+* Added new code action: `Remove braces from JSX attribute`.
+* Changed `Replace if-else with ?:` action: it now supports if-return-else-return scenario.
+* Fixed `Collapse/Expand empty tag` action: it previously didn't work when the element is nested into a JSX attribute.
 
 ### 0.4.0
 

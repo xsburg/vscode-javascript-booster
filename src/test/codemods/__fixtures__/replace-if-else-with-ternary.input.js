@@ -1,4 +1,4 @@
-/*$ { fixture: 'should-transform' } $*/
+/*$ { fixture: 'should-transform-assignment' } $*/
 
 function test() {
     let a;
@@ -7,5 +7,15 @@ function test() {
         a = 1; /*# { pos: 10 } #*/
     } else {
         a = 0;
+    }
+}
+
+/*$ { fixture: 'should-transform-return' } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return 1;
+    } else {
+        return 0;
     }
 }

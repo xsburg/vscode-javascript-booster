@@ -2,8 +2,8 @@
 
 function test() {
     let a;
-    if (true) {
-        a = 1; /*# { pos: 6 } #*/
+    if (true) { /*# { pos: 6 } #*/
+        a = 1;
     } else {
         a = 0;
     }
@@ -17,6 +17,16 @@ function test() {
         a = 1; /*# { pos: 11 } #*/
     } else {
         a = 0;
+    }
+}
+
+/*$ { fixture: 'should-trigger-with-return', expected: true } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return 1;
+    } else {
+        return 0;
     }
 }
 
