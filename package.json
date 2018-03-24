@@ -78,7 +78,7 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./ && cpx ./src/test/codemods/__fixtures__/**/* ./out/test/codemods/__fixtures__",
+        "compile": "tsc -p ./ && cpx ./src/test/codemods/__fixtures__/**/* ./out/test/codemods/__fixtures__ && cpx ./src/test/__prettier-fixtures__/**/* ./out/test/__prettier-fixtures__",
         "watch": "npm run compile && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
@@ -91,7 +91,6 @@
         "@types/node": "^7.0.43",
         "cpx": "^1.5.0",
         "lodash": "^4.17.5",
-        "prettier": "^1.10.2",
         "react": "^16.2.0",
         "tslint": "^5.9.1",
         "tslint-config-prettier": "^1.10.0",
@@ -105,6 +104,7 @@
         "@types/prettier": "^1.10.0",
         "babylon": "^7.0.0-beta.42",
         "fs-extra": "^5.0.0",
-        "jscodeshift": "xsburg/jscodeshift"
+        "jscodeshift": "xsburg/jscodeshift",
+        "prettier": "^1.10.2"
     }
 }
