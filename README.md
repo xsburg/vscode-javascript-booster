@@ -53,7 +53,6 @@ You can easily load and run your own code actions. -->
 
 ### More code actions
 
-* Add parens to arrow function parameter
 * Convert if -> switch-case
 * TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
@@ -79,7 +78,11 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ### 0.5.0 (Upcoming changes)
 
-* Added new code action: `Remove braces from JSX attribute`.
+* Added new inline code actions.
+
+    * Add parens to arrow function parameter
+    * Remove braces from JSX attribute
+
 * Changed `Replace if-else with ?:` action: it now supports if-return-else-return scenario.
 * Fixed `Collapse/Expand empty tag` action: it previously didn't work when the element is nested into a JSX attribute.
 
