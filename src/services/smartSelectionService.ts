@@ -9,6 +9,7 @@ import {
 } from 'ast-types';
 import * as vscode from 'vscode';
 import astService, { AstRoot, LanguageId, Selection } from './astService';
+import { JsCodeShift } from 'jscodeshift';
 
 interface UnordedSelection {
     start: number;
@@ -68,7 +69,7 @@ class SmartSelectionService {
         string,
         {
             source: string;
-            selectionStack: Selection[];
+            selectionStack: Selection[][];
         }
     > = new Map();
 
@@ -77,18 +78,60 @@ class SmartSelectionService {
         source,
         fileName,
         ast,
-        selection
+        selections
     }: {
         languageId: LanguageId;
         source: string;
         fileName: string;
         ast: AstRoot;
-        selection: Selection;
-    }): Selection {
+        selections: Selection[];
+    }): Selection[] {
         const j = astService.getCodeShift(languageId);
+
+        let changed = false;
+        const newSelections = selections.map(sel => {
+            const result = this._extendOneSelection(j, source, ast, sel);
+            if (!result) {
+                return sel;
+            } else {
+                changed = true;
+                return toSelection(result, sel);
+            }
+        });
+
+        if (!changed) {
+            return selections;
+        }
+
+        return this._pushSelections(fileName, source, newSelections, selections);
+    }
+
+    public shrinkSelection({
+        languageId,
+        fileName,
+        source,
+        ast,
+        selections
+    }: {
+        languageId: LanguageId;
+        fileName: string;
+        source: string;
+        ast: AstRoot;
+        selections: Selection[];
+    }): Selection[] {
+        const jscodeshift = astService.getCodeShift(languageId);
+        return this._popSelections(fileName, source, selections);
+    }
+
+    private _extendOneSelection(
+        j: JsCodeShift,
+        source: string,
+        ast: AstRoot,
+        selection: Selection
+    ): UnordedSelection | null {
         const target = ast.findNodeInRange(selection.anchor, selection.active);
         if (target.length === 0) {
-            return selection;
+            return null;
         }
 
         const { start, end } = fromSelection(selection);
@@ -103,7 +146,7 @@ class SmartSelectionService {
         while (start === targetNode.start && end === targetNode.end) {
             if (!targetPath.parentPath) {
                 // root object achieved -> no change
-                return selection;
+                return null;
             }
 
             if (
@@ -114,7 +157,7 @@ class SmartSelectionService {
                 const siblings = targetPath.parentPath.value as Node[];
                 result.start = siblings[0].start;
                 result.end = siblings[siblings.length - 1].end;
-                return this._pushSelection(fileName, source, result, selection);
+                return result;
             }
 
             // switch node to parent -> proceed as planned
@@ -123,7 +166,7 @@ class SmartSelectionService {
         }
 
         if (!j.Node.check(targetNode)) {
-            return selection;
+            return null;
         }
 
         switch (targetNode.type as TypeName) {
@@ -160,33 +203,7 @@ class SmartSelectionService {
                 break;
         }
 
-        return this._pushSelection(fileName, source, result, selection);
-    }
-
-    public shrinkSelection({
-        languageId,
-        fileName,
-        source,
-        ast,
-        selection
-    }: {
-        languageId: LanguageId;
-        fileName: string;
-        source: string;
-        ast: AstRoot;
-        selection: Selection;
-    }): Selection {
-        const jscodeshift = astService.getCodeShift(languageId);
-
-        const newSelection = this._popSelection(fileName, source, selection);
-        if (!newSelection) {
-            return {
-                anchor: selection.active,
-                active: selection.active
-            };
-        }
-
-        return newSelection;
+        return result;
     }
 
     private _extendCallExpression(
@@ -292,13 +309,22 @@ class SmartSelectionService {
         return { start, end };
     }
 
-    private _pushSelection(
+    private _pushSelections(
         fileName: string,
         source: string,
-        newSelection: UnordedSelection,
-        activeSelection: Selection
-    ): Selection {
+        newSelections: Selection[],
+        activeSelections: Selection[]
+    ): Selection[] {
         let cache = this._selectionCache.get(fileName);
+        if (!cache) {
+            // Invalid cache, start from scratch
+            cache = {
+                source,
+                selectionStack: [newSelections]
+            };
+            this._selectionCache.set(fileName, cache);
+        }
+
         if (
             !cache ||
             cache.selectionStack[cache.selectionStack.length - 1].anchor !==
@@ -318,28 +344,41 @@ class SmartSelectionService {
         return result;
     }
 
-    private _popSelection(
+    private _popSelections(
         fileName: string,
         source: string,
-        activeSelection: Selection
-    ): Selection | null {
-        const cache = this._selectionCache.get(fileName);
-        if (
-            !cache ||
-            cache.selectionStack[cache.selectionStack.length - 1].anchor !==
-                activeSelection.anchor ||
-            cache.selectionStack[cache.selectionStack.length - 1].active !== activeSelection.active
-        ) {
-            this._selectionCache.delete(fileName);
-            return null;
+        activeSelections: Selection[]
+    ): Selection[] {
+        function collapseSelection(sel: Selection) {
+            return {
+                active: sel.active,
+                anchor: sel.active
+            };
+        }
+        function eq(selA: Selection, selB: Selection) {
+            return selA.active === selB.active && selA.anchor === selB.anchor;
         }
 
-        if (cache.selectionStack.length <= 1) {
+        const cache = this._selectionCache.get(fileName);
+        if (!cache || cache.selectionStack.length < 2) {
+            // We must have at least two history items: active selections and one before
             this._selectionCache.delete(fileName);
+            return activeSelections.map(collapseSelection);
         }
-        cache.selectionStack.pop();
-        const prevSelection = cache.selectionStack[cache.selectionStack.length - 1];
-        return prevSelection;
+
+        // 1. Selection exists in cache => return its previous state
+        // 2. Can't find selection => collapse active selection
+        const storedActiveSelections = cache.selectionStack.pop()!;
+        const storedPrevSelections = cache.selectionStack[cache.selectionStack.length - 1];
+        const newSelections = activeSelections.map(sel => {
+            const index = storedActiveSelections.findIndex(val => eq(sel, val));
+            if (index !== -1) {
+                return storedPrevSelections[index];
+            } else {
+                return collapseSelection(sel);
+            }
+        });
+        return newSelections;
     }
 }
 

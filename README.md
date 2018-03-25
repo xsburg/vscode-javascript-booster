@@ -149,19 +149,4 @@ Calling out known issues can help limit users opening duplicate issues against y
 * Fix canRun() for string literals in enums
 * Allow Split declaration & initialization for const variables, makes little sense otherwise if const used everywhere
 
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
  -->

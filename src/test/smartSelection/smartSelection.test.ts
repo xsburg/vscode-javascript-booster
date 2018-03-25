@@ -233,4 +233,16 @@ suite(`Smart selection: extend`, () => {
             'const company = selectors.company.getCompany|ById(state, d.companyId);'
         ]);
     });
+
+    test('should extend multiple selections to Identifier', () => {
+        const before = `
+            const company1 = selectors.company.getCo|1|mpa|1|nyById(state, d.companyId);
+            const company2 = selectors.company.getCo|2|mpa|2|nyById(state, d.companyId);
+        `;
+        const after = `
+            const company1 = selectors.company.|1|getCompanyById|1|(state, d.companyId);
+            const company2 = selectors.company.|2|getCompanyById|2|(state, d.companyId);
+        `;
+        assertSmartSelection(before, after);
+    });
 });

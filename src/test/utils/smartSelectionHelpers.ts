@@ -3,7 +3,7 @@ import * as os from 'os';
 import astService, { LanguageId, Selection } from '../../services/astService';
 import smartSelectionService from '../../services/smartSelectionService';
 
-function extractSelection(code: string): Selection {
+function extractSelections(code: string): Selection[] {
     let normalizedCode = code.replace(/\r?\n/g, os.EOL);
     // anchor - always at the start
     // active - always at the end
@@ -24,7 +24,7 @@ function removeSelectionMarkers(code: string) {
     return code.replace('|', '').replace('|', '');
 }
 
-function applySelectionMarkers(code: string, selection: Selection) {
+function applySelectionMarkers(code: string, selections: Selection[]) {
     let start = selection.anchor;
     let end = selection.active;
     if (selection.active < selection.anchor) {
@@ -70,8 +70,8 @@ export function assertSmartSelection(
     const extractedData2 = extractAction(outputFixture);
     inputFixture = extractedData1.text.trim();
     outputFixture = extractedData2.text.trim();
-    const inputSelection = extractSelection(inputFixture);
-    const expectedSelection = extractSelection(outputFixture);
+    const inputSelections = extractSelections(inputFixture);
+    const expectedSelections = extractSelections(outputFixture);
     const cleanInputFixture = removeSelectionMarkers(inputFixture);
     const cleanOutputFixture = removeSelectionMarkers(inputFixture);
     assert.equal(
@@ -88,26 +88,26 @@ export function assertSmartSelection(
         throw new Error('SyntaxError in input fixture.');
     }
 
-    let actualSelection;
+    let actualSelections;
     if (extractedData1.action) {
-        actualSelection = smartSelectionService.extendSelection({
+        actualSelections = smartSelectionService.extendSelection({
             languageId,
             source: cleanInputFixture,
             fileName: 'example.js',
             ast,
-            selection: inputSelection
+            selections: inputSelections
         });
     } else {
-        actualSelection = smartSelectionService.shrinkSelection({
+        actualSelections = smartSelectionService.shrinkSelection({
             languageId,
             source: cleanInputFixture,
             fileName: 'example.js',
             ast,
-            selection: inputSelection
+            selections: inputSelections
         });
     }
 
-    const actualOutputFixture = applySelectionMarkers(cleanInputFixture, actualSelection);
+    const actualOutputFixture = applySelectionMarkers(cleanInputFixture, actualSelections);
     assert.equal(actualOutputFixture, outputFixture, `Input fixture: ${inputFixture}`);
 }
 

@@ -35,21 +35,24 @@ export async function extendSelectionCommand() {
         return;
     }
 
-    window.activeTextEditor.selections = window.activeTextEditor.selections.map(selection => {
-        const result = smartSelectionService.extendSelection({
+    window.activeTextEditor!.selections = smartSelectionService
+        .extendSelection({
             languageId: document.languageId as LanguageId,
             source,
             fileName: document.fileName,
             ast,
-            selection: {
-                anchor: astService.offsetAt(source, window.activeTextEditor!.selection.anchor),
-                active: astService.offsetAt(source, window.activeTextEditor!.selection.active)
-            }
-        });
-        const anchor = astService.positionAt(source, result.anchor);
-        const active = astService.positionAt(source, result.active);
-        return new Selection(anchor, active);
-    });
+            selections: window.activeTextEditor!.selections.map(sel => ({
+                anchor: astService.offsetAt(source, sel.anchor),
+                active: astService.offsetAt(source, sel.active)
+            }))
+        })
+        .map(
+            sel =>
+                new Selection(
+                    astService.positionAt(source, sel.anchor),
+                    astService.positionAt(source, sel.active)
+                )
+        );
 }
 
 export async function shrinkSelectionCommand() {
@@ -73,19 +76,22 @@ export async function shrinkSelectionCommand() {
         return;
     }
 
-    window.activeTextEditor.selections = window.activeTextEditor.selections.map(selection => {
-        const result = smartSelectionService.shrinkSelection({
+    window.activeTextEditor!.selections = smartSelectionService
+        .shrinkSelection({
             languageId: document.languageId as LanguageId,
             source,
             fileName: document.fileName,
             ast,
-            selection: {
-                anchor: astService.offsetAt(source, window.activeTextEditor!.selection.anchor),
-                active: astService.offsetAt(source, window.activeTextEditor!.selection.active)
-            }
-        });
-        const anchor = astService.positionAt(source, result.anchor);
-        const active = astService.positionAt(source, result.active);
-        return new Selection(anchor, active);
-    });
+            selections: window.activeTextEditor!.selections.map(sel => ({
+                anchor: astService.offsetAt(source, sel.anchor),
+                active: astService.offsetAt(source, sel.active)
+            }))
+        })
+        .map(
+            sel =>
+                new Selection(
+                    astService.positionAt(source, sel.anchor),
+                    astService.positionAt(source, sel.active)
+                )
+        );
 }
