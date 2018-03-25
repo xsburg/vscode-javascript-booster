@@ -1,2 +1,2 @@
 package.json
-src/test/codemods/__fixtures__
+src/test/__codemod-fixtures__

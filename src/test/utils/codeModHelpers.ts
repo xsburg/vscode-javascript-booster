@@ -256,7 +256,7 @@ function defineTransformTests(
     fixtureId: string | null = null,
     options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
-    const fixDir = path.join(dirName, '__fixtures__');
+    const fixDir = path.join(dirName, '__codemod-fixtures__');
     const fixtureSuffix = fixtureId ? `.${fixtureId}` : '';
     const files = fs.readdirSync(fixDir);
     const inputFile = files.find(file => file.startsWith(`${modId}${fixtureSuffix}.input.`));
@@ -303,7 +303,7 @@ function defineCanRunTests(
     fixtureId: string | null = null,
     options: { fileName?: string; pos?: IPosition; startPos?: IPosition; endPos?: IPosition } = {}
 ) {
-    const fixDir = path.join(dirName, '__fixtures__');
+    const fixDir = path.join(dirName, '__codemod-fixtures__');
     const fixtureSuffix = fixtureId ? `.${fixtureId}` : '';
     const files = fs.readdirSync(fixDir);
     const inputFile = files.find(file => file.startsWith(`${modId}${fixtureSuffix}.check.`));
@@ -347,7 +347,7 @@ function defineCanRunTests(
 }
 
 export function defineCodeModTests(dirName: string) {
-    const fixDir = path.join(dirName, '__fixtures__');
+    const fixDir = path.join(dirName, '__codemod-fixtures__');
     const files = fs.readdirSync(fixDir);
     const modIds = _.uniq(files.map(f => f.substring(0, f.indexOf('.'))));
 

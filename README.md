@@ -61,7 +61,6 @@ You can easily load and run your own code actions. -->
 
 ### New commands
 
-* Support milticursors in smart selection
 * Duplicate line/selection
 * Navigate to related files (Hello.jsx -> Hello.scss, Hello.spec.jsx)
 
@@ -83,6 +82,7 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
     * Add parens to arrow function parameter
     * Remove braces from JSX attribute
 
+* Added support for multiple cursors in smart selection commands.
 * Changed `Replace if-else with ?:` action: it now supports if-return-else-return scenario.
 * Fixed `Collapse/Expand empty tag` action: it previously didn't work when the element is nested into a JSX attribute.
 

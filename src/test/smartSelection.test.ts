@@ -8,7 +8,7 @@ import {
 } from './utils/smartSelectionHelpers';
 
 suite(`Smart selection`, () => {
-    /* test('helpers should extract single selection position', () => {
+    test('helpers should extract single selection position', () => {
         const before = `
             let a = 'content is a sen|te|nce';
         `;
@@ -256,7 +256,7 @@ suite(`Smart selection`, () => {
             const company = |<div><div /></div>|;
         `;
         assertSmartSelection(before, after);
-    }); */
+    });
 
     test('should shrink when have passed a sequence of extensions', () => {
         assertSmartSelectionBulk([
@@ -285,5 +285,39 @@ suite(`Smart selection`, () => {
             const company2 = selectors.company.|2|getCompanyById|2|(state, d.companyId);
         `;
         assertSmartSelection(before, after);
+    });
+
+    test('should shrink when have passed a sequence of extensions', () => {
+        assertSmartSelectionBulk([
+            `
+                /*# { action: '+' } #*/
+                const company = selectors.company.|1|getCompanyById|1|(state, d.companyId);
+                const company = |2|selectors.company.getCompanyById|2|(state, d.companyId);
+            `,
+            `
+                /*# { action: '+' } #*/
+                const company = |1|selectors.company.getCompanyById|1|(state, d.companyId);
+                const company = |2|selectors.company.getCompanyById(state, d.companyId)|2|;
+            `,
+            `
+                /*# { action: '-' } #*/
+                const company = |1|selectors.company.getCompanyById(state, d.companyId)|1|;
+                const |2|company = selectors.company.getCompanyById(state, d.companyId)|2|;
+            `,
+            `
+                /*# { action: '-' } #*/
+                const company = |1|selectors.company.getCompanyById|1|(state, d.companyId);
+                const company = |2|selectors.company.getCompanyById(state, d.companyId)|2|;
+            `,
+            `
+                /*# { action: '-' } #*/
+                const company = selectors.company.|1|getCompanyById|1|(state, d.companyId);
+                const company = |2|selectors.company.getCompanyById|2|(state, d.companyId);
+            `,
+            `
+                const company = selectors.company.getCompanyById|1|(state, d.companyId);
+                const company = selectors.company.getCompanyById|2|(state, d.companyId);
+            `
+        ]);
     });
 });
