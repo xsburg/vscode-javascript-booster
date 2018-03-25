@@ -1,40 +1,77 @@
 import * as assert from 'assert';
+import * as _ from 'lodash';
 import * as os from 'os';
 import astService, { LanguageId, Selection } from '../../services/astService';
 import smartSelectionService from '../../services/smartSelectionService';
 
-function extractSelections(code: string): Selection[] {
-    let normalizedCode = code.replace(/\r?\n/g, os.EOL);
-    // anchor - always at the start
-    // active - always at the end
-    const anchor = normalizedCode.indexOf('|');
-    normalizedCode = normalizedCode.replace('|', '');
-    let active = normalizedCode.lastIndexOf('|');
-    if (active === -1) {
-        active = anchor;
+export function extractSelections(code: string): Selection[] {
+    code = code.replace(/\r?\n/g, os.EOL);
+
+    const re = /\|(?:(\d+)\|)?/g;
+    let adjustedIndex = 0;
+    const selections: any = {};
+    let match;
+    // tslint:disable-next-line:no-conditional-assignment
+    while ((match = re.exec(code)) !== null) {
+        const fragment = match[0];
+        const selectionId = match[1] || 'single';
+        let selInfo = selections[selectionId];
+        if (!selInfo) {
+            selInfo = selections[selectionId] = {};
+        }
+        if (!Number.isFinite(selInfo.anchor)) {
+            selInfo.anchor = match.index - adjustedIndex;
+        } else {
+            selInfo.active = match.index - adjustedIndex;
+        }
+        adjustedIndex += fragment.length;
     }
 
-    return {
-        anchor,
-        active
-    };
+    return Object.values(selections);
 }
 
-function removeSelectionMarkers(code: string) {
-    return code.replace('|', '').replace('|', '');
+export function removeSelectionMarkers(code: string) {
+    return code.replace(/\|(?:(\d+)\|)?/g, '');
 }
 
-function applySelectionMarkers(code: string, selections: Selection[]) {
-    let start = selection.anchor;
-    let end = selection.active;
-    if (selection.active < selection.anchor) {
-        [start, end] = [end, start];
-    }
-    const result =
-        start === end
-            ? [code.substring(0, start), code.substring(end)]
-            : [code.substring(0, start), code.substring(start, end), code.substring(end)];
-    return result.join('|');
+export function applySelectionMarkers(code: string, selections: Selection[]) {
+    const points: {
+        [offset: number]: {
+            indexes: number[];
+        };
+    } = {};
+    selections
+        .slice(0)
+        .sort((a, b) => {
+            return a.active - b.active;
+        })
+        .forEach((sel, i) => {
+            [sel.anchor, sel.active].forEach(point => {
+                let a = points[point];
+                if (!a) {
+                    a = points[point] = {
+                        indexes: []
+                    };
+                }
+                if (!a.indexes.includes(i)) {
+                    a.indexes.push(i);
+                }
+            });
+        });
+
+    Object.keys(points)
+        .sort((a, b) => Number(b) - Number(a))
+        .forEach(key => {
+            const offset = Number(key);
+            const point = points[offset];
+            code = [
+                code.substring(0, offset),
+                ...point.indexes.map(i => (selections.length === 1 ? '|' : `|${i + 1}|`)),
+                code.substring(offset)
+            ].join('');
+        });
+
+    return code;
 }
 
 /**
@@ -73,10 +110,10 @@ export function assertSmartSelection(
     const inputSelections = extractSelections(inputFixture);
     const expectedSelections = extractSelections(outputFixture);
     const cleanInputFixture = removeSelectionMarkers(inputFixture);
-    const cleanOutputFixture = removeSelectionMarkers(inputFixture);
+    const cleanOutputFixture = removeSelectionMarkers(outputFixture);
     assert.equal(
-        cleanInputFixture,
         cleanOutputFixture,
+        cleanInputFixture,
         'Source code in input and output fixtures must be the same.'
     );
     const ast = astService.getAstTree({

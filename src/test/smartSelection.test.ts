@@ -1,6 +1,47 @@
-import { assertSmartSelection, assertSmartSelectionBulk } from '../utils/smartSelectionHelpers';
+import * as assert from 'assert';
+import {
+    applySelectionMarkers,
+    assertSmartSelection,
+    assertSmartSelectionBulk,
+    extractSelections,
+    removeSelectionMarkers
+} from './utils/smartSelectionHelpers';
 
-suite(`Smart selection: extend`, () => {
+suite(`Smart selection`, () => {
+    /* test('helpers should extract single selection position', () => {
+        const before = `
+            let a = 'content is a sen|te|nce';
+        `;
+        const actualSelections = extractSelections(before);
+        const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
+        assert.equal(after, before);
+    });
+
+    test('helpers should extract multiple selection position', () => {
+        const before = `
+            let a = 'content is a sen|1|te|1|nce';
+            let b = 'content is a sen|2|te|2|nce';
+        `;
+        const actualSelections = extractSelections(before);
+        const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
+        assert.equal(after, before);
+    });
+
+    test('helpers should extract selection from 0 offset', () => {
+        const before = '|const company = selectors.company.getCompanyById(state, d.companyId);|';
+        const actualSelections = extractSelections(before);
+        const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
+        assert.equal(after, before);
+    });
+
+    test('helpers should extract selection from 0 offset', () => {
+        const before = 'const company = selectors.company.|getCompanyById|(state, d.companyId);';
+        const actualSelections = extractSelections(before);
+        assert.equal(actualSelections.length, 1);
+        assert.equal(actualSelections[0].anchor, 34);
+        assert.equal(actualSelections[0].active, 48);
+    });
+
     test('should extend to word', () => {
         const before = `
             let a = 'content is a sen|te|nce';
@@ -215,7 +256,7 @@ suite(`Smart selection: extend`, () => {
             const company = |<div><div /></div>|;
         `;
         assertSmartSelection(before, after);
-    });
+    }); */
 
     test('should shrink when have passed a sequence of extensions', () => {
         assertSmartSelectionBulk([

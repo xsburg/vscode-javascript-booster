@@ -7,9 +7,9 @@ import {
     StringLiteral,
     TypeName
 } from 'ast-types';
+import { JsCodeShift } from 'jscodeshift';
 import * as vscode from 'vscode';
 import astService, { AstRoot, LanguageId, Selection } from './astService';
-import { JsCodeShift } from 'jscodeshift';
 
 interface UnordedSelection {
     start: number;
@@ -62,6 +62,10 @@ function wrapBrackets(
         start,
         end
     };
+}
+
+function equalSelections(selA: Selection, selB: Selection) {
+    return selA.active === selB.active && selA.anchor === selB.anchor;
 }
 
 class SmartSelectionService {
@@ -316,32 +320,33 @@ class SmartSelectionService {
         activeSelections: Selection[]
     ): Selection[] {
         let cache = this._selectionCache.get(fileName);
-        if (!cache) {
+        let invalidCache = !cache;
+
+        if (cache) {
+            // 1. Active selection found in stack => great.
+            // 2. New active selection? Start from scratch.
+            // 3. Cache has active selections which are now gone? Remove them.
+            const storedActiveSelections = cache.selectionStack[cache.selectionStack.length - 1];
+            const allSelectionsPresentInCache = activeSelections.every(sel => {
+                return storedActiveSelections.some(val => equalSelections(sel, val));
+            });
+            const cacheHasRemovedSelections = storedActiveSelections.some(sel => {
+                return !activeSelections.some(val => equalSelections(sel, val));
+            });
+            invalidCache = !allSelectionsPresentInCache || cacheHasRemovedSelections;
+        }
+
+        if (invalidCache) {
             // Invalid cache, start from scratch
             cache = {
                 source,
-                selectionStack: [newSelections]
+                selectionStack: [activeSelections]
             };
             this._selectionCache.set(fileName, cache);
         }
 
-        if (
-            !cache ||
-            cache.selectionStack[cache.selectionStack.length - 1].anchor !==
-                activeSelection.anchor ||
-            cache.selectionStack[cache.selectionStack.length - 1].active !== activeSelection.active
-        ) {
-            // Invalid cache, start from scratch
-            cache = {
-                source,
-                selectionStack: [activeSelection]
-            };
-            this._selectionCache.set(fileName, cache);
-        }
-
-        const result = toSelection(newSelection, activeSelection);
-        cache.selectionStack.push(result);
-        return result;
+        cache!.selectionStack.push(newSelections);
+        return newSelections;
     }
 
     private _popSelections(
@@ -354,9 +359,6 @@ class SmartSelectionService {
                 active: sel.active,
                 anchor: sel.active
             };
-        }
-        function eq(selA: Selection, selB: Selection) {
-            return selA.active === selB.active && selA.anchor === selB.anchor;
         }
 
         const cache = this._selectionCache.get(fileName);
@@ -371,7 +373,7 @@ class SmartSelectionService {
         const storedActiveSelections = cache.selectionStack.pop()!;
         const storedPrevSelections = cache.selectionStack[cache.selectionStack.length - 1];
         const newSelections = activeSelections.map(sel => {
-            const index = storedActiveSelections.findIndex(val => eq(sel, val));
+            const index = storedActiveSelections.findIndex(val => equalSelections(sel, val));
             if (index !== -1) {
                 return storedPrevSelections[index];
             } else {
