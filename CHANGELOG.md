@@ -4,6 +4,17 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
 
+### 0.5.0
+
+* Added new inline code actions.
+
+    * Add parens to arrow function parameter
+    * Remove braces from JSX attribute
+
+* Added support for multiple cursors in smart selection commands.
+* Changed `Replace if-else with ?:` action: it now supports if-return-else-return scenario.
+* Fixed `Collapse/Expand empty tag` action: it previously didn't work when the element is nested into a JSX attribute.
+
 ### 0.4.0
 
 * Added new inline code actions.

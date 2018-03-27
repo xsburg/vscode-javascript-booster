@@ -24,10 +24,12 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 * 💥 Flip ?:
 * 💥 Convert shorthand arrow function to statement
 * 💥 Convert to shorthand arrow function
+* 💥 Add parens to single arrow function parameter
 * 💥 Convert function to arrow function
 * 💥 Replace string with template string
 * 💥 Replace template string with regular string
 * 💥 JSX: Wrap value with {} (JSX attributes)
+* 💥 JSX: Remove {} from JSX attribute
 * 💥 JSX: Collapse/Expand empty tag
 * 💥 Convert var/const to let
 * 💥 Convert var to const
@@ -39,7 +41,7 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 These two commands allow you to successively select blocks of code so that it's easier to select what you want. Just look at the animation, rather than read this text 🤓. Unlike VS Code's embedded commands (`editor.action.smartSelect.*`), this extension uses an abstract syntax tree under the hood, which provides much more accurate results.
 
-You might want to assign hotkeys for these commands, search for `javascriptBooster.extendSelection` and `javascriptBooster.shrinkSelection`.
+You might want to assign hotkeys for these commands, search for `javascriptBooster.extendSelection` and `javascriptBooster.shrinkSelection`. `Ctrl+W` and `Ctrl+Shift+W` (⌘W and ⌘⇧W) are used in WebStorm by default.
 
 ![Smart extend/shrink selection](resources/smartSelection.gif)
 
@@ -75,7 +77,7 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ## Release Notes
 
-### 0.5.0 (Upcoming changes)
+### 0.5.0
 
 * Added new inline code actions.
 
