@@ -46,8 +46,20 @@ codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
 
+    let testPath = target.firstPath();
+    while (testPath && testPath.parent) {
+        if (
+            j.VariableDeclarator.check(testPath.parent.node) &&
+            testPath.parent.node.init === testPath.node
+        ) {
+            // if path is the node responsible for initialization => target is inside initializer
+            return false;
+        }
+        testPath = testPath.parent;
+    }
+
+    const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
     return Boolean(
         path && path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
     );

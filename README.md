@@ -77,6 +77,10 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ## Release Notes
 
+### 0.6.0 (Upcoming release)
+
+* Changed `Split into declaration and initialization` action: it no longer appears in the bulb when the cursor is inside variable initializers.
+
 ### 0.5.0
 
 * Added new inline code actions.
