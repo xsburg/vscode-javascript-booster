@@ -61,7 +61,9 @@ codeMod.canRun = (fileInfo, api, options) => {
 
     const path = target.thisOrClosest(j.VariableDeclaration).firstPath();
     return Boolean(
-        path && path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
+        path &&
+            !j.ExportNamedDeclaration.check(path.parent.node) &&
+            path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
     );
 };
 

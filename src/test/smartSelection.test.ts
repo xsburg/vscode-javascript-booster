@@ -287,7 +287,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should shrink when have passed a sequence of extensions', () => {
+    test('should extend/shrink with multiple cursors', () => {
         assertSmartSelectionBulk([
             `
                 /*# { action: '+' } #*/

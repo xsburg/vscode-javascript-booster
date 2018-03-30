@@ -17,3 +17,7 @@ let a = 'bar'; /*# { pos: 11 } #*/
 /*$ { fixture: 'should-not-trigger-when-no-init', expected: false } $*/
 
 let a; /*# { pos: 5 } #*/
+
+/*$ { fixture: 'should-not-trigger-when-exported', expected: false } $*/
+
+export const a = 'foo'; /*# { pos: 14 } #*/

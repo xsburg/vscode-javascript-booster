@@ -79,7 +79,12 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ### 0.6.0 (Upcoming release)
 
-* Changed `Split into declaration and initialization` action: it no longer appears in the bulb when the cursor is inside variable initializers.
+* Changed `Split into declaration and initialization` action:
+
+    * It no longer appears in the bulb when the cursor is inside a variable initializer.
+    * It no longer appears in the bulb when variable declaration is a part of ES6 module export.
+
+* Changed `Convert to shorthand arrow function` action: it now supports transformation of Expression Statements (without explicit return).
 
 ### 0.5.0
 
