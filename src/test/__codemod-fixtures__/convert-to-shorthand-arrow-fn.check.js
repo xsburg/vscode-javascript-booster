@@ -1,21 +1,30 @@
 /*$ { fixture: 'should-not-trigger', expected: false } $*/
 
-const a = 1;
+let a = 1; /*# { pos: 9 } #*/
 
-if (a) { 
-    let b = 2; /*# { pos: 9 } #*/
-} else {
-    let c = 3;
-}
+/*$ { fixture: 'should-not-trigger-at-var-decl', expected: false } $*/
+
+const a = () => { /*# { pos: 15 } #*/
+    let b = 3;
+};
 
 /*$ { fixture: 'should-trigger', expected: true } $*/
 
-const a = 1;
+let b = () => { /*# { pos: 13 } #*/
+    return 2;
+};
 
-if (a) {
-    let b = () => { /*# { pos: 17 } #*/
-        return 2;
-    };
-} else {
-    let c = 3;
-}
+/*$ { fixture: 'should-trigger-at-expression-statement', expected: true } $*/
+
+let b = () => { /*# { pos: 13 } #*/
+    dispatch({
+        type: 'FOO'
+    });
+};
+
+/*$ { fixture: 'should-trigger-at-assignment-statement', expected: true } $*/
+
+let b;
+const a = () => { /*# { pos: 15 } #*/
+    b = 3;
+};

@@ -17,3 +17,18 @@ function test() {
 function test() {
     const a = () => undefined;
 }
+
+/*$ { fixture: 'should-transform-expression-statement' } $*/
+
+function test() {
+    const a = () => dispatch({
+        type: 'FOO'
+    });
+}
+
+/*$ { fixture: 'should-transform-assignment-statement' } $*/
+
+function test() {
+    let b;
+    const a = () => b = 3;
+}

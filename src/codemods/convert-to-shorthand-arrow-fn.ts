@@ -2,6 +2,7 @@ import {
     ArrowFunctionExpression,
     BlockStatement,
     Expression,
+    ExpressionStatement,
     FunctionDeclaration,
     IfStatement,
     Printable,
@@ -17,9 +18,14 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const target = options.target;
     const node = target.firstNode<ArrowFunctionExpression>()!;
 
-    const returnStatement = (node.body as BlockStatement).body[0] as ReturnStatement;
-    const returnExpr = returnStatement.argument || j.identifier('undefined');
-    node.body = returnExpr;
+    const blockStatement = (node.body as BlockStatement).body[0];
+    if (j.ReturnStatement.check(blockStatement)) {
+        const returnExpr = blockStatement.argument || j.identifier('undefined');
+        node.body = returnExpr;
+    } else {
+        const expr = (blockStatement as ExpressionStatement).expression;
+        node.body = expr;
+    }
 
     const resultText = ast.toSource();
     return resultText;
@@ -35,7 +41,8 @@ codeMod.canRun = (fileInfo, api, options) => {
         j.ArrowFunctionExpression.check(node) &&
         j.BlockStatement.check(node.body) &&
         node.body.body.length === 1 &&
-        j.ReturnStatement.check(node.body.body[0])
+        (j.ReturnStatement.check(node.body.body[0]) ||
+            j.ExpressionStatement.check(node.body.body[0]))
     );
 };
 

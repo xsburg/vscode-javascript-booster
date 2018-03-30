@@ -23,3 +23,22 @@ function test() {
         return;
     };
 }
+
+/*$ { fixture: 'should-transform-expression-statement' } $*/
+
+function test() {
+    const a = () => { /*# { pos: 19 } #*/
+        dispatch({
+            type: 'FOO'
+        });
+    };
+}
+
+/*$ { fixture: 'should-transform-assignment-statement' } $*/
+
+function test() {
+    let b;
+    const a = () => { /*# { pos: 19 } #*/
+        b = 3;
+    };
+}
