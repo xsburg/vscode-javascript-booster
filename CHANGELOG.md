@@ -4,6 +4,15 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
 
+### 0.6.0
+
+* Changed `Split into declaration and initialization` action:
+
+    * It no longer appears in the bulb when the cursor is inside a variable initializer.
+    * It no longer appears in the bulb when variable declaration is a part of ES6 module export.
+
+* Changed `Convert to shorthand arrow function` action: it now supports transformation of Expression Statements (without explicit return).
+
 ### 0.5.0
 
 * Added new inline code actions.
