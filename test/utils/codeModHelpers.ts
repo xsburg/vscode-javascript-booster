@@ -16,9 +16,9 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import { LanguageId } from '../../services/astService';
-import codeModService from '../../services/codeModService';
-import { IPosition, Position } from '../../utils';
+import { LanguageId } from '../../src/services/astService';
+import codeModService from '../../src/services/codeModService';
+import { IPosition, Position } from '../../src/utils';
 
 function toZeroBasedPosition(pos: IPosition) {
     return new vscode.Position(pos.line - 1, pos.column - 1);

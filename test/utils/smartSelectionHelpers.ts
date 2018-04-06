@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import * as _ from 'lodash';
 import * as os from 'os';
-import astService, { LanguageId, Selection } from '../../services/astService';
-import smartSelectionService from '../../services/smartSelectionService';
+import astService, { LanguageId, Selection } from '../../src/services/astService';
+import smartSelectionService from '../../src/services/smartSelectionService';
 
 export function extractSelections(code: string): Selection[] {
     code = code.replace(/\r?\n/g, os.EOL);

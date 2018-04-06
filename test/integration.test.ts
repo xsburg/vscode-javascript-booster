@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { CodeModCodeActionProvider } from '../CodeModCodeActionProvider';
-import { runCodeModCommand } from '../runCodeModCommand';
+import { CodeModCodeActionProvider } from '../src/CodeModCodeActionProvider';
+import { runCodeModCommand } from '../src/runCodeModCommand';
 
 function getWorkspaceFilePath(workspaceName: string, relativeFilePath: string) {
     return path.join(__dirname, `__${workspaceName}__`, relativeFilePath);

@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import { Position, window } from 'vscode';
-import astService from '../services/astService';
+import astService from '../src/services/astService';
 
 suite('astService', () => {
     const eolLength = os.EOL.length;
