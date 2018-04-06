@@ -28,7 +28,7 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         return codeMods.map(
             mod =>
                 ({
-                    title: mod.name, // Add an icon? ✏  ↪ ♦ 🚀 🍒 🔥 ☞ ⚡ ✎
+                    title: mod.name,
                     tooltip: mod.detail || mod.description,
                     command: commandIds.runCodeMod,
                     arguments: [mod]

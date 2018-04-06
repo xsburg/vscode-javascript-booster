@@ -62,7 +62,7 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         return;
     }
     const allTextRange = new Range(document.positionAt(0), document.positionAt(source.length));
-    window.activeTextEditor.edit(edit => {
+    await window.activeTextEditor.edit(edit => {
         edit.replace(allTextRange, result);
     });
 }
