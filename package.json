@@ -38,19 +38,23 @@
         "commands": [
             {
                 "command": "javascriptBooster.runCodeMod",
-                "title": "[Booster] Run Global Code Action"
+                "title": "Run Global Code Action",
+                "category": "JS Booster"
             },
             {
                 "command": "javascriptBooster.reloadCodeMods",
-                "title": "[Booster] Reload Code Actions"
+                "title": "Reload Code Actions",
+                "category": "JS Booster"
             },
             {
                 "command": "javascriptBooster.extendSelection",
-                "title": "[Booster] Extend selection"
+                "title": "Extend selection",
+                "category": "JS Booster"
             },
             {
                 "command": "javascriptBooster.shrinkSelection",
-                "title": "[Booster] Shrink selection"
+                "title": "Shrink selection",
+                "category": "JS Booster"
             }
         ],
         "configuration": [
