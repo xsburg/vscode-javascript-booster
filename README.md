@@ -1,4 +1,4 @@
-# VS Code JavaScript Booster [![Travis](https://travis-ci.org/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster)
+# VS Code JavaScript Booster [![Travis](https://travis-ci.org/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster) [![Coverage Status](https://coveralls.io/repos/github/xsburg/vscode-javascript-booster/badge.svg?branch=master)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master)
 
 Make your life easier, use code actions to do repetitive tasks for you! They can help a lot, just follow the light bulb 💡!
 
