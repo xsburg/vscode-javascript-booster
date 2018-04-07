@@ -13,6 +13,8 @@ install:
   - npm run vscode:prepublish
 script:
   - npm test --silent
+after_script:
+  - node ./node_modules/coveralls/bin/coveralls.js -v < ./out/coverage/lcov.info
 before_deploy:
   - npm install -g vsce
   - vsce package

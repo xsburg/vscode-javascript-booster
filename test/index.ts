@@ -10,13 +10,18 @@
 // to report the results back to the caller. When the tests are finished, return
 // a possible error to the callback or null if none.
 
+import { join } from 'path';
 import * as testRunner from 'vscode/lib/testrunner';
+import { setupTestCoverage } from './utils/testCoverage';
 
 // You can directly control Mocha options by uncommenting the following lines
 // See https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options for more info
 testRunner.configure({
-    ui: 'tdd', // the TDD UI is being used in extension.test.ts (suite, test, etc.)
-    useColors: true // colored output from test results
+    ui: 'tdd',
+    useColors: true,
+    timeout: 5000
 });
+
+setupTestCoverage(join(__dirname, '../src'));
 
 module.exports = testRunner;

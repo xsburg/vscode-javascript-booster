@@ -91,12 +91,18 @@
         "generate-ast-typings": "node ./typings/generate-ast-typings"
     },
     "devDependencies": {
+        "@types/glob": "^5.0.35",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
+        "coveralls": "^3.0.0",
         "cpx": "^1.5.0",
+        "decache": "^4.4.0",
+        "glob": "^7.1.2",
+        "istanbul": "^0.4.5",
         "lodash": "^4.17.5",
         "prettier": "^1.10.2",
         "react": "^16.2.0",
+        "remap-istanbul": "^0.11.0",
         "tslint": "^5.9.1",
         "tslint-config-prettier": "^1.10.0",
         "tslint-react": "^3.5.1",
