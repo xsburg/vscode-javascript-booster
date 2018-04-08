@@ -1,10 +1,66 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { commands, ExtensionContext, QuickPickItem, Range, Uri, window, workspace } from 'vscode';
+import {
+    commands,
+    ExtensionContext,
+    QuickPickItem,
+    Range,
+    TextDocument,
+    Uri,
+    window,
+    workspace
+} from 'vscode';
 import { CodeModDefinition } from './models/CodeMod';
 import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
 import logService from './services/logService';
+
+async function updateText(document: TextDocument, before: string, after: string): Promise<void> {
+    let startPosBefore = 0;
+    let startPosAfter = 0;
+    while (startPosBefore < before.length && startPosAfter < after.length) {
+        const cb = before[startPosBefore];
+        const ca = after[startPosAfter];
+        if (cb === ca) {
+            startPosBefore++;
+            startPosAfter++;
+        } else if (cb === '\r' && before[startPosBefore + 1] === '\n' && ca === '\n') {
+            // \n removed after transformation
+            startPosBefore++;
+        } else if (ca === '\r' && after[startPosAfter + 1] === '\n' && cb === '\n') {
+            // \n added after transformation
+            startPosAfter++;
+        } else {
+            break;
+        }
+    }
+
+    let endPosBefore = before.length;
+    let endPosAfter = after.length;
+    while (endPosBefore - 1 >= 0 && endPosAfter - 1 >= 0) {
+        const cb = before[endPosBefore - 1];
+        const ca = after[endPosAfter - 1];
+        if (cb === ca) {
+            endPosBefore--;
+            endPosAfter--;
+        } else if (cb === '\r' && before[endPosBefore] === '\n') {
+            // \n removed after transformation
+            endPosBefore--;
+        } else if (ca === '\r' && after[endPosAfter] === '\n') {
+            // \n added after transformation
+            endPosAfter--;
+        } else {
+            break;
+        }
+    }
+
+    const range = new Range(document.positionAt(startPosBefore), document.positionAt(endPosBefore));
+    const replacement = after.substring(startPosAfter, endPosAfter);
+
+    await window.activeTextEditor!.edit(edit => {
+        edit.replace(range, replacement);
+    });
+}
 
 export async function runCodeModCommand(mod?: CodeModDefinition) {
     if (!window.activeTextEditor) {
@@ -61,8 +117,6 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         window.showInformationMessage('No changes.');
         return;
     }
-    const allTextRange = new Range(document.positionAt(0), document.positionAt(source.length));
-    await window.activeTextEditor.edit(edit => {
-        edit.replace(allTextRange, result);
-    });
+
+    await updateText(document, source, result);
 }
