@@ -77,6 +77,10 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ## Release Notes
 
+### 0.7.0 (Upcoming release)
+
+* Optimized code action performance on large files. Only the transformed fragment of the code is replaced when an action is applied.
+
 ### 0.6.0
 
 * Changed `Split into declaration and initialization` action:
