@@ -146,6 +146,10 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
     * Split into declaration and initialisation
     * Merge declaration and initialisation
 
+## Credits
+
+The icon made by [Swifticons](https://www.flaticon.com/authors/swifticons) from [www.flaticon.com](https://www.flaticon.com/) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)
+
 <!-- ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
