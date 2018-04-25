@@ -31,7 +31,11 @@
         "onLanguage:javascript",
         "onLanguage:javascriptreact",
         "onLanguage:typescript",
-        "onLanguage:typescriptreact"
+        "onLanguage:typescriptreact",
+        "onCommand:javascriptBooster.runCodeMod",
+        "onCommand:javascriptBooster.reloadCodeMods",
+        "onCommand:javascriptBooster.extendSelection",
+        "onCommand:javascriptBooster.shrinkSelection"
     ],
     "main": "./out/src/extension",
     "contributes": {

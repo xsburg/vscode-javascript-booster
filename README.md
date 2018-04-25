@@ -56,6 +56,7 @@ You can easily load and run your own code actions. -->
 ### More code actions
 
 * Convert if -> switch-case
+* Replace ?: with if-else
 * TS: Change member access (public -> private etc)
 * TS: Convert alias to interface
 * TS: Generate missing switch cases for enum
