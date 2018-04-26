@@ -81,7 +81,7 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 ### 0.7.0
 
 * Optimized code action performance on large files. Only the transformed fragment of the code is replaced when an action is applied.
-* Fixed Extend/Shrink selections fallback commands not working due to missing extension activation points
+* Fixed Extend/Shrink selections fallback commands not working due to missing extension activation points.
 
 ### 0.6.0
 
