@@ -41,3 +41,6 @@ deploy:
 notifications:
   email:
     on_success: change
+branches:
+  only:
+    - master
