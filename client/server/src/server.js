@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode_languageserver_1 = require("vscode-languageserver");
 // Create a connection for the server. The connection uses Node's IPC as a transport
@@ -24,7 +32,8 @@ connection.onInitialize((_params) => {
             // Tell the client that the server support code complete
             completionProvider: {
                 resolveProvider: true
-            }
+            },
+            codeActionProvider: true
         }
     };
 });
@@ -95,6 +104,15 @@ connection.onDidChangeWatchedFiles(_change => {
     // Monitored files have change in VSCode
     connection.console.log('We received an file change event');
 });
+connection.onCodeAction((params) => __awaiter(this, void 0, void 0, function* () {
+    return Promise.resolve([
+        {
+            title: 'My Fancy Command',
+            command: 'javascriptBooster.extendSelection',
+            arguments: [{ foo: { bar: 'test' } }]
+        }
+    ]);
+}));
 // This handler provides the initial list of the completion items.
 connection.onCompletion((_textDocumentPosition) => {
     // The pass parameter contains the position of the text document in

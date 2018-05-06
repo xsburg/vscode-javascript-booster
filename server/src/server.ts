@@ -1,4 +1,5 @@
 import {
+    Command,
     CompletionItem,
     CompletionItemKind,
     createConnection,
@@ -44,6 +45,10 @@ connection.onInitialize((_params): InitializeResult => {
             // Tell the client that the server support code complete
             completionProvider: {
                 resolveProvider: true
+            },
+            codeActionProvider: true,
+            executeCommandProvider: {
+                commands: ['javascriptBooster.test1']
             }
         }
     };
@@ -130,6 +135,33 @@ function validateTextDocument(textDocument: TextDocument): void {
 connection.onDidChangeWatchedFiles(_change => {
     // Monitored files have change in VSCode
     connection.console.log('We received an file change event');
+});
+
+connection.onCodeAction(async params => {
+    return Promise.resolve([
+        {
+            title: 'My Fancy Command',
+            command: 'javascriptBooster.test1',
+            arguments: [{ foo: { bar: 'test' } }]
+        } as Command
+    ]);
+});
+
+connection.onExecuteCommand(async params => {
+    const command = params.command;
+    /* const versionedTextDocumentIdentifier = params.arguments[0];
+    connection.workspace.applyEdit({
+        documentChanges: [{
+            textDocument: versionedTextDocumentIdentifier,
+            edits: [{
+                range: {
+                    start: {line: 0, character: 0},
+                    end: {line: Number.MAX_SAFE_INTEGER, character: Number.MAX_SAFE_INTEGER}
+                },
+                newText: this.documents.get(versionedTextDocumentIdentifier.uri).getText().toUpperCase()
+            }]
+        }]
+    }); */
 });
 
 // This handler provides the initial list of the completion items.

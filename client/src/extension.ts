@@ -18,11 +18,15 @@ import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelection
 export function activate(context: ExtensionContext) {
     let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
     let serverOptions: ServerOptions = {
-        run: { module: serverModule, transport: TransportKind.ipc },
+        run: {
+            module: serverModule,
+            transport: TransportKind.ipc,
+            options: { cwd: process.cwd() }
+        },
         debug: {
             module: serverModule,
             transport: TransportKind.ipc,
-            options: { execArgv: ['--nolazy', '--inspect=6010'] }
+            options: { execArgv: ['--nolazy', '--inspect=6014'], cwd: process.cwd() }
         }
     };
 
@@ -44,8 +48,7 @@ export function activate(context: ExtensionContext) {
         'jsBoosterLangServer',
         'JavaScript Booster Language Server',
         serverOptions,
-        clientOptions,
-        true
+        clientOptions
     );
 
     context.subscriptions.push(

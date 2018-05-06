@@ -1,0 +1,16 @@
+// A launch configuration that compiles the extension and then opens it inside a new window
+{
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "Attach to Server",
+            "type": "node",
+            "request": "attach",
+            "address": "localhost",
+            "protocol": "inspector",
+            "port": 6014,
+            "sourceMaps": true,
+            "outFiles": ["${workspaceRoot}/../client/server/**/*.js"]
+        }
+    ]
+}

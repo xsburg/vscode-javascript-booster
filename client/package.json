@@ -87,7 +87,7 @@
         "clean": "rimraf out",
         "vscode:prepublish": "npm run compile",
         "compile": "npm run clean && tsc -p ./ && cpx ./test/__codemod-fixtures__/**/* ./out/test/__codemod-fixtures__ && cpx ./test/__test-workspace-1__/**/* ./out/test/__test-workspace-1__",
-        "watch": "npm run compile && tsc -watch -p ./",
+        "watch": "tsc -watch -p ./",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "preversion": "npm test",
         "postversion": "git push && git push --tags",
