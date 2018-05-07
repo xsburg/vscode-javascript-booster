@@ -12,6 +12,10 @@
         "url": "https://github.com/Microsoft/vscode-extension-samples"
     },
     "dependencies": {
+        "babylon": "^7.0.0-beta.46",
+        "fs-extra": "^6.0.0",
+        "jscodeshift": "github:xsburg/jscodeshift",
+        "lodash": "^4.17.10",
         "vscode-languageserver": "^4.1.2"
     },
     "scripts": {
@@ -20,12 +24,17 @@
         "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
     },
     "devDependencies": {
+        "@types/fs-extra": "^5.0.2",
+        "@types/lodash": "^4.14.108",
         "@types/node": "^10.0.4",
+        "coveralls": "^3.0.0",
+        "cpx": "^1.5.0",
+        "prettier": "^1.10.2",
+        "react": "^16.3.2",
+        "rimraf": "^2.6.2",
         "tslint": "^5.9.1",
         "tslint-config-prettier": "^1.10.0",
         "tslint-react": "^3.5.1",
-        "typescript": "2.7.2",
-        "coveralls": "^3.0.0",
-        "prettier": "^1.10.2"
+        "typescript": "2.7.2"
     }
 }

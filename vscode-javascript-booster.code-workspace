@@ -6,5 +6,6 @@
 		{
 			"path": "server"
 		}
-	]
+	],
+	"settings": {}
 }
