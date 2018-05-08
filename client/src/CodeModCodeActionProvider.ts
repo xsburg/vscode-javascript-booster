@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { commandIds } from './const';
 import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
+import langService from './services/langService';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
     public async provideCodeActions(
@@ -16,22 +17,19 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
 
         const source = document.getText();
         const activeTextEditor = vscode.window.activeTextEditor!;
-        const codeMods = await codeModService.getCodeActionMods({
-            languageId: document.languageId as LanguageId,
-            fileName: document.fileName,
-            source,
-            selection: {
-                anchor: astService.offsetAt(source, activeTextEditor.selection.anchor),
-                active: astService.offsetAt(source, activeTextEditor.selection.active)
-            }
-        });
+
+        const codeMods = await langService.requestCodeActions(
+            document.uri.toString(),
+            activeTextEditor.selection
+        );
+
         return codeMods.map(
             mod =>
                 ({
-                    title: mod.name,
-                    tooltip: mod.detail || mod.description,
+                    title: mod.title,
+                    tooltip: mod.tooltip,
                     command: commandIds.runCodeMod,
-                    arguments: [mod]
+                    arguments: [mod.id]
                 } as vscode.Command)
         );
     }

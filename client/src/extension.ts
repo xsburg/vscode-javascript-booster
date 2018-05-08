@@ -1,10 +1,11 @@
 'use strict';
 
 import * as path from 'path';
-import { commands, ExtensionContext, languages, workspace } from 'vscode';
+import { commands, ExtensionContext, languages, Position, workspace } from 'vscode';
 import {
     LanguageClient,
     LanguageClientOptions,
+    RequestType,
     ServerOptions,
     TransportKind
 } from 'vscode-languageclient';
@@ -13,6 +14,7 @@ import { commandIds, extensionId } from './const';
 import { runCodeModCommand } from './runCodeModCommand';
 import astService from './services/astService';
 import codeModService from './services/codeModService';
+import langService from './services/langService';
 import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
 export function activate(context: ExtensionContext) {
@@ -51,10 +53,12 @@ export function activate(context: ExtensionContext) {
         clientOptions
     );
 
+    langService.initialize(languageClient);
+
     context.subscriptions.push(
         commands.registerCommand(commandIds.extendSelection, extendSelectionCommand),
         commands.registerCommand(commandIds.shrinkSelection, shrinkSelectionCommand),
-        commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
+        // commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
         commands.registerCommand(commandIds.reloadCodeMods, () => {
             codeModService.reloadAllCodeMods();
         }),

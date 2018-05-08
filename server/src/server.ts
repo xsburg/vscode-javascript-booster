@@ -9,11 +9,15 @@ import {
     InitializeResult,
     IPCMessageReader,
     IPCMessageWriter,
+    NotificationType,
+    RequestType,
     TextDocument,
     TextDocumentPositionParams,
     TextDocuments
 } from 'vscode-languageserver';
+import * as vscode from 'vscode-languageserver-types';
 import { commandIds } from './const';
+import { CodeModDefinition } from './models/CodeMod';
 import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
 import codeService from './services/codeService';
@@ -32,7 +36,7 @@ connection.onInitialize((_params): InitializeResult => {
     return {
         capabilities: {
             textDocumentSync: documents.syncKind,
-            codeActionProvider: true,
+            // codeActionProvider: true,
             executeCommandProvider: {
                 commands: ['javascriptBooster.test1']
             }
@@ -54,57 +58,81 @@ connection.onDidChangeConfiguration(change => {
     documents.all().forEach(validateTextDocument);
 });
 
-function validateTextDocument(textDocument: TextDocument): void {
-    let diagnostics: Diagnostic[] = [];
-    let lines = textDocument.getText().split(/\r?\n/g);
-    let problems = 0;
-    for (let i = 0; i < lines.length && problems < 100; i++) {
-        let line = lines[i];
-        let index = line.indexOf('typescript');
-        if (index >= 0) {
-            problems++;
+function validateTextDocument(textDocument: TextDocument): void {}
 
-            let diagnosic: Diagnostic = {
-                severity: DiagnosticSeverity.Warning,
-                range: {
-                    start: { line: i, character: index },
-                    end: { line: i, character: index + 10 }
-                },
-                message: `${line.substr(index, 10)} should be spelled TypeScript`,
-                source: 'ex'
-            };
-            if (true) {
-                diagnosic.relatedInformation = [
-                    {
-                        location: {
-                            uri: textDocument.uri,
-                            range: {
-                                start: { line: i, character: index },
-                                end: { line: i, character: index + 10 }
-                            }
-                        },
-                        message: 'Spelling matters'
-                    },
-                    {
-                        location: {
-                            uri: textDocument.uri,
-                            range: {
-                                start: { line: i, character: index },
-                                end: { line: i, character: index + 10 }
-                            }
-                        },
-                        message: 'Particularly for names'
-                    }
-                ];
-            }
-            diagnostics.push(diagnosic);
-        }
-    }
-    // Send the computed diagnostics to VSCode.
-    connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+/* interface AllFixesParams {
+    // textDocument: TextDocumentIdentifier;
+    isOnSave: boolean;
 }
 
-connection.onCodeAction(async params => {
+interface AllFixesResult {
+    documentVersion: number;
+    foo: string;
+}
+
+namespace AllFixesRequest {
+    export const type = new server.RequestType<AllFixesParams, AllFixesResult, void, void>(
+        'textDocument/tslint/allFixes'
+    );
+}
+
+connection.onRequest(AllFixesRequest.type, async params => {
+    return {
+        documentVersion: 1,
+        foo: 'bar'
+    };
+}); */
+// connection.sendRequest
+
+interface CodeActionsParams {
+    textDocumentUri: string;
+    selection: {
+        anchor: vscode.Position;
+        active: vscode.Position;
+    };
+}
+
+interface CodeActionsResult {
+    codeMods: Array<{
+        id: string;
+        title: string;
+        tooltip?: string;
+    }>;
+}
+
+export const codeActionsRequestType = new RequestType<
+    CodeActionsParams,
+    CodeActionsResult,
+    void,
+    void
+>('javascriptBooster/codeActions');
+
+connection.onRequest(codeActionsRequestType, async (params): Promise<CodeActionsResult> => {
+    let result: CodeActionsResult;
+
+    const document = documents.get(params.textDocumentUri);
+    const source = document.getText();
+    const codeMods = await codeModService.getCodeActionMods({
+        languageId: document.languageId as LanguageId,
+        fileName: document.uri,
+        source,
+        selection: {
+            anchor: astService.offsetAt(source, params.selection.anchor),
+            active: astService.offsetAt(source, params.selection.active)
+        }
+    });
+
+    result = {
+        codeMods: codeMods.map(mod => ({
+            id: mod.id,
+            title: mod.name,
+            tooltip: mod.detail || mod.description
+        }))
+    };
+    return result;
+});
+
+/* connection.onCodeAction(async params => {
     const document = documents.get(params.textDocument.uri);
     if (!astService.isSupportedLanguage(document.languageId)) {
         return [];
@@ -131,10 +159,97 @@ connection.onCodeAction(async params => {
                 arguments: [mod]
             } as Command)
     );
-});
+}); */
+
+function updateText(document: TextDocument, before: string, after: string) {
+    let startPosBefore = 0;
+    let startPosAfter = 0;
+    while (startPosBefore < before.length && startPosAfter < after.length) {
+        const cb = before[startPosBefore];
+        const ca = after[startPosAfter];
+        if (cb === ca) {
+            startPosBefore++;
+            startPosAfter++;
+        } else if (cb === '\r' && before[startPosBefore + 1] === '\n' && ca === '\n') {
+            // \n removed after transformation
+            startPosBefore++;
+        } else if (ca === '\r' && after[startPosAfter + 1] === '\n' && cb === '\n') {
+            // \n added after transformation
+            startPosAfter++;
+        } else {
+            break;
+        }
+    }
+
+    let endPosBefore = before.length;
+    let endPosAfter = after.length;
+    while (endPosBefore - 1 >= 0 && endPosAfter - 1 >= 0) {
+        const cb = before[endPosBefore - 1];
+        const ca = after[endPosAfter - 1];
+        if (cb === ca) {
+            endPosBefore--;
+            endPosAfter--;
+        } else if (cb === '\r' && before[endPosBefore] === '\n') {
+            // \n removed after transformation
+            endPosBefore--;
+        } else if (ca === '\r' && after[endPosAfter] === '\n') {
+            // \n added after transformation
+            endPosAfter--;
+        } else {
+            break;
+        }
+    }
+
+    const range = new Range(document.positionAt(startPosBefore), document.positionAt(endPosBefore));
+    const replacement = after.substring(startPosAfter, endPosAfter);
+
+    return {
+        range,
+        replacement
+    };
+    /* await window.activeTextEditor!.edit(edit => {
+        edit.replace(range, replacement);
+    }); */
+}
+
+function runCodeMod(codeModId: string) {
+    /* const document = window.activeTextEditor.document;
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        return;
+    }
+
+    const source = document.getText();
+    const selection = {
+        anchor: astService.offsetAt(source, window.activeTextEditor.selection.anchor),
+        active: astService.offsetAt(source, window.activeTextEditor.selection.active)
+    };
+
+    let result: string;
+    try {
+        result = codeModService.executeTransform(mod, {
+            languageId: document.languageId as LanguageId,
+            fileName: document.fileName,
+            source,
+            selection
+        });
+    } catch (e) {
+        logService.outputError(`Error while executing ${mod.id}.transform(): ${e.toString()}`);
+        return;
+    }
+
+    if (result === source) {
+        window.showInformationMessage('No changes.');
+        return;
+    }
+
+    await updateText(document, source, result); */
+}
 
 connection.onExecuteCommand(async params => {
     const command = params.command;
+    if (command === commandIds.runCodeMod) {
+        runCodeMod(params.arguments![0]);
+    }
     /* const versionedTextDocumentIdentifier = params.arguments[0];
     connection.workspace.applyEdit({
         documentChanges: [{
