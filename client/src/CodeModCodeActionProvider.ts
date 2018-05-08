@@ -16,20 +16,17 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         }
 
         const source = document.getText();
-        const activeTextEditor = vscode.window.activeTextEditor!;
+        const selection = vscode.window.activeTextEditor!.selection;
 
-        const codeMods = await langService.requestCodeActions(
-            document.uri.toString(),
-            activeTextEditor.selection
-        );
+        const result = await langService.requestCodeActions(document.uri.toString(), selection);
 
-        return codeMods.map(
+        return result.codeMods.map(
             mod =>
                 ({
                     title: mod.title,
                     tooltip: mod.tooltip,
                     command: commandIds.runCodeMod,
-                    arguments: [mod.id]
+                    arguments: [mod.id, result.textDocument, selection]
                 } as vscode.Command)
         );
     }

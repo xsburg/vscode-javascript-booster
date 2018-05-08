@@ -3,66 +3,27 @@ import * as path from 'path';
 import {
     commands,
     ExtensionContext,
+    Position,
     QuickPickItem,
     Range,
+    Selection,
     TextDocument,
     Uri,
     window,
     workspace
 } from 'vscode';
+import { VersionedTextDocumentIdentifier } from 'vscode-languageclient/lib/main';
 import { CodeModDefinition } from './models/CodeMod';
 import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
+import langService from './services/langService';
 import logService from './services/logService';
 
-async function updateText(document: TextDocument, before: string, after: string): Promise<void> {
-    let startPosBefore = 0;
-    let startPosAfter = 0;
-    while (startPosBefore < before.length && startPosAfter < after.length) {
-        const cb = before[startPosBefore];
-        const ca = after[startPosAfter];
-        if (cb === ca) {
-            startPosBefore++;
-            startPosAfter++;
-        } else if (cb === '\r' && before[startPosBefore + 1] === '\n' && ca === '\n') {
-            // \n removed after transformation
-            startPosBefore++;
-        } else if (ca === '\r' && after[startPosAfter + 1] === '\n' && cb === '\n') {
-            // \n added after transformation
-            startPosAfter++;
-        } else {
-            break;
-        }
-    }
-
-    let endPosBefore = before.length;
-    let endPosAfter = after.length;
-    while (endPosBefore - 1 >= 0 && endPosAfter - 1 >= 0) {
-        const cb = before[endPosBefore - 1];
-        const ca = after[endPosAfter - 1];
-        if (cb === ca) {
-            endPosBefore--;
-            endPosAfter--;
-        } else if (cb === '\r' && before[endPosBefore] === '\n') {
-            // \n removed after transformation
-            endPosBefore--;
-        } else if (ca === '\r' && after[endPosAfter] === '\n') {
-            // \n added after transformation
-            endPosAfter--;
-        } else {
-            break;
-        }
-    }
-
-    const range = new Range(document.positionAt(startPosBefore), document.positionAt(endPosBefore));
-    const replacement = after.substring(startPosAfter, endPosAfter);
-
-    await window.activeTextEditor!.edit(edit => {
-        edit.replace(range, replacement);
-    });
-}
-
-export async function runCodeModCommand(mod?: CodeModDefinition) {
+export async function runCodeModCommand(
+    modId: string,
+    textDocument: VersionedTextDocumentIdentifier,
+    selection: Selection
+) {
     if (!window.activeTextEditor) {
         return;
     }
@@ -71,8 +32,32 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         return;
     }
 
+    const result = await langService.requestTransformation(modId, textDocument, selection);
+    if (!result) {
+        return;
+    }
+
+    await window.activeTextEditor!.edit(edit => {
+        edit.replace(
+            new Range(
+                new Position(result.range.start.line, result.range.start.character),
+                new Position(result.range.end.line, result.range.end.character)
+            ),
+            result.newText
+        );
+    });
+    /* if (!window.activeTextEditor) {
+        return;
+    }
+    const document = window.activeTextEditor.document;
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        return;
+    }
+
+    langService.requestTransformation(mod);
+
     const source = document.getText();
-    const selection = {
+    selection = selection || {
         anchor: astService.offsetAt(source, window.activeTextEditor.selection.anchor),
         active: astService.offsetAt(source, window.activeTextEditor.selection.active)
     };
@@ -118,5 +103,5 @@ export async function runCodeModCommand(mod?: CodeModDefinition) {
         return;
     }
 
-    await updateText(document, source, result);
+    await updateText(document, source, result); */
 }

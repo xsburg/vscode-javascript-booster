@@ -128,7 +128,7 @@ class CodeModService {
     }
 
     public executeTransform(
-        mod: CodeModDefinition,
+        modId: string,
         options: {
             languageId: LanguageId;
             fileName: string;
@@ -136,6 +136,7 @@ class CodeModService {
             selection: Selection;
         }
     ): string {
+        const mod = this._codeModsCache!.find(m => m.id === modId)!;
         const jscodeshift = astService.getCodeShift(options.languageId);
         const ast = astService.getAstTree(options);
         if (!ast) {

@@ -58,7 +58,7 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(
         commands.registerCommand(commandIds.extendSelection, extendSelectionCommand),
         commands.registerCommand(commandIds.shrinkSelection, shrinkSelectionCommand),
-        // commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
+        commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
         commands.registerCommand(commandIds.reloadCodeMods, () => {
             codeModService.reloadAllCodeMods();
         }),

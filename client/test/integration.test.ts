@@ -56,7 +56,8 @@ suite(`Integration tests`, () => {
             createDiagnosticsMock(),
             createCancellationTokenMock()
         );
-        await runCodeModCommand(codeActions[0].arguments![0]);
+        // fixme!
+        await runCodeModCommand(codeActions[0].arguments![0], null as any, null as any);
 
         const actualText = textDocument.getText();
         assert.equal(

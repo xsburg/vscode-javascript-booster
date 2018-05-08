@@ -21,6 +21,7 @@ import { CodeModDefinition } from './models/CodeMod';
 import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
 import codeService from './services/codeService';
+import logService from './services/logService';
 
 let connection: IConnection = createConnection(
     new IPCMessageReader(process),
@@ -38,7 +39,9 @@ connection.onInitialize((_params): InitializeResult => {
             textDocumentSync: documents.syncKind,
             // codeActionProvider: true,
             executeCommandProvider: {
-                commands: ['javascriptBooster.test1']
+                commands: [
+                    /* commandIds.runCodeMod */
+                ]
             }
         }
     };
@@ -93,6 +96,7 @@ interface CodeActionsParams {
 }
 
 interface CodeActionsResult {
+    textDocument: vscode.VersionedTextDocumentIdentifier;
     codeMods: Array<{
         id: string;
         title: string;
@@ -123,11 +127,81 @@ connection.onRequest(codeActionsRequestType, async (params): Promise<CodeActions
     });
 
     result = {
+        textDocument: {
+            uri: document.uri,
+            version: document.version
+        },
         codeMods: codeMods.map(mod => ({
             id: mod.id,
             title: mod.name,
             tooltip: mod.detail || mod.description
         }))
+    };
+    return result;
+});
+
+interface ProduceTransformationParams {
+    codeModId: string;
+    textDocumentIdentifier: vscode.VersionedTextDocumentIdentifier;
+    selection: {
+        anchor: vscode.Position;
+        active: vscode.Position;
+    };
+}
+
+interface ProduceTransformationResult {
+    edits: {
+        range: { start: vscode.Position; end: vscode.Position };
+        newText: string;
+    } | null;
+}
+
+export const produceTransformationRequestType = new RequestType<
+    ProduceTransformationParams,
+    ProduceTransformationResult,
+    void,
+    void
+>('javascriptBooster/produceTransformation');
+
+connection.onRequest(produceTransformationRequestType, async params => {
+    const { selection, codeModId, textDocumentIdentifier } = params;
+    let result: ProduceTransformationResult = {
+        edits: null
+    };
+
+    const document = documents.get(textDocumentIdentifier.uri);
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        return result;
+    }
+
+    const source = document.getText();
+    const offsetSelection = {
+        anchor: astService.offsetAt(source, selection.anchor),
+        active: astService.offsetAt(source, selection.active)
+    };
+
+    let transformResult: string;
+    try {
+        transformResult = codeModService.executeTransform(codeModId, {
+            languageId: document.languageId as LanguageId,
+            fileName: document.uri,
+            source,
+            selection: offsetSelection
+        });
+    } catch (e) {
+        logService.outputError(`Error while executing ${codeModId}.transform(): ${e.toString()}`);
+        return result;
+    }
+
+    if (transformResult === source) {
+        return result;
+    }
+
+    const { range, replacement } = getReplacementRange(document, source, transformResult);
+
+    result.edits = {
+        range,
+        newText: replacement
     };
     return result;
 });
@@ -161,7 +235,7 @@ connection.onRequest(codeActionsRequestType, async (params): Promise<CodeActions
     );
 }); */
 
-function updateText(document: TextDocument, before: string, after: string) {
+function getReplacementRange(document: TextDocument, before: string, after: string) {
     let startPosBefore = 0;
     let startPosAfter = 0;
     while (startPosBefore < before.length && startPosAfter < after.length) {
@@ -200,69 +274,83 @@ function updateText(document: TextDocument, before: string, after: string) {
         }
     }
 
-    const range = new Range(document.positionAt(startPosBefore), document.positionAt(endPosBefore));
+    const range: vscode.Range = {
+        start: document.positionAt(startPosBefore),
+        end: document.positionAt(endPosBefore)
+    };
     const replacement = after.substring(startPosAfter, endPosAfter);
 
     return {
         range,
         replacement
     };
-    /* await window.activeTextEditor!.edit(edit => {
-        edit.replace(range, replacement);
-    }); */
 }
 
-function runCodeMod(codeModId: string) {
-    /* const document = window.activeTextEditor.document;
+function runCodeMod(
+    codeModId: string,
+    textDocument: vscode.VersionedTextDocumentIdentifier,
+    selection: {
+        anchor: vscode.Position;
+        active: vscode.Position;
+    }
+) {
+    const document = documents.get(textDocument.uri);
     if (!astService.isSupportedLanguage(document.languageId)) {
         return;
     }
 
     const source = document.getText();
-    const selection = {
-        anchor: astService.offsetAt(source, window.activeTextEditor.selection.anchor),
-        active: astService.offsetAt(source, window.activeTextEditor.selection.active)
+    const offsetSelection = {
+        anchor: astService.offsetAt(source, selection.anchor),
+        active: astService.offsetAt(source, selection.active)
     };
 
     let result: string;
     try {
-        result = codeModService.executeTransform(mod, {
+        result = codeModService.executeTransform(codeModId, {
             languageId: document.languageId as LanguageId,
-            fileName: document.fileName,
+            fileName: document.uri,
             source,
-            selection
+            selection: offsetSelection
         });
     } catch (e) {
-        logService.outputError(`Error while executing ${mod.id}.transform(): ${e.toString()}`);
+        logService.outputError(`Error while executing ${codeModId}.transform(): ${e.toString()}`);
         return;
     }
 
     if (result === source) {
-        window.showInformationMessage('No changes.');
         return;
     }
 
-    await updateText(document, source, result); */
+    const { range, replacement } = getReplacementRange(document, source, result);
+    connection.workspace.applyEdit({
+        changes: {
+            [textDocument.uri]: [
+                {
+                    range,
+                    newText: replacement
+                }
+            ]
+        } /* ,
+        documentChanges: [
+            {
+                textDocument,
+                edits: [
+                    {
+                        range,
+                        newText: replacement
+                    }
+                ]
+            }
+        ] */
+    });
 }
 
 connection.onExecuteCommand(async params => {
     const command = params.command;
     if (command === commandIds.runCodeMod) {
-        runCodeMod(params.arguments![0]);
+        // runCodeMod(params.arguments![0], params.arguments![1], params.arguments![2]);
     }
-    /* const versionedTextDocumentIdentifier = params.arguments[0];
-    connection.workspace.applyEdit({
-        documentChanges: [{
-            textDocument: versionedTextDocumentIdentifier,
-            edits: [{
-                range: {
-                    start: {line: 0, character: 0},
-                    end: {line: Number.MAX_SAFE_INTEGER, character: Number.MAX_SAFE_INTEGER}
-                },
-                newText: this.documents.get(versionedTextDocumentIdentifier.uri).getText().toUpperCase()
-            }]
-        }]
-    }); */
 });
 
 connection.listen();

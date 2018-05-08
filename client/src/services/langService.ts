@@ -1,15 +1,17 @@
 import * as vscode from 'vscode';
-import { LanguageClient, RequestType } from 'vscode-languageclient';
+import {
+    LanguageClient,
+    RequestType,
+    VersionedTextDocumentIdentifier
+} from 'vscode-languageclient';
 
 interface CodeActionsParams {
     textDocumentUri: string;
-    selection: {
-        anchor: vscode.Position;
-        active: vscode.Position;
-    };
+    selection: vscode.Selection;
 }
 
 interface CodeActionsResult {
+    textDocument: VersionedTextDocumentIdentifier;
     codeMods: Array<{
         id: string;
         title: string;
@@ -24,6 +26,26 @@ export const codeActionsRequestType = new RequestType<
     void
 >('javascriptBooster/codeActions');
 
+interface ProduceTransformationParams {
+    codeModId: string;
+    textDocumentIdentifier: VersionedTextDocumentIdentifier;
+    selection: vscode.Selection;
+}
+
+interface ProduceTransformationResult {
+    edits: {
+        range: { start: vscode.Position; end: vscode.Position };
+        newText: string;
+    } | null;
+}
+
+export const produceTransformationRequestType = new RequestType<
+    ProduceTransformationParams,
+    ProduceTransformationResult,
+    void,
+    void
+>('javascriptBooster/produceTransformation');
+
 class LangService {
     private _languageClient!: LanguageClient;
 
@@ -36,7 +58,20 @@ class LangService {
             textDocumentUri,
             selection
         });
-        return result.codeMods;
+        return result;
+    }
+
+    public async requestTransformation(
+        codeModId: string,
+        textDocumentIdentifier: VersionedTextDocumentIdentifier,
+        selection: vscode.Selection
+    ) {
+        const result = await this._languageClient.sendRequest(produceTransformationRequestType, {
+            codeModId,
+            textDocumentIdentifier,
+            selection
+        });
+        return result.edits;
     }
 }
 
