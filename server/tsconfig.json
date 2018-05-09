@@ -11,6 +11,6 @@
         "allowUnreachableCode": true,
         "rootDir": "./"
     },
-    "include": ["./src/**/*", "./test/**/*", "./typings/**/*"],
+    "include": ["./src/**/*", "./tests/**/*", "./typings/**/*"],
     "exclude": ["node_modules", ".vscode-test"]
 }

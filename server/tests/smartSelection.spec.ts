@@ -7,8 +7,8 @@ import {
     removeSelectionMarkers
 } from './utils/smartSelectionHelpers';
 
-suite(`Smart selection`, () => {
-    test('helpers should extract single selection position', () => {
+describe(`Smart selection`, () => {
+    it('helpers should extract single selection position', () => {
         const before = `
             let a = 'content is a sen|te|nce';
         `;
@@ -17,7 +17,7 @@ suite(`Smart selection`, () => {
         assert.equal(after, before);
     });
 
-    test('helpers should extract multiple selection position', () => {
+    it('helpers should extract multiple selection position', () => {
         const before = `
             let a = 'content is a sen|1|te|1|nce';
             let b = 'content is a sen|2|te|2|nce';
@@ -27,14 +27,14 @@ suite(`Smart selection`, () => {
         assert.equal(after, before);
     });
 
-    test('helpers should extract selection from 0 offset', () => {
+    it('helpers should extract selection from 0 offset', () => {
         const before = '|const company = selectors.company.getCompanyById(state, d.companyId);|';
         const actualSelections = extractSelections(before);
         const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
         assert.equal(after, before);
     });
 
-    test('helpers should extract selection from 0 offset', () => {
+    it('helpers should extract selection from 0 offset', () => {
         const before = 'const company = selectors.company.|getCompanyById|(state, d.companyId);';
         const actualSelections = extractSelections(before);
         assert.equal(actualSelections.length, 1);
@@ -42,7 +42,7 @@ suite(`Smart selection`, () => {
         assert.equal(actualSelections[0].active, 48);
     });
 
-    test('should extend to word', () => {
+    it('should extend to word', () => {
         const before = `
             let a = 'content is a sen|te|nce';
         `;
@@ -52,7 +52,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to string value', () => {
+    it('should extend to string value', () => {
         const before = `
             let a = 'content is a |sentence|';
         `;
@@ -62,7 +62,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to string literal', () => {
+    it('should extend to string literal', () => {
         const before = `
             let a = '|content is a sentence|';
         `;
@@ -72,7 +72,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to string literal 2', () => {
+    it('should extend to string literal 2', () => {
         const before = `
             let a = 'cont|ent is a sentence'|;
         `;
@@ -82,7 +82,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to whole node: Identifier', () => {
+    it('should extend to whole node: Identifier', () => {
         const before = `
             let fo|ob|ar;
         `;
@@ -92,7 +92,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to brackets within node: [ ]', () => {
+    it('should extend to brackets within node: [ ]', () => {
         const before = `
             let array = [
                 |'foo',
@@ -108,7 +108,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to whole node: [ ]', () => {
+    it('should extend to whole node: [ ]', () => {
         const before = `
             let array = [|
                 'foo',
@@ -124,7 +124,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to whole node 2: [ ]', () => {
+    it('should extend to whole node 2: [ ]', () => {
         const before = `
             let array = |[
                 'foo',
@@ -140,7 +140,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to brackets within node: {} if', () => {
+    it('should extend to brackets within node: {} if', () => {
         const before = `
             if (true) {
                 |let a;
@@ -156,7 +156,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to brackets within node: {} object', () => {
+    it('should extend to brackets within node: {} object', () => {
         const before = `
             let obj = {
                 |foo: 'foo',
@@ -172,7 +172,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to siblings: object properties', () => {
+    it('should extend to siblings: object properties', () => {
         const before = `
             let obj = {
                 |foo: 'foo'|,
@@ -188,7 +188,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to siblings: statements', () => {
+    it('should extend to siblings: statements', () => {
         const before = `
             function test() {
                 let a;
@@ -206,7 +206,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to CallExpression brackets', () => {
+    it('should extend to CallExpression brackets', () => {
         const before = `
             let result = object.property(
                 |var1,
@@ -222,7 +222,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend to FunctionDeclaration brackets', () => {
+    it('should extend to FunctionDeclaration brackets', () => {
         const before = `
             function test(
                 |foo,
@@ -238,7 +238,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend from MemberExpression identifier to the left', () => {
+    it('should extend from MemberExpression identifier to the left', () => {
         const before = `
             const company = selectors.company.|getCompanyById|(state, d.companyId);
         `;
@@ -248,7 +248,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend from JSXOpenElement when tag is collapsed', () => {
+    it('should extend from JSXOpenElement when tag is collapsed', () => {
         const before = `
             const company = <div>|<div />|</div>;
         `;
@@ -258,7 +258,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should shrink when have passed a sequence of extensions', () => {
+    it('should shrink when have passed a sequence of extensions', () => {
         assertSmartSelectionBulk([
             'const company = selectors.company.getCo|mpany|ById(state, d.companyId); /*# { action: `+` } #*/',
             'const company = selectors.company.|getCompanyById|(state, d.companyId); /*# { action: `+` } #*/',
@@ -275,7 +275,7 @@ suite(`Smart selection`, () => {
         ]);
     });
 
-    test('should extend multiple selections to Identifier', () => {
+    it('should extend multiple selections to Identifier', () => {
         const before = `
             const company1 = selectors.company.getCo|1|mpa|1|nyById(state, d.companyId);
             const company2 = selectors.company.getCo|2|mpa|2|nyById(state, d.companyId);
@@ -287,7 +287,7 @@ suite(`Smart selection`, () => {
         assertSmartSelection(before, after);
     });
 
-    test('should extend/shrink with multiple cursors', () => {
+    it('should extend/shrink with multiple cursors', () => {
         assertSmartSelectionBulk([
             `
                 /*# { action: '+' } #*/

@@ -21,20 +21,43 @@
     "scripts": {
         "installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
         "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-        "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
+        "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p .",
+        "test": "jest"
     },
     "devDependencies": {
         "@types/fs-extra": "^5.0.2",
+        "@types/jest": "^22.2.3",
         "@types/lodash": "^4.14.108",
         "@types/node": "^10.0.4",
         "coveralls": "^3.0.0",
         "cpx": "^1.5.0",
+        "jest": "^22.4.3",
         "prettier": "^1.10.2",
         "react": "^16.3.2",
         "rimraf": "^2.6.2",
+        "ts-jest": "^22.4.5",
         "tslint": "^5.9.1",
         "tslint-config-prettier": "^1.10.0",
         "tslint-react": "^3.5.1",
         "typescript": "2.7.2"
+    },
+    "jest": {
+        "globals": {
+            "ts-jest": {
+                "tsConfigFile": "tsconfig.json"
+            }
+        },
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "testRegex": "/tests/.*\\.spec\\.(jsx?|tsx?)$",
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
+        ]
     }
 }

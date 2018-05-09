@@ -14,14 +14,14 @@ import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as os from 'os';
 import * as path from 'path';
-import * as vscode from 'vscode';
+import * as vscode from 'vscode-languageserver-types';
 
 import { LanguageId } from '../../src/services/astService';
 import codeModService from '../../src/services/codeModService';
 import { IPosition, Position } from '../../src/utils';
 
 function toZeroBasedPosition(pos: IPosition) {
-    return new vscode.Position(pos.line - 1, pos.column - 1);
+    return vscode.Position.create(pos.line - 1, pos.column - 1);
 }
 
 function toOffsetFromStart(input: string, posOneBased: IPosition): number {
@@ -75,7 +75,7 @@ function runInlineTransformTest(
     if (!canRun) {
         throw new Error('The transform cannot be run at this position.');
     }
-    let actualOutput = codeModService.executeTransform(mod, runOptions);
+    let actualOutput = codeModService.executeTransform(mod.id, runOptions);
     actualOutput = normalizeLineEndings(actualOutput);
 
     assert.equal(actualOutput, output);
@@ -272,7 +272,7 @@ function defineTransformTests(
     const inputFixtures = extractFixtures(modId, input, fixtureId, true);
     const outputFixtures = extractFixtures(modId, output, fixtureId, false);
 
-    suite(`${modId} transform`, () => {
+    describe(`${modId} transform`, () => {
         inputFixtures.forEach(fx => {
             const testName = fx.name
                 ? `"${modId}:${fx.name}" transforms correctly (pos ${fx.pos.line}:${fx.pos.column})`
@@ -281,7 +281,7 @@ function defineTransformTests(
             if (!outputFx) {
                 throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
             }
-            test(testName, () => {
+            it(testName, () => {
                 runInlineTransformTest(
                     getLanguageIdByFileName(inputFile),
                     modId,
@@ -315,7 +315,7 @@ function defineCanRunTests(
     const input = fs.readFileSync(path.join(fixDir, inputFile), 'utf8');
     const inputFixtures = extractFixtures(modId, input, fixtureId, true);
 
-    suite(`${modId} can run`, () => {
+    describe(`${modId} can run`, () => {
         inputFixtures.forEach(fx => {
             if (typeof fx.raw.expected !== 'boolean') {
                 throw new Error(
@@ -330,7 +330,7 @@ function defineCanRunTests(
                 : `"${modId}" ${expected ? 'can' : 'cannot'} run (pos ${fx.pos.line}:${
                       fx.pos.column
                   })`;
-            test(testName, () => {
+            it(testName, () => {
                 runInlineCanRunTest(
                     getLanguageIdByFileName(inputFile),
                     modId,
