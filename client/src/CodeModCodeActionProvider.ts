@@ -1,7 +1,5 @@
 import * as vscode from 'vscode';
-import { commandIds } from './const';
-import astService, { LanguageId } from './services/astService';
-import codeModService from './services/codeModService';
+import { commandIds, isSupportedLanguage } from './const';
 import langService from './services/langService';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
@@ -11,13 +9,18 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         context: vscode.CodeActionContext,
         token: vscode.CancellationToken
     ): Promise<vscode.Command[]> {
-        if (!astService.isSupportedLanguage(document.languageId)) {
+        if (!isSupportedLanguage(document.languageId)) {
             return [];
         }
 
         const source = document.getText();
-        const selection = vscode.window.activeTextEditor!.selection;
+        const textEditor = vscode.window.activeTextEditor;
+        if (!textEditor) {
+            // Complex commands, run-on-save etc
+            return [];
+        }
 
+        const selection = textEditor.selection;
         const result = await langService.requestCodeActions(document.uri.toString(), selection);
 
         return result.codeMods.map(

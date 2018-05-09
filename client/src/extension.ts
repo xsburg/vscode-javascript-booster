@@ -32,14 +32,12 @@ export function activate(context: ExtensionContext) {
         }
     };
 
-    // Options to control the language client
     let clientOptions: LanguageClientOptions = {
-        // Register the server for plain text documents
         documentSelector: [
-            { language: 'typescript', scheme: 'file' },
-            { language: 'typescriptreact', scheme: 'file' },
-            { language: 'javascript', scheme: 'file' },
-            { language: 'javascriptreact', scheme: 'file' }
+            { language: 'typescript' },
+            { language: 'typescriptreact' },
+            { language: 'javascript' },
+            { language: 'javascriptreact' }
         ],
         synchronize: {
             configurationSection: extensionId
@@ -47,7 +45,7 @@ export function activate(context: ExtensionContext) {
     };
 
     const languageClient = new LanguageClient(
-        'jsBoosterLangServer',
+        'jsboosterLangServer',
         'JavaScript Booster Language Server',
         serverOptions,
         clientOptions

@@ -89,24 +89,28 @@ class AstService {
     }
 
     /**
-     * Compute Position for zero-based offset provided by Babylon.
+     * Compute VSCode Position of zero-based offset provided by Babylon.
      * @param document
      * @param offset
      */
     public positionAt(text: string, offset: number): vscode.Position {
-        const lines = text.replace(/\r?\n/g, os.EOL).split(os.EOL);
+        const lines = this.normalizedText(text).split(os.EOL);
 
-        // TODO fixme
-        return {} as any;
-        /* let activeOffset = 0;
+        let activeOffset = 0;
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (activeOffset + line.length >= offset) {
-                return new vscode.Position(i, offset - activeOffset);
+                return {
+                    line: i,
+                    character: offset - activeOffset
+                };
             }
             activeOffset += line.length + os.EOL.length;
         }
-        return new vscode.Position(0, 0); */
+        return {
+            line: 0,
+            character: 0
+        };
     }
 
     /**

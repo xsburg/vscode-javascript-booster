@@ -22,6 +22,7 @@ import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
 import codeService from './services/codeService';
 import logService from './services/logService';
+import smartSelectionService from './services/smartSelectionService';
 
 let connection: IConnection = createConnection(
     new IPCMessageReader(process),
@@ -36,13 +37,8 @@ documents.listen(connection);
 connection.onInitialize((_params): InitializeResult => {
     return {
         capabilities: {
-            textDocumentSync: documents.syncKind,
-            // codeActionProvider: true,
-            executeCommandProvider: {
-                commands: [
-                    /* commandIds.runCodeMod */
-                ]
-            }
+            textDocumentSync: documents.syncKind
+            // codeActionProvider: true
         }
     };
 });
@@ -62,30 +58,6 @@ connection.onDidChangeConfiguration(change => {
 });
 
 function validateTextDocument(textDocument: TextDocument): void {}
-
-/* interface AllFixesParams {
-    // textDocument: TextDocumentIdentifier;
-    isOnSave: boolean;
-}
-
-interface AllFixesResult {
-    documentVersion: number;
-    foo: string;
-}
-
-namespace AllFixesRequest {
-    export const type = new server.RequestType<AllFixesParams, AllFixesResult, void, void>(
-        'textDocument/tslint/allFixes'
-    );
-}
-
-connection.onRequest(AllFixesRequest.type, async params => {
-    return {
-        documentVersion: 1,
-        foo: 'bar'
-    };
-}); */
-// connection.sendRequest
 
 interface CodeActionsParams {
     textDocumentUri: string;
@@ -140,7 +112,7 @@ connection.onRequest(codeActionsRequestType, async (params): Promise<CodeActions
     return result;
 });
 
-interface ProduceTransformationParams {
+interface ExecuteTransformParams {
     codeModId: string;
     textDocumentIdentifier: vscode.VersionedTextDocumentIdentifier;
     selection: {
@@ -149,93 +121,21 @@ interface ProduceTransformationParams {
     };
 }
 
-interface ProduceTransformationResult {
-    edits: {
+interface ExecuteTransformResult {
+    edit: {
         range: { start: vscode.Position; end: vscode.Position };
         newText: string;
     } | null;
 }
 
-export const produceTransformationRequestType = new RequestType<
-    ProduceTransformationParams,
-    ProduceTransformationResult,
+export const executeTransformRequestType = new RequestType<
+    ExecuteTransformParams,
+    ExecuteTransformResult,
     void,
     void
->('javascriptBooster/produceTransformation');
+>('javascriptBooster/executeTransform');
 
-connection.onRequest(produceTransformationRequestType, async params => {
-    const { selection, codeModId, textDocumentIdentifier } = params;
-    let result: ProduceTransformationResult = {
-        edits: null
-    };
-
-    const document = documents.get(textDocumentIdentifier.uri);
-    if (!astService.isSupportedLanguage(document.languageId)) {
-        return result;
-    }
-
-    const source = document.getText();
-    const offsetSelection = {
-        anchor: astService.offsetAt(source, selection.anchor),
-        active: astService.offsetAt(source, selection.active)
-    };
-
-    let transformResult: string;
-    try {
-        transformResult = codeModService.executeTransform(codeModId, {
-            languageId: document.languageId as LanguageId,
-            fileName: document.uri,
-            source,
-            selection: offsetSelection
-        });
-    } catch (e) {
-        logService.outputError(`Error while executing ${codeModId}.transform(): ${e.toString()}`);
-        return result;
-    }
-
-    if (transformResult === source) {
-        return result;
-    }
-
-    const { range, replacement } = getReplacementRange(document, source, transformResult);
-
-    result.edits = {
-        range,
-        newText: replacement
-    };
-    return result;
-});
-
-/* connection.onCodeAction(async params => {
-    const document = documents.get(params.textDocument.uri);
-    if (!astService.isSupportedLanguage(document.languageId)) {
-        return [];
-    }
-
-    const source = document.getText();
-    // const activeTextEditor = vscode.window.activeTextEditor!;
-    const codeMods = await codeModService.getCodeActionMods({
-        languageId: document.languageId as LanguageId,
-        fileName: document.uri,
-        source,
-        selection: {
-            anchor: astService.offsetAt(source, params.range.start),
-            active: astService.offsetAt(source, params.range.end)
-            // anchor: astService.offsetAt(source, activeTextEditor.selection.anchor),
-            // active: astService.offsetAt(source, activeTextEditor.selection.active)
-        }
-    });
-    return codeMods.map(
-        mod =>
-            ({
-                title: mod.name,
-                command: commandIds.runCodeMod,
-                arguments: [mod]
-            } as Command)
-    );
-}); */
-
-function getReplacementRange(document: TextDocument, before: string, after: string) {
+function getTextEdit(document: TextDocument, before: string, after: string) {
     let startPosBefore = 0;
     let startPosAfter = 0;
     while (startPosBefore < before.length && startPosAfter < after.length) {
@@ -278,25 +178,23 @@ function getReplacementRange(document: TextDocument, before: string, after: stri
         start: document.positionAt(startPosBefore),
         end: document.positionAt(endPosBefore)
     };
-    const replacement = after.substring(startPosAfter, endPosAfter);
+    const newText = after.substring(startPosAfter, endPosAfter);
 
     return {
         range,
-        replacement
+        newText
     };
 }
 
-function runCodeMod(
-    codeModId: string,
-    textDocument: vscode.VersionedTextDocumentIdentifier,
-    selection: {
-        anchor: vscode.Position;
-        active: vscode.Position;
-    }
-) {
-    const document = documents.get(textDocument.uri);
+connection.onRequest(executeTransformRequestType, async params => {
+    const { selection, codeModId, textDocumentIdentifier } = params;
+    let result: ExecuteTransformResult = {
+        edit: null
+    };
+
+    const document = documents.get(textDocumentIdentifier.uri);
     if (!astService.isSupportedLanguage(document.languageId)) {
-        return;
+        return result;
     }
 
     const source = document.getText();
@@ -305,9 +203,9 @@ function runCodeMod(
         active: astService.offsetAt(source, selection.active)
     };
 
-    let result: string;
+    let transformResult: string;
     try {
-        result = codeModService.executeTransform(codeModId, {
+        transformResult = codeModService.executeTransform(codeModId, {
             languageId: document.languageId as LanguageId,
             fileName: document.uri,
             source,
@@ -315,42 +213,166 @@ function runCodeMod(
         });
     } catch (e) {
         logService.outputError(`Error while executing ${codeModId}.transform(): ${e.toString()}`);
-        return;
+        return result;
     }
 
-    if (result === source) {
-        return;
+    if (transformResult === source) {
+        return result;
     }
 
-    const { range, replacement } = getReplacementRange(document, source, result);
-    connection.workspace.applyEdit({
-        changes: {
-            [textDocument.uri]: [
-                {
-                    range,
-                    newText: replacement
-                }
-            ]
-        } /* ,
-        documentChanges: [
-            {
-                textDocument,
-                edits: [
-                    {
-                        range,
-                        newText: replacement
-                    }
-                ]
-            }
-        ] */
-    });
+    const { range, newText } = getTextEdit(document, source, transformResult);
+
+    result.edit = {
+        range,
+        newText
+    };
+    return result;
+});
+
+interface VscodeSelection {
+    anchor: vscode.Position;
+    active: vscode.Position;
 }
 
-connection.onExecuteCommand(async params => {
-    const command = params.command;
-    if (command === commandIds.runCodeMod) {
-        // runCodeMod(params.arguments![0], params.arguments![1], params.arguments![2]);
+interface ExtendSelectionParams {
+    textDocumentUri: string;
+    selections: VscodeSelection[];
+}
+
+interface ExtendSelectionResult {
+    selections: VscodeSelection[] | null;
+}
+
+export const extendSelectionRequestType = new RequestType<
+    ExtendSelectionParams,
+    ExtendSelectionResult,
+    void,
+    void
+>('javascriptBooster/extendSelection');
+
+connection.onRequest(extendSelectionRequestType, async params => {
+    const { textDocumentUri, selections } = params;
+    let result: ExtendSelectionResult = {
+        selections: null
+    };
+
+    const document = documents.get(textDocumentUri);
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        return result;
     }
+
+    const source = astService.normalizedText(document.getText());
+    const ast = astService.getAstTree({
+        languageId: document.languageId as LanguageId,
+        fileName: document.uri,
+        source
+    });
+    if (!ast) {
+        return result;
+    }
+
+    result.selections = smartSelectionService
+        .extendSelection({
+            languageId: document.languageId as LanguageId,
+            source,
+            fileName: document.uri,
+            ast,
+            selections: selections.map(sel => ({
+                anchor: astService.offsetAt(source, sel.anchor),
+                active: astService.offsetAt(source, sel.active)
+            }))
+        })
+        .map(sel => ({
+            anchor: astService.positionAt(source, sel.anchor),
+            active: astService.positionAt(source, sel.active)
+        }));
+
+    return result;
 });
+
+interface ShrinkSelectionParams {
+    textDocumentUri: string;
+    selections: VscodeSelection[];
+}
+
+interface ShrinkSelectionResult {
+    selections: VscodeSelection[] | null;
+}
+
+export const shrinkSelectionRequestType = new RequestType<
+    ShrinkSelectionParams,
+    ShrinkSelectionResult,
+    void,
+    void
+>('javascriptBooster/shrinkSelection');
+
+connection.onRequest(shrinkSelectionRequestType, async params => {
+    const { textDocumentUri, selections } = params;
+    let result: ExtendSelectionResult = {
+        selections: null
+    };
+
+    const document = documents.get(textDocumentUri);
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        return result;
+    }
+
+    const source = astService.normalizedText(document.getText());
+    const ast = astService.getAstTree({
+        languageId: document.languageId as LanguageId,
+        fileName: document.uri,
+        source
+    });
+    if (!ast) {
+        return result;
+    }
+
+    result.selections = smartSelectionService
+        .shrinkSelection({
+            languageId: document.languageId as LanguageId,
+            source,
+            fileName: document.uri,
+            ast,
+            selections: selections.map(sel => ({
+                anchor: astService.offsetAt(source, sel.anchor),
+                active: astService.offsetAt(source, sel.active)
+            }))
+        })
+        .map(sel => ({
+            anchor: astService.positionAt(source, sel.anchor),
+            active: astService.positionAt(source, sel.active)
+        }));
+
+    return result;
+});
+
+/* connection.onCodeAction(async params => {
+    const document = documents.get(params.textDocument.uri);
+    if (!astService.isSupportedLanguage(document.languageId)) {
+        return [];
+    }
+
+    const source = document.getText();
+    // const activeTextEditor = vscode.window.activeTextEditor!;
+    const codeMods = await codeModService.getCodeActionMods({
+        languageId: document.languageId as LanguageId,
+        fileName: document.uri,
+        source,
+        selection: {
+            anchor: astService.offsetAt(source, params.range.start),
+            active: astService.offsetAt(source, params.range.end)
+            // anchor: astService.offsetAt(source, activeTextEditor.selection.anchor),
+            // active: astService.offsetAt(source, activeTextEditor.selection.active)
+        }
+    });
+    return codeMods.map(
+        mod =>
+            ({
+                title: mod.name,
+                command: commandIds.runCodeMod,
+                arguments: [mod]
+            } as Command)
+    );
+}); */
 
 connection.listen();

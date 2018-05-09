@@ -26,25 +26,57 @@ export const codeActionsRequestType = new RequestType<
     void
 >('javascriptBooster/codeActions');
 
-interface ProduceTransformationParams {
+interface ExecuteTransformParams {
     codeModId: string;
     textDocumentIdentifier: VersionedTextDocumentIdentifier;
     selection: vscode.Selection;
 }
 
-interface ProduceTransformationResult {
-    edits: {
+interface ExecuteTransformResult {
+    edit: {
         range: { start: vscode.Position; end: vscode.Position };
         newText: string;
     } | null;
 }
 
-export const produceTransformationRequestType = new RequestType<
-    ProduceTransformationParams,
-    ProduceTransformationResult,
+export const executeTransformRequestType = new RequestType<
+    ExecuteTransformParams,
+    ExecuteTransformResult,
     void,
     void
->('javascriptBooster/produceTransformation');
+>('javascriptBooster/executeTransform');
+
+interface ExtendSelectionParams {
+    textDocumentUri: string;
+    selections: vscode.Selection[];
+}
+
+interface ExtendSelectionResult {
+    selections: vscode.Selection[] | null;
+}
+
+export const extendSelectionRequestType = new RequestType<
+    ExtendSelectionParams,
+    ExtendSelectionResult,
+    void,
+    void
+>('javascriptBooster/extendSelection');
+
+interface ShrinkSelectionParams {
+    textDocumentUri: string;
+    selections: vscode.Selection[];
+}
+
+interface ShrinkSelectionResult {
+    selections: vscode.Selection[] | null;
+}
+
+export const shrinkSelectionRequestType = new RequestType<
+    ShrinkSelectionParams,
+    ShrinkSelectionResult,
+    void,
+    void
+>('javascriptBooster/shrinkSelection');
 
 class LangService {
     private _languageClient!: LanguageClient;
@@ -61,17 +93,33 @@ class LangService {
         return result;
     }
 
-    public async requestTransformation(
+    public async executeTransform(
         codeModId: string,
         textDocumentIdentifier: VersionedTextDocumentIdentifier,
         selection: vscode.Selection
     ) {
-        const result = await this._languageClient.sendRequest(produceTransformationRequestType, {
+        const result = await this._languageClient.sendRequest(executeTransformRequestType, {
             codeModId,
             textDocumentIdentifier,
             selection
         });
-        return result.edits;
+        return result.edit;
+    }
+
+    public async extendSelection(textDocumentUri: string, selections: vscode.Selection[]) {
+        const result = await this._languageClient.sendRequest(extendSelectionRequestType, {
+            textDocumentUri,
+            selections
+        });
+        return result.selections;
+    }
+
+    public async shrinkSelection(textDocumentUri: string, selections: vscode.Selection[]) {
+        const result = await this._languageClient.sendRequest(shrinkSelectionRequestType, {
+            textDocumentUri,
+            selections
+        });
+        return result.selections;
     }
 }
 

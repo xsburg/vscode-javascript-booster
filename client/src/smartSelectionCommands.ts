@@ -1,7 +1,6 @@
-import { commands, Selection, window, workspace } from 'vscode';
+import { commands, Position, Selection, window, workspace } from 'vscode';
 import { configIds, extensionId } from './const';
-import astService, { LanguageId } from './services/astService';
-import smartSelectionService from './services/smartSelectionService';
+import langService from './services/langService';
 
 function executeFallbackSelectionCommand(extend: boolean) {
     const config = workspace.getConfiguration(extensionId);
@@ -18,80 +17,48 @@ export async function extendSelectionCommand() {
     if (!window.activeTextEditor) {
         return;
     }
+
     const document = window.activeTextEditor.document;
-    if (!astService.isSupportedLanguage(document.languageId)) {
+    const newSelections = await langService.extendSelection(
+        document.uri.toString(),
+        window.activeTextEditor!.selections
+    );
+
+    if (!newSelections) {
         executeFallbackSelectionCommand(true);
         return;
     }
 
-    const source = astService.normalizedText(document.getText());
-    const ast = astService.getAstTree({
-        languageId: document.languageId as LanguageId,
-        fileName: document.fileName,
-        source
-    });
-    if (!ast) {
-        executeFallbackSelectionCommand(true);
-        return;
-    }
-
-    window.activeTextEditor!.selections = smartSelectionService
-        .extendSelection({
-            languageId: document.languageId as LanguageId,
-            source,
-            fileName: document.fileName,
-            ast,
-            selections: window.activeTextEditor!.selections.map(sel => ({
-                anchor: astService.offsetAt(source, sel.anchor),
-                active: astService.offsetAt(source, sel.active)
-            }))
-        })
-        .map(
-            sel =>
-                new Selection(
-                    astService.positionAt(source, sel.anchor),
-                    astService.positionAt(source, sel.active)
-                )
-        );
+    window.activeTextEditor!.selections = newSelections.map(
+        sel =>
+            new Selection(
+                new Position(sel.anchor.line, sel.anchor.character),
+                new Position(sel.active.line, sel.active.character)
+            )
+    );
 }
 
 export async function shrinkSelectionCommand() {
     if (!window.activeTextEditor) {
         return;
     }
+
     const document = window.activeTextEditor.document;
-    if (!astService.isSupportedLanguage(document.languageId)) {
+    const newSelections = await langService.shrinkSelection(
+        document.uri.toString(),
+        window.activeTextEditor!.selections
+    );
+
+    if (!newSelections) {
         executeFallbackSelectionCommand(false);
         return;
     }
 
-    const source = astService.normalizedText(document.getText());
-    const ast = astService.getAstTree({
-        languageId: document.languageId as LanguageId,
-        fileName: document.fileName,
-        source
-    });
-    if (!ast) {
-        executeFallbackSelectionCommand(false);
-        return;
-    }
-
-    window.activeTextEditor!.selections = smartSelectionService
-        .shrinkSelection({
-            languageId: document.languageId as LanguageId,
-            source,
-            fileName: document.fileName,
-            ast,
-            selections: window.activeTextEditor!.selections.map(sel => ({
-                anchor: astService.offsetAt(source, sel.anchor),
-                active: astService.offsetAt(source, sel.active)
-            }))
-        })
-        .map(
-            sel =>
-                new Selection(
-                    astService.positionAt(source, sel.anchor),
-                    astService.positionAt(source, sel.active)
-                )
-        );
+    window.activeTextEditor!.selections = newSelections.map(
+        sel =>
+            new Selection(
+                new Position(sel.anchor.line, sel.anchor.character),
+                new Position(sel.active.line, sel.active.character)
+            )
+    );
 }
