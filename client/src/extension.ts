@@ -1,6 +1,5 @@
 'use strict';
 
-import * as path from 'path';
 import { commands, ExtensionContext, languages, Position, workspace } from 'vscode';
 import {
     LanguageClient,
@@ -10,61 +9,24 @@ import {
     TransportKind
 } from 'vscode-languageclient';
 import { CodeModCodeActionProvider } from './CodeModCodeActionProvider';
-import { commandIds, extensionId } from './const';
-import { runCodeModCommand } from './runCodeModCommand';
-import astService from './services/astService';
+import { commandIds, extensionId, supportedLanguages } from './const';
+import { executeCodeActionCommand } from './executeCodeActionCommand';
 import codeModService from './services/codeModService';
 import langService from './services/langService';
 import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
 export function activate(context: ExtensionContext) {
-    let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
-    let serverOptions: ServerOptions = {
-        run: {
-            module: serverModule,
-            transport: TransportKind.ipc,
-            options: { cwd: process.cwd() }
-        },
-        debug: {
-            module: serverModule,
-            transport: TransportKind.ipc,
-            options: { execArgv: ['--nolazy', '--inspect=6014'], cwd: process.cwd() }
-        }
-    };
-
-    let clientOptions: LanguageClientOptions = {
-        documentSelector: [
-            { language: 'typescript' },
-            { language: 'typescriptreact' },
-            { language: 'javascript' },
-            { language: 'javascriptreact' }
-        ],
-        synchronize: {
-            configurationSection: extensionId
-        }
-    };
-
-    const languageClient = new LanguageClient(
-        'jsboosterLangServer',
-        'JavaScript Booster Language Server',
-        serverOptions,
-        clientOptions
-    );
-
-    langService.initialize(languageClient);
+    langService.initialize(context);
 
     context.subscriptions.push(
+        langService.start(),
+        commands.registerCommand(commandIds._executeCodeAction, executeCodeActionCommand),
         commands.registerCommand(commandIds.extendSelection, extendSelectionCommand),
         commands.registerCommand(commandIds.shrinkSelection, shrinkSelectionCommand),
-        commands.registerCommand(commandIds.runCodeMod, runCodeModCommand),
         commands.registerCommand(commandIds.reloadCodeMods, () => {
             codeModService.reloadAllCodeMods();
         }),
-        languages.registerCodeActionsProvider(
-            astService.supportedlanguages,
-            new CodeModCodeActionProvider()
-        ),
-        languageClient.start()
+        languages.registerCodeActionsProvider(supportedLanguages, new CodeModCodeActionProvider())
     );
 }
 

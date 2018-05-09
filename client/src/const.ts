@@ -2,7 +2,7 @@ export const extensionId = 'javascriptBooster';
 
 export type LanguageId = 'javascript' | 'javascriptreact' | 'typescript' | 'typescriptreact';
 
-const supportedLanguages: LanguageId[] = [
+export const supportedLanguages: LanguageId[] = [
     'javascript',
     'javascriptreact',
     'typescript',
@@ -14,7 +14,7 @@ export function isSupportedLanguage(languageId: string): boolean {
 }
 
 export const commandIds = {
-    runCodeMod: `${extensionId}.runCodeMod`,
+    _executeCodeAction: `${extensionId}.executeCodeAction`,
     reloadCodeMods: `${extensionId}.reloadCodeMods`,
     extendSelection: `${extensionId}.extendSelection`,
     shrinkSelection: `${extensionId}.shrinkSelection`

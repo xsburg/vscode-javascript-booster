@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { CodeModCodeActionProvider } from '../src/CodeModCodeActionProvider';
-import { runCodeModCommand } from '../src/runCodeModCommand';
+import { executeCodeActionCommand } from '../src/executeCodeActionCommand';
 
 function getWorkspaceFilePath(workspaceName: string, relativeFilePath: string) {
     return path.join(__dirname, `__${workspaceName}__`, relativeFilePath);
@@ -56,8 +56,8 @@ suite(`Integration tests`, () => {
             createDiagnosticsMock(),
             createCancellationTokenMock()
         );
-        // fixme!
-        await runCodeModCommand(codeActions[0].arguments![0], null as any, null as any);
+        // fixme
+        await executeCodeActionCommand(codeActions[0].arguments![0], null as any, null as any);
 
         const actualText = textDocument.getText();
         assert.equal(

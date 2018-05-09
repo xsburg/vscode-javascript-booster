@@ -28,7 +28,7 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
                 ({
                     title: mod.title,
                     tooltip: mod.tooltip,
-                    command: commandIds.runCodeMod,
+                    command: commandIds._executeCodeAction,
                     arguments: [mod.id, result.textDocument, selection]
                 } as vscode.Command)
         );

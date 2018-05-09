@@ -1,9 +1,14 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import {
     LanguageClient,
+    LanguageClientOptions,
     RequestType,
+    ServerOptions,
+    TransportKind,
     VersionedTextDocumentIdentifier
 } from 'vscode-languageclient';
+import { extensionId } from '../const';
 
 interface CodeActionsParams {
     textDocumentUri: string;
@@ -81,8 +86,43 @@ export const shrinkSelectionRequestType = new RequestType<
 class LangService {
     private _languageClient!: LanguageClient;
 
-    public initialize(languageClient: LanguageClient) {
-        this._languageClient = languageClient;
+    public initialize(context: vscode.ExtensionContext) {
+        let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
+        let serverOptions: ServerOptions = {
+            run: {
+                module: serverModule,
+                transport: TransportKind.ipc,
+                options: { cwd: process.cwd() }
+            },
+            debug: {
+                module: serverModule,
+                transport: TransportKind.ipc,
+                options: { execArgv: ['--nolazy', '--inspect=6014'], cwd: process.cwd() }
+            }
+        };
+
+        let clientOptions: LanguageClientOptions = {
+            documentSelector: [
+                { language: 'typescript' },
+                { language: 'typescriptreact' },
+                { language: 'javascript' },
+                { language: 'javascriptreact' }
+            ],
+            synchronize: {
+                configurationSection: extensionId
+            }
+        };
+
+        this._languageClient = new LanguageClient(
+            'jsboosterLangServer',
+            'JavaScript Booster Language Server',
+            serverOptions,
+            clientOptions
+        );
+    }
+
+    public start() {
+        return this._languageClient.start();
     }
 
     public async requestCodeActions(textDocumentUri: string, selection: vscode.Selection) {
