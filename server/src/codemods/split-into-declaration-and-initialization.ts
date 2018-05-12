@@ -13,7 +13,7 @@ import {
     VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { CodeModExports } from '../models/CodeMod';
+import { CodeModExports } from '../codeModTypes';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;

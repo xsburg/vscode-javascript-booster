@@ -16,8 +16,8 @@ import {
     TextDocuments
 } from 'vscode-languageserver';
 import * as vscode from 'vscode-languageserver-types';
+import { CodeModDefinition } from './codeModTypes';
 import { commandIds } from './const';
-import { CodeModDefinition } from './models/CodeMod';
 import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
 import codeService from './services/codeService';
@@ -358,6 +358,8 @@ connection.onExecuteCommand(async params => {
             break;
     }
 });
+
+// TODO: Switch to the official code action API once selection is available through context
 
 /* connection.onCodeAction(async params => {
     const document = documents.get(params.textDocument.uri);

@@ -15,13 +15,12 @@ export function isSupportedLanguage(languageId: string): boolean {
 
 export const commandIds = {
     _executeCodeAction: `${extensionId}.executeCodeAction`,
-    reloadCodeMods: `${extensionId}.reloadCodeMods`,
+    executeCodeMod: `${extensionId}.executeCodeMod`,
     extendSelection: `${extensionId}.extendSelection`,
     shrinkSelection: `${extensionId}.shrinkSelection`
 };
 
 export const configIds = {
-    codemodDir: 'codemodDir',
     smartExtendFallbackCommand: 'smartExtendFallbackCommand',
     smartShrinkFallbackCommand: 'smartShrinkFallbackCommand'
 };

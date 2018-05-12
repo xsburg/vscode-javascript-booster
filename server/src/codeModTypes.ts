@@ -1,6 +1,6 @@
 import { File } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { Position } from '../utils/Position';
+import { Position } from './utils/Position';
 
 type CodeModTransform = (
     fileInfo: { path: string; source: string; ast: Collection<File> },

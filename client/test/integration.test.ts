@@ -25,7 +25,7 @@ function createSelectionFromPos(line: number, col: number) {
 
 suite(`Integration tests`, () => {
     test('CodeActionProvider should suggest code action', async () => {
-        const fileUri = vscode.Uri.file(getWorkspaceFilePath('test-workspace-1', 'file1.js'));
+        const fileUri = vscode.Uri.file(getWorkspaceFilePath('simple-workspace', 'file1.js'));
         const textDocument = await vscode.workspace.openTextDocument(fileUri);
         const editor = await vscode.window.showTextDocument(textDocument);
         editor.selection = createSelectionFromPos(2, 19);
@@ -44,7 +44,7 @@ suite(`Integration tests`, () => {
     });
 
     test('runCodeModCommand should update text in editor', async () => {
-        const fileUri = vscode.Uri.file(getWorkspaceFilePath('test-workspace-1', 'file1.js'));
+        const fileUri = vscode.Uri.file(getWorkspaceFilePath('simple-workspace', 'file1.js'));
         const textDocument = await vscode.workspace.openTextDocument(fileUri);
         const editor = await vscode.window.showTextDocument(textDocument);
         editor.selection = createSelectionFromPos(2, 19);

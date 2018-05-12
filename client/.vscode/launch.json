@@ -3,10 +3,15 @@
     "version": "0.1.0",
     "configurations": [
         {
-            "type": "node",
+            "name": "Launch Client",
+            "type": "extensionHost",
             "request": "launch",
-            "name": "Generate ast-types typings",
-            "program": "${workspaceFolder}/client/typings/generate-ast-typings.js"
+            "runtimeExecutable": "${execPath}",
+            "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": ["${workspaceRoot}/out/**/*.js"],
+            "preLaunchTask": "npm: watch"
         },
         {
             "name": "Extension Tests",
@@ -21,17 +26,6 @@
             "sourceMaps": true,
             "outFiles": ["${workspaceRoot}/out/test/**/*.js"],
             "preLaunchTask": "npm: compile"
-        },
-        {
-            "name": "Launch Client",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-            "stopOnEntry": false,
-            "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/out/**/*.js"],
-            "preLaunchTask": "npm: watch"
         }
     ]
 }

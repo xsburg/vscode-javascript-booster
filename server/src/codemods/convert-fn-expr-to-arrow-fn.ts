@@ -12,7 +12,7 @@ import {
     UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { CodeModExports } from '../models/CodeMod';
+import { CodeModExports } from '../codeModTypes';
 
 function canRunBindExprTransform(j: JsCodeShift, target: Collection) {
     const callExpression = target.thisOrClosest(j.CallExpression).firstNode();

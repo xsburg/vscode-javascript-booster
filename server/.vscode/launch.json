@@ -3,6 +3,12 @@
     "version": "0.1.0",
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Generate ast-types typings",
+            "program": "${workspaceFolder}/client/typings/generate-ast-typings.js"
+        },
+        {
             "name": "Attach to Server",
             "type": "node",
             "request": "attach",

@@ -19,29 +19,34 @@
         "node": ">=8.0.0",
         "npm": ">=5.6.0"
     },
-    "categories": [
-        "Programming Languages",
-        "Other"
-    ],
-    "keywords": [
-        "javascript",
-        "typescript",
-        "refactoring"
-    ],
+    "categories": ["Programming Languages", "Other"],
+    "keywords": ["javascript", "typescript", "refactoring"],
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "clean": "rimraf out",
+        "vscode:prepublish": "npm run compile",
+        "compile":
+            "npm run clean && tsc -p ./ && cpx ./test/__simple-workspace__/**/* ./out/test/__simple-workspace__",
+        "watch": "tsc -watch -p ./",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "preversion": "npm test",
+        "postversion": "git push && git push --tags"
+    },
+    "main": "./out/src/extension",
     "activationEvents": [
         "onLanguage:javascript",
         "onLanguage:javascriptreact",
         "onLanguage:typescript",
         "onLanguage:typescriptreact",
-        "onCommand:javascriptBooster.runCodeMod",
+        "onCommand:javascriptBooster.executeCodeMod",
         "onCommand:javascriptBooster.reloadCodeMods",
         "onCommand:javascriptBooster.extendSelection",
         "onCommand:javascriptBooster.shrinkSelection"
     ],
-    "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
-                "command": "javascriptBooster.runCodeMod",
+        "commands": [
+            {
+                "command": "javascriptBooster.executeCodeMod",
                 "title": "Run Global Code Action",
                 "category": "JS Booster"
             },
@@ -61,37 +66,31 @@
                 "category": "JS Booster"
             }
         ],
-        "configuration": [{
-            "title": "JavaScript Booster",
-            "properties": {
-                "javascriptBooster.codemodDir": {
-                    "type": "string",
-                    "default": "codemods",
-                    "description": "Specifies the directory containing workspace related code actions."
-                },
-                "javascriptBooster.smartExtendFallbackCommand": {
-                    "type": "string",
-                    "default": "editor.action.smartSelect.grow",
-                    "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
-                },
-                "javascriptBooster.smartShrinkFallbackCommand": {
-                    "type": "string",
-                    "default": "editor.action.smartSelect.shrink",
-                    "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+        "configuration": [
+            {
+                "title": "JavaScript Booster",
+                "properties": {
+                    "javascriptBooster.codemodDir": {
+                        "type": "string",
+                        "default": "codemods",
+                        "description":
+                            "Specifies the directory containing workspace related code actions."
+                    },
+                    "javascriptBooster.smartExtendFallbackCommand": {
+                        "type": "string",
+                        "default": "editor.action.smartSelect.grow",
+                        "description":
+                            "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    },
+                    "javascriptBooster.smartShrinkFallbackCommand": {
+                        "type": "string",
+                        "default": "editor.action.smartSelect.shrink",
+                        "description":
+                            "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    }
                 }
             }
-        }]
-    },
-    "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "clean": "rimraf out",
-        "vscode:prepublish": "npm run compile",
-        "compile": "npm run clean && tsc -p ./ && cpx ./test/__codemod-fixtures__/**/* ./out/test/__codemod-fixtures__ && cpx ./test/__test-workspace-1__/**/* ./out/test/__test-workspace-1__",
-        "watch": "tsc -watch -p ./",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "preversion": "npm test",
-        "postversion": "git push && git push --tags",
-        "generate-ast-typings": "node ./typings/generate-ast-typings"
+        ]
     },
     "devDependencies": {
         "@types/glob": "^5.0.35",
@@ -117,9 +116,6 @@
     "dependencies": {
         "@types/fs-extra": "^5.0.1",
         "@types/lodash": "^4.14.104",
-        "@types/prettier": "^1.10.0",
-        "babylon": "^7.0.0-beta.42",
-        "fs-extra": "^5.0.0",
-        "jscodeshift": "xsburg/jscodeshift"
+        "fs-extra": "^5.0.0"
     }
 }

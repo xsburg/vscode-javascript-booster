@@ -19,7 +19,7 @@ import {
     VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { CodeModExports } from '../models/CodeMod';
+import { CodeModExports } from '../codeModTypes';
 
 /**
  * Returns one expression when the parameter n is: "{ oneExpression; }" or "oneExpression;"

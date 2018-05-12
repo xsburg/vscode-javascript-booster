@@ -6,7 +6,7 @@ import {
     UnaryExpression
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { CodeModExports } from '../models/CodeMod';
+import { CodeModExports } from '../codeModTypes';
 import { negateExpression } from '../utils/astHelpers';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
