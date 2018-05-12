@@ -54,10 +54,7 @@ function runInlineTransformTest(
 ) {
     input = normalizeLineEndings(input);
     output = normalizeLineEndings(output);
-    const mod = codeModService.loadOneEmbeddedCodeMod(modId);
-    if (!mod) {
-        throw new Error(`Failed to load code mod ${modId}. Syntax error.`);
-    }
+    codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
         languageId,
@@ -71,11 +68,11 @@ function runInlineTransformTest(
         })
     };
 
-    const canRun = codeModService.executeCanRun(mod, runOptions);
+    const canRun = codeModService.executeCanRun(modId, runOptions);
     if (!canRun) {
         throw new Error('The transform cannot be run at this position.');
     }
-    let actualOutput = codeModService.executeTransform(mod.id, runOptions);
+    let actualOutput = codeModService.executeTransform(modId, runOptions);
     actualOutput = normalizeLineEndings(actualOutput);
 
     assert.equal(actualOutput, output);
@@ -88,10 +85,7 @@ function runInlineCanRunTest(
     expected: boolean,
     options: { fileName?: string; anchor?: IPosition; active: IPosition }
 ) {
-    const mod = codeModService.loadOneEmbeddedCodeMod(modId);
-    if (!mod) {
-        throw new Error(`Failed to load code mod ${modId}. Syntax error.`);
-    }
+    codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
         languageId,
@@ -105,7 +99,7 @@ function runInlineCanRunTest(
         })
     };
 
-    const actualOutput = codeModService.executeCanRun(mod, runOptions);
+    const actualOutput = codeModService.executeCanRun(modId, runOptions);
     assert.equal(actualOutput, expected);
 }
 

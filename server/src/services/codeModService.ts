@@ -48,9 +48,16 @@ class CodeModService {
         return validCodeMods;
     }
 
-    public loadOneEmbeddedCodeMod(modId: string): CodeModDefinition | null {
+    public loadOneEmbeddedCodeMod(modId: string): void {
         const fileName = path.join(embeddedCodeModDir, modId);
-        return this._parseCodeModFile(fileName);
+        const mod = this._parseCodeModFile(fileName);
+        if (!mod) {
+            throw new Error(`Failed to load the codeMod ${modId} (file: ${fileName}).`);
+        }
+        if (!this._codeModsCache) {
+            this._codeModsCache = [];
+        }
+        this._codeModsCache.push(mod);
     }
 
     public async getGlobalMods(options: {
@@ -67,7 +74,7 @@ class CodeModService {
                 return false;
             }
             try {
-                return this.executeCanRun(mod, options);
+                return this.executeCanRun(mod.id, options);
             } catch (e) {
                 logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
                 return false;
@@ -88,7 +95,7 @@ class CodeModService {
                 return false;
             }
             try {
-                return this.executeCanRun(mod, options);
+                return this.executeCanRun(mod.id, options);
             } catch (e) {
                 logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
                 return false;
@@ -97,7 +104,7 @@ class CodeModService {
     }
 
     public executeCanRun(
-        mod: CodeModDefinition,
+        modId: string,
         options: {
             languageId: LanguageId;
             fileName: string;
@@ -105,6 +112,7 @@ class CodeModService {
             selection: Selection;
         }
     ) {
+        const mod = this._getCodeMod(modId);
         const jscodeshift = astService.getCodeShift(options.languageId);
         const ast = astService.getAstTree(options);
         if (!ast) {
@@ -136,7 +144,7 @@ class CodeModService {
             selection: Selection;
         }
     ): string {
-        const mod = this._codeModsCache!.find(m => m.id === modId)!;
+        const mod = this._getCodeMod(modId);
         const jscodeshift = astService.getCodeShift(options.languageId);
         const ast = astService.getAstTree(options);
         if (!ast) {
@@ -191,6 +199,14 @@ class CodeModService {
         }
         await this.reloadAllCodeMods();
         return this._codeModsCache!;
+    }
+
+    private _getCodeMod(modId: string): CodeModDefinition {
+        const mod = this._codeModsCache && this._codeModsCache.find(m => m.id === modId);
+        if (!mod) {
+            throw new Error(`The requested mod ${modId} is missing in cache.`);
+        }
+        return mod;
     }
 }
 
