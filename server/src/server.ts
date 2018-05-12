@@ -37,7 +37,10 @@ documents.listen(connection);
 connection.onInitialize((_params): InitializeResult => {
     return {
         capabilities: {
-            textDocumentSync: documents.syncKind
+            textDocumentSync: documents.syncKind,
+            executeCommandProvider: {
+                commands: [commandIds.reloadCodeMods]
+            }
             // codeActionProvider: true
         }
     };
@@ -344,6 +347,16 @@ connection.onRequest(shrinkSelectionRequestType, async params => {
         }));
 
     return result;
+});
+
+connection.onExecuteCommand(async params => {
+    switch (params.command) {
+        case commandIds.reloadCodeMods:
+            codeModService.reloadAllCodeMods();
+            break;
+        default:
+            break;
+    }
 });
 
 /* connection.onCodeAction(async params => {

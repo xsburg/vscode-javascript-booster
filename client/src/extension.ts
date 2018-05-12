@@ -11,7 +11,6 @@ import {
 import { CodeModCodeActionProvider } from './CodeModCodeActionProvider';
 import { commandIds, extensionId, supportedLanguages } from './const';
 import { executeCodeActionCommand } from './executeCodeActionCommand';
-import codeModService from './services/codeModService';
 import langService from './services/langService';
 import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
@@ -23,9 +22,6 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand(commandIds._executeCodeAction, executeCodeActionCommand),
         commands.registerCommand(commandIds.extendSelection, extendSelectionCommand),
         commands.registerCommand(commandIds.shrinkSelection, shrinkSelectionCommand),
-        commands.registerCommand(commandIds.reloadCodeMods, () => {
-            codeModService.reloadAllCodeMods();
-        }),
         languages.registerCodeActionsProvider(supportedLanguages, new CodeModCodeActionProvider())
     );
 }
