@@ -1,4 +1,4 @@
-import codeService from './codeService';
+import connectionService from './connectionService';
 
 const CHANNEL_NAME = 'JavaScript Booster';
 
@@ -12,7 +12,8 @@ class LogService {
     public output(message: string) {
         // tslint:disable-next-line:no-console
         // console.log(`[LogService.output] ${message}`);
-        codeService.connection().console.log(`${new Date().toISOString()}: ${message}`);
+        // connectionService.connection().sendNot
+        connectionService.connection().console.log(`${new Date().toISOString()}: ${message}`);
         // this._channel.appendLine(`${new Date().toISOString()}: ${message}`);
     }
 

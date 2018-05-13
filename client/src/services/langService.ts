@@ -8,7 +8,7 @@ import {
     TransportKind,
     VersionedTextDocumentIdentifier
 } from 'vscode-languageclient';
-import { extensionId } from '../const';
+import { extensionId, supportedLanguages } from '../const';
 
 interface CodeActionsParams {
     textDocumentUri: string;
@@ -102,20 +102,15 @@ class LangService {
         };
 
         let clientOptions: LanguageClientOptions = {
-            documentSelector: [
-                { language: 'typescript' },
-                { language: 'typescriptreact' },
-                { language: 'javascript' },
-                { language: 'javascriptreact' }
-            ],
+            documentSelector: supportedLanguages.map(language => ({ language })),
             synchronize: {
                 configurationSection: extensionId
             }
         };
 
         this._languageClient = new LanguageClient(
-            'jsboosterLangServer',
-            'JavaScript Booster Language Server',
+            extensionId,
+            'JavaScript Booster',
             serverOptions,
             clientOptions
         );
