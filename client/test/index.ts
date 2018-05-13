@@ -19,7 +19,7 @@ import { setupTestCoverage } from './utils/testCoverage';
 testRunner.configure({
     ui: 'tdd',
     useColors: true,
-    timeout: 5000
+    timeout: 15000
 });
 
 setupTestCoverage(join(__dirname, '../src'));

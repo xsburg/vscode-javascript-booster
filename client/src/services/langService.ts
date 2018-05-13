@@ -87,7 +87,13 @@ class LangService {
     private _languageClient!: LanguageClient;
 
     public initialize(context: vscode.ExtensionContext) {
-        let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
+        if (this._languageClient) {
+            // Already initialized
+            return;
+        }
+
+        const base = path.join(__dirname, '..', '..', '..');
+        let serverModule = path.normalize(path.join(base, 'server', 'src', 'server.js'));
         let serverOptions: ServerOptions = {
             run: {
                 module: serverModule,
@@ -118,6 +124,10 @@ class LangService {
 
     public start() {
         return this._languageClient.start();
+    }
+
+    public ready() {
+        return this._languageClient.onReady();
     }
 
     public async requestCodeActions(textDocumentUri: string, selection: vscode.Selection) {

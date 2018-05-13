@@ -17,7 +17,8 @@ export const commandIds = {
     _executeCodeAction: `${extensionId}.executeCodeAction`,
     executeCodeMod: `${extensionId}.executeCodeMod`,
     extendSelection: `${extensionId}.extendSelection`,
-    shrinkSelection: `${extensionId}.shrinkSelection`
+    shrinkSelection: `${extensionId}.shrinkSelection`,
+    reloadCodeMods: `${extensionId}.reloadCodeMods`
 };
 
 export const configIds = {
