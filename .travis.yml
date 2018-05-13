@@ -10,12 +10,13 @@ before_install:
     sh -e /etc/init.d/xvfb start; sleep 3; fi
 install:
   - npm install
-  - npm run vscode:prepublish
 script:
-  - npm test --silent
+  - npm run compile
+  - npm test
 after_script:
-  - node ./node_modules/coveralls/bin/coveralls.js -v < ./out/coverage/lcov.info
+  - node ./server/node_modules/coveralls/bin/coveralls.js -v < ./server/coverage/lcov.info
 before_deploy:
+  - cd client
   - npm install -g vsce
   - vsce package
 deploy:
