@@ -4,6 +4,10 @@
     "version": "0.0.1",
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
+    "engines": {
+        "node": ">=8.0.0",
+        "npm": ">=5.6.0"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/xsburg/vscode-javascript-booster.git"

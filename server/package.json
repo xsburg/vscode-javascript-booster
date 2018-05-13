@@ -5,7 +5,8 @@
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
     "engines": {
-        "node": "*"
+        "node": ">=8.0.0",
+        "npm": ">=5.6.0"
     },
     "repository": {
         "type": "git",
@@ -47,11 +48,6 @@
         "typescript": "2.7.2"
     },
     "jest": {
-        "globals": {
-            "ts-jest": {
-                "tsConfigFile": "tsconfig.json"
-            }
-        },
         "transform": {
             "^.+\\.tsx?$": "ts-jest"
         },
