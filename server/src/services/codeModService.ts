@@ -2,10 +2,12 @@ import { File, Program } from 'ast-types';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
+import Uri from 'vscode-uri';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../codeModTypes';
 import { configIds, extensionId } from '../const';
 import { Position } from '../utils/Position';
 import astService, { LanguageId, Selection } from './astService';
+import connectionService from './connectionService';
 import logService from './logService';
 
 const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
@@ -35,12 +37,29 @@ class CodeModService {
             .filter(x => x.isFile)
             .map(x => this._parseCodeModFile(x.fileName));
         // user-workspace code mods
-        /* const config = vscode.workspace.getConfiguration(extensionId);
-        const codemodDir = config.get(configIds.codemodDir);
-        if (vscode.workspace.name) {
-            const uris = await vscode.workspace.findFiles(`${codemodDir}/*.{ts,js}`);
-            codeMods.push(...uris.map(uri => this._parseCodeModFile(uri.fsPath)));
-        } */
+        const wsFolders = await connectionService.connection().workspace.getWorkspaceFolders();
+        if (wsFolders) {
+            const codemodDir = connectionService.getSettings().codemodDir;
+            for (let folder of wsFolders) {
+                const folderUri = Uri.parse(folder.uri);
+                if (folderUri.scheme !== 'file') {
+                    continue;
+                }
+
+                const dirName = path.join(folderUri.fsPath, codemodDir);
+                if (!(await fs.pathExists(dirName))) {
+                    continue;
+                }
+
+                const names = await fs.readdir(dirName);
+                for (let n of names) {
+                    const fn = path.join(dirName, n);
+                    if ((await fs.stat(fn)).isFile) {
+                        codeMods.push(this._parseCodeModFile(fn));
+                    }
+                }
+            }
+        }
         const validCodeMods = codeMods.filter(c => c) as CodeModDefinition[];
         validCodeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
         this._codeModsCache = validCodeMods;
@@ -178,7 +197,7 @@ class CodeModService {
         try {
             modFn = require(fileName);
         } catch (e) {
-            logService.outputError(`Failed to parse codemod '${fileName}: ${e.message}'`);
+            logService.outputError(`Failed to parse codemod '${fileName}': ${e.message}`);
             return null;
         }
         const name = path.basename(fileName, path.extname(fileName));
