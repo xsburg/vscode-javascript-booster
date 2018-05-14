@@ -3,4 +3,5 @@ node_modules
 .vscode-test/
 *.vsix
 \.history/
-./client/server
+client/server
+server/coverage

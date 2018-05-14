@@ -19,14 +19,20 @@
         "node": ">=8.0.0",
         "npm": ">=5.6.0"
     },
-    "categories": ["Programming Languages", "Other"],
-    "keywords": ["javascript", "typescript", "refactoring"],
+    "categories": [
+        "Programming Languages",
+        "Other"
+    ],
+    "keywords": [
+        "javascript",
+        "typescript",
+        "refactoring"
+    ],
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "clean": "rimraf out",
         "vscode:prepublish": "npm run compile",
-        "compile":
-            "npm run clean && tsc -p ./ && cpx ./test/__simple-workspace__/**/* ./out/test/__simple-workspace__",
+        "compile": "npm run clean && tsc -p ./ && cpx ./test/__simple-workspace__/**/* ./out/test/__simple-workspace__",
         "watch": "tsc -watch -p ./",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "preversion": "npm test",
@@ -73,20 +79,17 @@
                     "javascriptBooster.codemodDir": {
                         "type": "string",
                         "default": "codemods",
-                        "description":
-                            "Specifies the directory containing workspace related code actions."
+                        "description": "Specifies the directory containing workspace related code actions."
                     },
                     "javascriptBooster.smartExtendFallbackCommand": {
                         "type": "string",
                         "default": "editor.action.smartSelect.grow",
-                        "description":
-                            "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                        "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
                     },
                     "javascriptBooster.smartShrinkFallbackCommand": {
                         "type": "string",
                         "default": "editor.action.smartSelect.shrink",
-                        "description":
-                            "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                        "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
                     }
                 }
             }

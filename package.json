@@ -22,6 +22,6 @@
         "watch:client": "cd client && npm run watch",
         "compile:server": "cd server && npm run compile && cd ..",
         "watch:server": "cd server && npm run watch",
-        "test": "cd server && npm test && cd ../client && npm test && cd .."
+        "test": "cd server && npm test -- --coverage && cd ../client && npm test && cd .."
     }
 }
