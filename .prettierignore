@@ -1,5 +1,1 @@
 package.json
-client/package.json
-server/package.json
-server/tests/__codemod-fixtures__
-client/test/__simple-workspace__

@@ -3,6 +3,7 @@ import astService, { LanguageId } from './services/astService';
 import codeModService from './services/codeModService';
 import connectionService from './services/connectionService';
 import logService from './services/logService';
+import getTextEdit from './utils/getTextEdit';
 import * as vscode from './utils/vscodeExtra';
 
 interface ExecuteTransformParams {
@@ -27,57 +28,6 @@ export const executeTransformRequestType = new RequestType<
     void,
     void
 >('javascriptBooster/executeTransform');
-
-function getTextEdit(document: TextDocument, before: string, after: string) {
-    let startPosBefore = 0;
-    let startPosAfter = 0;
-    while (startPosBefore < before.length && startPosAfter < after.length) {
-        const cb = before[startPosBefore];
-        const ca = after[startPosAfter];
-        if (cb === ca) {
-            startPosBefore++;
-            startPosAfter++;
-        } else if (cb === '\r' && before[startPosBefore + 1] === '\n' && ca === '\n') {
-            // \n removed after transformation
-            startPosBefore++;
-        } else if (ca === '\r' && after[startPosAfter + 1] === '\n' && cb === '\n') {
-            // \n added after transformation
-            startPosAfter++;
-        } else {
-            break;
-        }
-    }
-
-    let endPosBefore = before.length;
-    let endPosAfter = after.length;
-    while (endPosBefore - 1 >= 0 && endPosAfter - 1 >= 0) {
-        const cb = before[endPosBefore - 1];
-        const ca = after[endPosAfter - 1];
-        if (cb === ca) {
-            endPosBefore--;
-            endPosAfter--;
-        } else if (cb === '\r' && before[endPosBefore] === '\n') {
-            // \n removed after transformation
-            endPosBefore--;
-        } else if (ca === '\r' && after[endPosAfter] === '\n') {
-            // \n added after transformation
-            endPosAfter--;
-        } else {
-            break;
-        }
-    }
-
-    const range: vscode.Range = {
-        start: document.positionAt(startPosBefore),
-        end: document.positionAt(endPosBefore)
-    };
-    const newText = after.substring(startPosAfter, endPosAfter);
-
-    return {
-        range,
-        newText
-    };
-}
 
 export const executeTransformRequestHandler: RequestHandler<
     ExecuteTransformParams,
@@ -117,10 +67,13 @@ export const executeTransformRequestHandler: RequestHandler<
         return result;
     }
 
-    const { range, newText } = getTextEdit(document, source, transformResult);
+    const { range, newText } = getTextEdit(source, transformResult);
 
     result.edit = {
-        range,
+        range: {
+            start: document.positionAt(range.start),
+            end: document.positionAt(range.end)
+        },
         newText
     };
     return result;

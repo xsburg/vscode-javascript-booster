@@ -3,7 +3,7 @@ import * as jscodeshift from 'jscodeshift';
 import * as os from 'os';
 import { PrinterOptions } from 'recast';
 import * as vscode from 'vscode-languageserver-types';
-import { registerCollectionExtensions } from '../utils';
+import { registerCollectionExtensions } from '../utils/collectionExtensions';
 import logService from './logService';
 
 // Hack to adjust default recast options

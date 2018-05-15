@@ -17,6 +17,19 @@
             "port": 6014,
             "sourceMaps": true,
             "outFiles": ["${workspaceRoot}/../client/server/**/*.js"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Jest Tests",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+            "cwd": "${workspaceFolder}",
+            "args": ["--runInBand", "-t=${selectedText}"],
+            "runtimeArgs": ["--nolazy"],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "sourceMaps": true
         }
     ]
 }

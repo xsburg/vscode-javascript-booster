@@ -18,7 +18,7 @@ import * as vscode from 'vscode-languageserver-types';
 
 import { LanguageId } from '../../src/services/astService';
 import codeModService from '../../src/services/codeModService';
-import { IPosition, Position } from '../../src/utils';
+import { IPosition, Position } from '../../src/utils/Position';
 
 function toZeroBasedPosition(pos: IPosition) {
     return vscode.Position.create(pos.line - 1, pos.column - 1);
