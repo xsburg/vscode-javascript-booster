@@ -1,5 +1,5 @@
 import { commands, Position, Selection, window, workspace } from 'vscode';
-import { configIds, extensionId } from './const';
+import { configIds, extensionId, isSupportedLanguage } from './const';
 import langService from './services/langService';
 
 function executeFallbackSelectionCommand(extend: boolean) {
@@ -19,6 +19,11 @@ export async function extendSelectionCommand() {
     }
 
     const document = window.activeTextEditor.document;
+    if (!isSupportedLanguage(document.languageId)) {
+        executeFallbackSelectionCommand(true);
+        return;
+    }
+
     const newSelections = await langService.extendSelection(
         document.uri.toString(),
         window.activeTextEditor!.selections
@@ -44,6 +49,11 @@ export async function shrinkSelectionCommand() {
     }
 
     const document = window.activeTextEditor.document;
+    if (!isSupportedLanguage(document.languageId)) {
+        executeFallbackSelectionCommand(false);
+        return;
+    }
+
     const newSelections = await langService.shrinkSelection(
         document.uri.toString(),
         window.activeTextEditor!.selections
