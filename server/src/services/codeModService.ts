@@ -149,7 +149,8 @@ class CodeModService {
                 stats: () => {}
             },
             {
-                target
+                target,
+                selection: options.selection
             }
         );
     }
@@ -182,7 +183,8 @@ class CodeModService {
                 stats: () => {}
             },
             {
-                target
+                target,
+                selection: options.selection
             }
         );
         astService.invalidateAstTree(options.fileName);

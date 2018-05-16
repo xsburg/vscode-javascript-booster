@@ -75,7 +75,8 @@ function runInlineTransformTest(
     let actualOutput = codeModService.executeTransform(modId, runOptions);
     actualOutput = normalizeLineEndings(actualOutput);
 
-    assert.equal(actualOutput, output);
+    // Wrong result in execute()
+    expect(actualOutput).toBe(output);
 }
 
 function runInlineCanRunTest(

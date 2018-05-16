@@ -1,5 +1,6 @@
 import { File } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+import { Selection } from './services/astService';
 import { Position } from './utils/Position';
 
 type CodeModTransform = (
@@ -7,6 +8,7 @@ type CodeModTransform = (
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
+        selection: Selection;
     }
 ) => string | undefined | null;
 
@@ -15,6 +17,7 @@ type CanRunFunction = (
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
+        selection: Selection;
     }
 ) => boolean;
 
