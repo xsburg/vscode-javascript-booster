@@ -53,8 +53,11 @@ codeMod.canRun = (fileInfo, api, options) => {
             j.VariableDeclarator.check(testPath.parent.node) &&
             testPath.parent.node.init === testPath.node
         ) {
-            // if path is the node responsible for initialization => target is inside initializer
+            // if parent.init === testPath the cursor is inside `init` => we don't want it to trigger.
             return false;
+        }
+        if (j.VariableDeclaration.check(testPath.node)) {
+            break;
         }
         testPath = testPath.parent;
     }

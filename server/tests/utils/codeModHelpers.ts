@@ -89,8 +89,7 @@ function runInlineCanRunTest(
 
     const runOptions = {
         languageId,
-        fileName:
-            (options && options.fileName) || '/Users/billy/projects/example/codemods/example.ts',
+        fileName: (options && options.fileName) || '/Users/example/example.ts',
         source: input,
         selection: getSelection({
             input,
@@ -100,7 +99,8 @@ function runInlineCanRunTest(
     };
 
     const actualOutput = codeModService.executeCanRun(modId, runOptions);
-    assert.equal(actualOutput, expected);
+    // canRun test fail
+    expect(actualOutput).toBe(expected);
 }
 
 function getLanguageIdByFileName(fileName: string): LanguageId {
