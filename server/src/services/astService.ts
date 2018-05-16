@@ -1,5 +1,6 @@
 import { File } from 'ast-types';
 import * as jscodeshift from 'jscodeshift';
+import * as _ from 'lodash';
 import * as os from 'os';
 import { PrinterOptions } from 'recast';
 import * as vscode from 'vscode-languageserver-types';
@@ -55,6 +56,10 @@ class AstService {
             ast: AstRoot | null;
         }
     > = new Map();
+
+    public constructor() {
+        this._addDelayedLogEntry = _.debounce(this._addDelayedLogEntry, 1500);
+    }
 
     public isSupportedLanguage(languageId: string): boolean {
         return supportedLanguages.indexOf(languageId as any) !== -1;
@@ -129,13 +134,16 @@ class AstService {
         let ast: AstRoot | null = null;
         try {
             ast = codeshift(options.source) as AstRoot;
+            if (cache && !cache.ast) {
+                this._addDelayedLogEntry(`File now valid: ${options.fileName}.`);
+            }
         } catch (e) {
             if (e.name === 'SyntaxError') {
-                logService.output(
+                this._addDelayedLogEntry(
                     `Syntax error in file ${options.fileName} (${e.loc.line}:${e.loc.column}).`
                 );
             } else {
-                logService.output(
+                this._addDelayedLogEntry(
                     `Unknown error in file ${options.fileName}. \nError from Babylon Parser: ${
                         e.message
                     }.`
@@ -154,6 +162,10 @@ class AstService {
         if (cache) {
             this._astCache.delete(fileName);
         }
+    }
+
+    private _addDelayedLogEntry(message: string) {
+        logService.output(message);
     }
 }
 
