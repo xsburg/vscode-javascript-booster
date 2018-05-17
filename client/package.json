@@ -31,7 +31,7 @@
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "clean": "rimraf out",
-        "vscode:prepublish": "cd .. && npm run compile && cd client",
+        "vscode:prepublish": "cd .. && npm run compile",
         "compile": "npm run clean && tsc -p ./ && cpx ./test/__simple-workspace__/**/* ./out/test/__simple-workspace__",
         "watch": "tsc -watch -p ./",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
