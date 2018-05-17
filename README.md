@@ -6,7 +6,7 @@ This VS Code extension provides various code actions (quick fixes) when editing 
 
 You might want to reassign the default shortcut for the quick fix menu to `Alt+Enter` if you are moving from WebStorm. Search for `editor.action.quickFix` command.
 
-![Features](client/resources/features.gif)
+![Features](resources/features.gif)
 
 ## Installation
 
@@ -44,7 +44,7 @@ These two commands allow you to successively select blocks of code so that it's 
 
 You might want to assign hotkeys for these commands, search for `javascriptBooster.extendSelection` and `javascriptBooster.shrinkSelection`. `Ctrl+W` and `Ctrl+Shift+W` (⌘W and ⌘⇧W) are used in WebStorm by default.
 
-![Smart extend/shrink selection](client/resources/smartSelection.gif)
+![Smart extend/shrink selection](resources/smartSelection.gif)
 
 As this feature is only supported in JavaScript and TypeScript for now, you can configure fallback commands that will be called for other file types instead (VS Code's `smartSelect.*` by default). They will also be called if the file has fatal syntax errors.
 
