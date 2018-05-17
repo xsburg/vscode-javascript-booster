@@ -3,7 +3,7 @@
     "displayName": "JavaScript Booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
     "icon": "resources/icon.png",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "publisher": "sburg",
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
@@ -50,7 +50,8 @@
         "onCommand:javascriptBooster.shrinkSelection"
     ],
     "contributes": {
-        "commands": [{
+        "commands": [
+            {
                 "command": "javascriptBooster.executeCodeMod",
                 "title": "Run Global Code Action",
                 "category": "JS Booster"
@@ -71,26 +72,28 @@
                 "category": "JS Booster"
             }
         ],
-        "configuration": [{
-            "title": "JavaScript Booster",
-            "properties": {
-                "javascriptBooster.codemodDir": {
-                    "type": "string",
-                    "default": "codemods",
-                    "description": "Specifies the directory containing workspace related code actions."
-                },
-                "javascriptBooster.smartExtendFallbackCommand": {
-                    "type": "string",
-                    "default": "editor.action.smartSelect.grow",
-                    "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
-                },
-                "javascriptBooster.smartShrinkFallbackCommand": {
-                    "type": "string",
-                    "default": "editor.action.smartSelect.shrink",
-                    "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+        "configuration": [
+            {
+                "title": "JavaScript Booster",
+                "properties": {
+                    "javascriptBooster.codemodDir": {
+                        "type": "string",
+                        "default": "codemods",
+                        "description": "Specifies the directory containing workspace related code actions."
+                    },
+                    "javascriptBooster.smartExtendFallbackCommand": {
+                        "type": "string",
+                        "default": "editor.action.smartSelect.grow",
+                        "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    },
+                    "javascriptBooster.smartShrinkFallbackCommand": {
+                        "type": "string",
+                        "default": "editor.action.smartSelect.shrink",
+                        "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    }
                 }
             }
-        }]
+        ]
     },
     "devDependencies": {
         "@types/fs-extra": "^5.0.1",
