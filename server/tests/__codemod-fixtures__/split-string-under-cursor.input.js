@@ -20,7 +20,7 @@ const a = '\ud83c\udf36foo🌶bar'; /*# { pos: 29 } #*/
 
 /*$ { fixture: 'should-break-unicode-sequence-shamelessly' } $*/
 
-const a = '\ud83c\udf36foo'; /*# { pos: 16 } #*/
+const a = '\ud83c\udf36foo'; /*# { pos: 18 } #*/
 
 /*$ { fixture: 'should-handle-new-line' } $*/
 
@@ -37,6 +37,6 @@ const a = 'foo\nbar'; /*# { pos: 16 } #*/
 const a = 'foo\
 bar';
 
-/*$ { fixture: 'should-avoid-parens-when-splitting-inside-expression', skip: true } $*/
+/*$ { fixture: 'should-avoid-parens-when-splitting-inside-expression' } $*/
 
 const a = 'foo' + 'barbaz'; /*# { pos: 23 } #*/

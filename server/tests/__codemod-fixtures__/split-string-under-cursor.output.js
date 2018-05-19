@@ -20,7 +20,7 @@ const a = '\ud83c\udf36foo🌶' + 'bar';
 
 /*$ { fixture: 'should-break-unicode-sequence-shamelessly' } $*/
 
-const a = '\ud8' + '3c\udf36foo';
+const a = '\ud83c' + '\udf36foo';
 
 /*$ { fixture: 'should-handle-new-line' } $*/
 

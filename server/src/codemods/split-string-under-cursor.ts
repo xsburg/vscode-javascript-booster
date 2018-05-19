@@ -49,7 +49,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const leftNode = j.identifier(leftValue + quoteChar);
     const rightNode = j.identifier(quoteChar + rightValue);
 
-    /* let replacementTarget = path as NodePath<AstNode>;
+    let replacementTarget = path as NodePath<AstNode>;
     while (
         replacementTarget.parent &&
         j.BinaryExpression.check(replacementTarget.parent.node) &&
@@ -59,10 +59,18 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         replacementTarget = replacementTarget.parent;
     }
 
-    path.replace(leftNode);
-    const replacement = j.binaryExpression('+', replacementTarget.node as Expression, rightNode); */
-
-    path.replace(j.binaryExpression('+', leftNode, rightNode));
+    if (replacementTarget === path) {
+        // literal, no wrapping binary expressions.
+        // replacement: 'foobar' => 'foo' + 'bar'
+        path.replace(j.binaryExpression('+', leftNode, rightNode));
+    } else {
+        // wrapping binary expressions where we are in the right operand.
+        // replacement: 'extra' + 'foobar' => ('extra' + 'foo') + 'bar'
+        (path.parent.node as BinaryExpression).right = leftNode;
+        replacementTarget.replace(
+            j.binaryExpression('+', replacementTarget.node as Expression, rightNode)
+        );
+    }
 
     const resultText = ast.toSource();
     return resultText;
