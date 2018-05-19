@@ -5,6 +5,7 @@ import {
     FunctionDeclaration,
     IfStatement,
     Node,
+    NodePath,
     Printable,
     StringLiteral,
     TemplateElement,
@@ -22,12 +23,46 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const path = target.firstPath<StringLiteral>()!;
     const node = path.node;
 
-    const offset = options.selection.active - (node.start + 1); // Take opening quote into account
-    const value1 = node.value.substring(0, offset);
-    const value2 = node.value.substring(offset);
+    const raw = ((node as any).extra as any).raw as string;
+    const quoteChar = raw[0];
+    const offset = options.selection.active - node.start;
 
-    const replacement = j.binaryExpression('+', j.stringLiteral(value1), j.stringLiteral(value2));
-    path.replace(replacement);
+    // Identifiers are used as we want to preserve the original escape characters
+    // and find the cursor's position at the same time.
+
+    let leftValue = raw.substring(0, offset);
+    let rightValue = raw.substring(offset);
+    if (leftValue.endsWith('\\')) {
+        if (rightValue.startsWith('\n')) {
+            // Multiline literal with slash escaping new line. We remove both escapes.
+            leftValue = leftValue.substring(0, leftValue.length - 1);
+            rightValue = rightValue.substring(1);
+        } else {
+            // Move the escape character into the right pair (so the strings keep being valid)
+            leftValue = leftValue.substring(0, leftValue.length - 1);
+            rightValue = '\\' + rightValue;
+        }
+    }
+
+    const index = leftValue.lastIndexOf('\\');
+
+    const leftNode = j.identifier(leftValue + quoteChar);
+    const rightNode = j.identifier(quoteChar + rightValue);
+
+    /* let replacementTarget = path as NodePath<AstNode>;
+    while (
+        replacementTarget.parent &&
+        j.BinaryExpression.check(replacementTarget.parent.node) &&
+        replacementTarget.parent.node.operator === '+' &&
+        replacementTarget.parent.node.right === replacementTarget.node
+    ) {
+        replacementTarget = replacementTarget.parent;
+    }
+
+    path.replace(leftNode);
+    const replacement = j.binaryExpression('+', replacementTarget.node as Expression, rightNode); */
+
+    path.replace(j.binaryExpression('+', leftNode, rightNode));
 
     const resultText = ast.toSource();
     return resultText;

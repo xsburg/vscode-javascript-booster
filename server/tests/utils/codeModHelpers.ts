@@ -145,7 +145,7 @@ function extractPosition(
     if (!match || !match[0]) {
         throw new Error(
             `[${modId}][${fixtureId ||
-                ''}] Position is not provided, use '/*# { position: columnNumber } #*/'`
+                ''}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
         );
     }
     // tslint:disable-next-line:no-eval
@@ -154,9 +154,16 @@ function extractPosition(
         throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
     }
     const column: number = posDef.pos;
-    const line: number = source.split('\n').findIndex(l => l.includes(match[0])) + 1;
+    let line: number = source.split('\n').findIndex(l => l.includes(match[0])) + 1;
+    if (posDef.nextLine) {
+        line++;
+    }
 
-    const cleanSource = source.replace(reClean, '');
+    let cleanSource = source.replace(reClean, '');
+    if (cleanSource.startsWith('\n')) {
+        cleanSource = cleanSource.substring(1);
+        line--;
+    }
 
     return {
         source: cleanSource,
@@ -176,6 +183,7 @@ function extractFixtures(
     interface FixtureRawDef {
         raw: any;
         name: string;
+        skip?: boolean;
         inputStart: number;
         inputEnd: number;
     }
@@ -197,6 +205,7 @@ function extractFixtures(
         activeFixture = {
             raw: fixtureDef,
             name: fixtureDef.fixture as string,
+            skip: fixtureDef.skip,
             inputStart: re.lastIndex,
             inputEnd: input.length
         };
@@ -207,6 +216,7 @@ function extractFixtures(
     const fullFixtures: Array<{
         raw: any;
         name: string | null;
+        skip: boolean;
         source: string;
         pos: IPosition;
     }> = fixtures.map(fx => {
@@ -222,6 +232,7 @@ function extractFixtures(
         return {
             raw: fx.raw,
             name: fx.name,
+            skip: fx.skip || false,
             source,
             pos
         };
@@ -238,6 +249,7 @@ function extractFixtures(
         fullFixtures.push({
             raw: {},
             name: fallbackFixtureName,
+            skip: false,
             source,
             pos
         });
@@ -276,7 +288,8 @@ function defineTransformTests(
             if (!outputFx) {
                 throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
             }
-            it(testName, () => {
+            const fn = fx.skip ? it.skip : it;
+            fn(testName, () => {
                 runInlineTransformTest(
                     getLanguageIdByFileName(inputFile),
                     modId,
