@@ -45,7 +45,7 @@ function normalizeLineEndings(text: string) {
     return text.split('\r').join('');
 }
 
-function runInlineTransformTest(
+async function runInlineTransformTest(
     languageId: LanguageId,
     modId: string,
     input: string,
@@ -75,10 +75,11 @@ function runInlineTransformTest(
             input,
             anchor: options.anchor,
             active: options.active
-        })
+        }),
+        include: [modId]
     };
 
-    const canRun = codeModService.executeCanRun(modId, runOptions);
+    const canRun = (await codeModService.getRunnableCodeMods(runOptions)).length === 1;
     if (!canRun) {
         throw new Error('The transform cannot be run at this position.');
     }
@@ -107,7 +108,7 @@ function runInlineTransformTest(
     }
 }
 
-function runInlineCanRunTest(
+async function runInlineCanRunTest(
     languageId: LanguageId,
     modId: string,
     input: string,
@@ -124,12 +125,13 @@ function runInlineCanRunTest(
             input,
             anchor: options.anchor,
             active: options.active
-        })
+        }),
+        include: [modId]
     };
 
-    const actualOutput = codeModService.executeCanRun(modId, runOptions);
+    const actualCanRun = (await codeModService.getRunnableCodeMods(runOptions)).length === 1;
     // canRun test fail
-    expect(actualOutput).toBe(expected);
+    expect(actualCanRun).toBe(expected);
 }
 
 function getLanguageIdByFileName(fileName: string): LanguageId {
@@ -322,8 +324,8 @@ function defineTransformTests(
                 throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
             }
             const fn = fx.skip ? it.skip : it;
-            fn(testName, () => {
-                runInlineTransformTest(
+            fn(testName, async () => {
+                await runInlineTransformTest(
                     getLanguageIdByFileName(inputFile),
                     modId,
                     fx.source,
@@ -378,8 +380,9 @@ function defineCanRunTests(
                 : `"${modId}" ${expected ? 'can' : 'cannot'} run (pos ${fx.pos.line}:${
                       fx.pos.column
                   })`;
-            it(testName, () => {
-                runInlineCanRunTest(
+            const fn = fx.skip ? it.skip : it;
+            fn(testName, async () => {
+                await runInlineCanRunTest(
                     getLanguageIdByFileName(inputFile),
                     modId,
                     fx.source,

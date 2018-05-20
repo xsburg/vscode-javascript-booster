@@ -68,6 +68,9 @@ class CodeModService {
     }
 
     public loadOneEmbeddedCodeMod(modId: string): void {
+        if (this._codeModsCache && this._codeModsCache.some(m => m.id === modId)) {
+            return;
+        }
         const fileName = path.join(embeddedCodeModDir, modId);
         const mod = this._parseCodeModFile(fileName);
         if (!mod) {
@@ -85,21 +88,15 @@ class CodeModService {
         source: string;
         selection: Selection;
     }) {
-        const mods = (await this._getAllCodeMods()).filter(mod => {
-            if (!mod) {
-                return false;
-            }
-            if (mod.scope !== CodeModScope.Global) {
-                return false;
-            }
-            try {
-                return this.executeCanRun(mod.id, options);
-            } catch (e) {
-                logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
-                return false;
-            }
-        });
-        return mods;
+        try {
+            const mods = await this.getRunnableCodeMods(options);
+            return mods.filter(mod => mod.scope === CodeModScope.Global);
+        } catch (e) {
+            logService.outputError(
+                `Error while executing [getGlobalMods].getRunnableCodeMods(): ${e.toString()}`
+            );
+            return [];
+        }
     }
 
     public async getCodeActionMods(options: {
@@ -108,52 +105,65 @@ class CodeModService {
         source: string;
         selection: Selection;
     }) {
-        const mods = await this._getAllCodeMods();
-        return mods.filter(mod => {
-            if (mod.scope !== CodeModScope.Cursor) {
-                return false;
-            }
-            try {
-                return this.executeCanRun(mod.id, options);
-            } catch (e) {
-                logService.outputError(`Error while executing ${mod.id}.canRun(): ${e.toString()}`);
-                return false;
-            }
-        });
+        try {
+            const mods = await this.getRunnableCodeMods(options);
+            return mods.filter(mod => mod.scope === CodeModScope.Cursor);
+        } catch (e) {
+            logService.outputError(
+                `Error while executing [getCodeActionMods].getRunnableCodeMods(): ${e.toString()}`
+            );
+            return [];
+        }
     }
 
-    public executeCanRun(
-        modId: string,
-        options: {
-            languageId: LanguageId;
-            fileName: string;
-            source: string;
-            selection: Selection;
+    public async getRunnableCodeMods(options: {
+        languageId: LanguageId;
+        fileName: string;
+        source: string;
+        selection: Selection;
+        include?: string[];
+        exclude?: string[];
+    }): Promise<CodeModDefinition[]> {
+        let mods = await this._getAllCodeMods();
+        if (options.include) {
+            mods = options.include!.map(id => {
+                const mod = mods.find(m => m.id === id);
+                if (!mod) {
+                    throw new Error(`Mod ${id} not loaded.`);
+                }
+                return mod;
+            });
         }
-    ) {
-        const mod = this._getCodeMod(modId);
+        if (options.exclude) {
+            mods = mods.filter(m => !options.exclude!.includes(m.id));
+        }
+
         const jscodeshift = astService.getCodeShift(options.languageId);
         const ast = astService.getAstTree(options);
         if (!ast) {
-            return false;
+            return [];
         }
-        // TODO: do not recalculate target node for each call
+
         const target = ast.findNodeAtPosition(options.selection.active);
-        return mod.canRun(
-            {
-                path: options.fileName,
-                source: options.source,
-                ast
-            },
-            {
-                jscodeshift,
-                stats: () => {}
-            },
-            {
-                target,
-                selection: options.selection
-            }
-        );
+        const stats = () => {};
+        return mods.filter(m => {
+            const r = m.canRun(
+                {
+                    path: options.fileName,
+                    source: options.source,
+                    ast
+                },
+                {
+                    jscodeshift,
+                    stats
+                },
+                {
+                    target,
+                    selection: options.selection
+                }
+            );
+            return r;
+        });
     }
 
     public executeTransform(
