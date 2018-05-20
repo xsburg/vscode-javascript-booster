@@ -137,6 +137,7 @@ class CodeModService {
         if (!ast) {
             return false;
         }
+        // TODO: do not recalculate target node for each call
         const target = ast.findNodeAtPosition(options.selection.active);
         return mod.canRun(
             {
@@ -163,7 +164,10 @@ class CodeModService {
             source: string;
             selection: Selection;
         }
-    ): string {
+    ): {
+        source: string;
+        selection?: Selection;
+    } {
         const mod = this._getCodeMod(modId);
         const jscodeshift = astService.getCodeShift(options.languageId);
         const ast = astService.getAstTree(options);
@@ -189,9 +193,20 @@ class CodeModService {
         );
         astService.invalidateAstTree(options.fileName);
         if (!result) {
-            return options.source;
+            return {
+                source: options.source
+            };
         }
-        return result;
+        if (typeof result === 'string') {
+            return {
+                source: result
+            };
+        } else {
+            return {
+                source: result.source,
+                selection: result.selection
+            };
+        }
     }
 
     private _parseCodeModFile(fileName: string): CodeModDefinition | null {

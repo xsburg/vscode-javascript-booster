@@ -10,7 +10,14 @@ type CodeModTransform = (
         target: Collection;
         selection: Selection;
     }
-) => string | undefined | null;
+) =>
+    | string
+    | undefined
+    | null
+    | {
+          source: string;
+          selection: Selection;
+      };
 
 type CanRunFunction = (
     fileInfo: { path: string; source: string; ast: Collection<File> },

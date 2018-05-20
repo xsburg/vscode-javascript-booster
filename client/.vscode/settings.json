@@ -12,6 +12,8 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "out": true,
-        "server": true
+        "server": true,
+        ".history/**": true,
+        ".vscode-test/**": true
     }
 }

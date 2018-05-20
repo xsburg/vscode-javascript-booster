@@ -16,7 +16,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode-languageserver-types';
 
-import { LanguageId } from '../../src/services/astService';
+import astService, { LanguageId } from '../../src/services/astService';
 import codeModService from '../../src/services/codeModService';
 import { IPosition, Position } from '../../src/utils/Position';
 
@@ -49,11 +49,21 @@ function runInlineTransformTest(
     languageId: LanguageId,
     modId: string,
     input: string,
-    output: string,
-    options: { fileName?: string; anchor?: IPosition; active: IPosition }
+    output: {
+        source: string;
+        selection?: {
+            anchor?: IPosition;
+            active: IPosition;
+        };
+    },
+    options: {
+        fileName?: string;
+        anchor?: IPosition;
+        active: IPosition;
+    }
 ) {
     input = normalizeLineEndings(input);
-    output = normalizeLineEndings(output);
+    const expectedOutput = normalizeLineEndings(output.source);
     codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
@@ -72,11 +82,29 @@ function runInlineTransformTest(
     if (!canRun) {
         throw new Error('The transform cannot be run at this position.');
     }
-    let actualOutput = codeModService.executeTransform(modId, runOptions);
-    actualOutput = normalizeLineEndings(actualOutput);
+    let result = codeModService.executeTransform(modId, runOptions);
+    const actualOutput = normalizeLineEndings(result.source);
 
     // Wrong result in execute()
-    expect(actualOutput).toBe(output);
+    expect(actualOutput).toBe(expectedOutput);
+
+    if (output.selection) {
+        expect(result.selection).toBeTruthy();
+        const actualActivePos = Position.fromZeroBased(
+            astService.positionAt(result.source, result.selection!.active)
+        );
+        const actualAnchorPos = Position.fromZeroBased(
+            astService.positionAt(result.source, result.selection!.anchor)
+        );
+        const expectedActivePos = new Position(
+            output.selection.active.line,
+            output.selection.active.column
+        );
+        const expectedAnchorPos = output.selection.anchor || expectedActivePos;
+        // Wrong output selection
+        expect(actualActivePos).toEqual(expectedActivePos);
+        expect(actualAnchorPos).toEqual(expectedAnchorPos);
+    }
 }
 
 function runInlineCanRunTest(
@@ -134,19 +162,12 @@ function getLanguageIdByFileName(fileName: string): LanguageId {
     return def.parser;
 }
 
-function extractPosition(
-    modId: string,
-    fixtureId: string | null,
-    source: string
-): IPosition & { source: string } {
+function extractPosition(modId: string, source: string): (IPosition & { source: string }) | null {
     const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
     const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
     const match = re.exec(source);
     if (!match || !match[0]) {
-        throw new Error(
-            `[${modId}][${fixtureId ||
-                ''}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
-        );
+        return null;
     }
     // tslint:disable-next-line:no-eval
     const posDef = eval('(' + match[1] + ')');
@@ -176,7 +197,7 @@ function extractFixtures(
     modId: string,
     input: string,
     fallbackFixtureName: string | null = null,
-    searchPosition: boolean = true
+    hasPosition: boolean = true
 ) {
     const re = /\/\*\$\s*([^\$]+?)\s*\$\*\//g; // /*$ VALUE $*/
     let match;
@@ -184,6 +205,7 @@ function extractFixtures(
         raw: any;
         name: string;
         skip?: boolean;
+        validateOutPos?: boolean;
         inputStart: number;
         inputEnd: number;
     }
@@ -206,6 +228,7 @@ function extractFixtures(
             raw: fixtureDef,
             name: fixtureDef.fixture as string,
             skip: fixtureDef.skip,
+            validateOutPos: fixtureDef.validateOutPos,
             inputStart: re.lastIndex,
             inputEnd: input.length
         };
@@ -216,42 +239,52 @@ function extractFixtures(
     const fullFixtures: Array<{
         raw: any;
         name: string | null;
+        validateOutPos: boolean;
         skip: boolean;
         source: string;
         pos: IPosition;
     }> = fixtures.map(fx => {
         const inputFragment = input.substring(fx.inputStart, fx.inputEnd);
         let source = inputFragment.trim();
-        let pos;
-        if (searchPosition) {
-            pos = extractPosition(modId, fx.name, source);
+        let pos = extractPosition(modId, source);
+        if (pos) {
             source = pos.source;
-        } else {
-            pos = new Position(1, 1);
         }
+        if (!pos && (hasPosition || fx.validateOutPos)) {
+            throw new Error(
+                `[${modId}][${fx.name ||
+                    ''}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
+            );
+        }
+
         return {
             raw: fx.raw,
             name: fx.name,
+            validateOutPos: Boolean(fx.validateOutPos),
             skip: fx.skip || false,
             source,
-            pos
+            pos: pos || new Position(1, 1)
         };
     });
     if (fullFixtures.length === 0) {
         let source = input.trim();
-        let pos;
-        if (searchPosition) {
-            pos = extractPosition(modId, fallbackFixtureName, source);
+        let pos = extractPosition(modId, source);
+        if (pos) {
             source = pos.source;
-        } else {
-            pos = new Position(1, 1);
         }
+        if (!pos && hasPosition) {
+            throw new Error(
+                `[${modId}][${fallbackFixtureName}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
+            );
+        }
+
         fullFixtures.push({
             raw: {},
             name: fallbackFixtureName,
+            validateOutPos: false,
             skip: false,
             source,
-            pos
+            pos: pos || new Position(1, 1)
         });
     }
     return fullFixtures;
@@ -294,7 +327,14 @@ function defineTransformTests(
                     getLanguageIdByFileName(inputFile),
                     modId,
                     fx.source,
-                    outputFx.source,
+                    {
+                        source: outputFx.source,
+                        selection: outputFx.validateOutPos
+                            ? {
+                                  active: outputFx.pos
+                              }
+                            : undefined
+                    },
                     {
                         fileName: options.fileName,
                         active: fx.pos

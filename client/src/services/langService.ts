@@ -10,75 +10,60 @@ import {
 } from 'vscode-languageclient';
 import { extensionId, supportedLanguages } from '../const';
 
-interface CodeActionsParams {
-    textDocumentUri: string;
-    selection: vscode.Selection;
-}
-
-interface CodeActionsResult {
-    textDocument: VersionedTextDocumentIdentifier;
-    codeMods: Array<{
-        id: string;
-        title: string;
-        tooltip?: string;
-    }>;
-}
-
 export const codeActionsRequestType = new RequestType<
-    CodeActionsParams,
-    CodeActionsResult,
+    {
+        textDocumentUri: string;
+        selection: vscode.Selection;
+    },
+    {
+        textDocument: VersionedTextDocumentIdentifier;
+        codeMods: Array<{
+            id: string;
+            title: string;
+            tooltip?: string;
+        }>;
+    },
     void,
     void
 >('javascriptBooster/codeActions');
 
-interface ExecuteTransformParams {
-    codeModId: string;
-    textDocumentIdentifier: VersionedTextDocumentIdentifier;
-    selection: vscode.Selection;
-}
-
-interface ExecuteTransformResult {
-    edit: {
-        range: { start: vscode.Position; end: vscode.Position };
-        newText: string;
-    } | null;
-}
-
 export const executeTransformRequestType = new RequestType<
-    ExecuteTransformParams,
-    ExecuteTransformResult,
+    {
+        codeModId: string;
+        textDocumentIdentifier: VersionedTextDocumentIdentifier;
+        selection: vscode.Selection;
+    },
+    {
+        edit: {
+            range: { start: vscode.Position; end: vscode.Position };
+            newText: string;
+        } | null;
+        selection: vscode.Selection | null;
+    },
     void,
     void
 >('javascriptBooster/executeTransform');
 
-interface ExtendSelectionParams {
-    textDocumentUri: string;
-    selections: vscode.Selection[];
-}
-
-interface ExtendSelectionResult {
-    selections: vscode.Selection[] | null;
-}
-
 export const extendSelectionRequestType = new RequestType<
-    ExtendSelectionParams,
-    ExtendSelectionResult,
+    {
+        textDocumentUri: string;
+        selections: vscode.Selection[];
+    },
+    {
+        selections: vscode.Selection[] | null;
+    },
     void,
     void
 >('javascriptBooster/extendSelection');
 
-interface ShrinkSelectionParams {
-    textDocumentUri: string;
-    selections: vscode.Selection[];
-}
-
-interface ShrinkSelectionResult {
-    selections: vscode.Selection[] | null;
-}
-
 export const shrinkSelectionRequestType = new RequestType<
-    ShrinkSelectionParams,
-    ShrinkSelectionResult,
+    {
+        textDocumentUri: string;
+        selections: vscode.Selection[];
+    },
+    {
+        selections: vscode.Selection[] | null;
+    },
     void,
     void
 >('javascriptBooster/shrinkSelection');
@@ -148,7 +133,10 @@ class LangService {
             textDocumentIdentifier,
             selection
         });
-        return result.edit;
+        if (result.selection) {
+            result.selection = this._rebuildSelection(result.selection);
+        }
+        return result;
     }
 
     public async extendSelection(textDocumentUri: string, selections: vscode.Selection[]) {
@@ -156,7 +144,10 @@ class LangService {
             textDocumentUri,
             selections
         });
-        return result.selections;
+        if (!result.selections) {
+            return null;
+        }
+        return result.selections.map(sel => this._rebuildSelection(sel));
     }
 
     public async shrinkSelection(textDocumentUri: string, selections: vscode.Selection[]) {
@@ -164,7 +155,17 @@ class LangService {
             textDocumentUri,
             selections
         });
-        return result.selections;
+        if (!result.selections) {
+            return null;
+        }
+        return result.selections.map(sel => this._rebuildSelection(sel));
+    }
+
+    private _rebuildSelection(sel: vscode.Selection) {
+        return new vscode.Selection(
+            new vscode.Position(sel.anchor.line, sel.anchor.character),
+            new vscode.Position(sel.active.line, sel.active.character)
+        );
     }
 }
 

@@ -1,5 +1,5 @@
 import { RequestHandler, RequestType, TextDocument } from 'vscode-languageserver';
-import astService, { LanguageId } from './services/astService';
+import astService, { LanguageId, Selection } from './services/astService';
 import codeModService from './services/codeModService';
 import connectionService from './services/connectionService';
 import logService from './services/logService';
@@ -20,6 +20,10 @@ interface ExecuteTransformResult {
         range: { start: vscode.Position; end: vscode.Position };
         newText: string;
     } | null;
+    selection: {
+        anchor: vscode.Position;
+        active: vscode.Position;
+    } | null;
 }
 
 export const executeTransformRequestType = new RequestType<
@@ -36,7 +40,8 @@ export const executeTransformRequestHandler: RequestHandler<
 > = async params => {
     const { selection, codeModId, textDocumentIdentifier } = params;
     let result: ExecuteTransformResult = {
-        edit: null
+        edit: null,
+        selection: null
     };
 
     const document = connectionService.getDocument(textDocumentIdentifier.uri);
@@ -50,7 +55,10 @@ export const executeTransformRequestHandler: RequestHandler<
         active: astService.offsetAt(source, selection.active)
     };
 
-    let transformResult: string;
+    let transformResult: {
+        source: string;
+        selection?: Selection;
+    };
     try {
         transformResult = codeModService.executeTransform(codeModId, {
             languageId: document.languageId as LanguageId,
@@ -63,11 +71,11 @@ export const executeTransformRequestHandler: RequestHandler<
         return result;
     }
 
-    if (transformResult === source) {
+    if (transformResult.source === source) {
         return result;
     }
 
-    const { range, newText } = getTextEdit(source, transformResult);
+    const { range, newText } = getTextEdit(source, transformResult.source);
 
     result.edit = {
         range: {
@@ -76,5 +84,11 @@ export const executeTransformRequestHandler: RequestHandler<
         },
         newText
     };
+    if (transformResult.selection) {
+        result.selection = {
+            active: astService.positionAt(transformResult.source, transformResult.selection.active),
+            anchor: astService.positionAt(transformResult.source, transformResult.selection.anchor)
+        };
+    }
     return result;
 };

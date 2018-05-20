@@ -10,17 +10,28 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 
+const SELECTION_ANCHOR = '$a605add6-6288-4061-8727-c878c27e0d20$';
+
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
     const node = target.thisOrClosest(j.ArrowFunctionExpression).firstNode()!;
 
+    // Identifier is updated explicitly as it is the only way to affect formatting
     const param = node.params[0] as Identifier;
-    param.name = `(${param.name})`; // Messing with Identifier as it's the only way to force the printer to print parens
+    param.name = `(${param.name}${SELECTION_ANCHOR})`;
 
-    const resultText = ast.toSource();
-    return resultText;
+    let source = ast.toSource();
+    const selectionPos = source.indexOf(SELECTION_ANCHOR);
+    source = source.replace(SELECTION_ANCHOR, '');
+    return {
+        source,
+        selection: {
+            anchor: selectionPos,
+            active: selectionPos
+        }
+    };
 };
 
 codeMod.canRun = (fileInfo, api, options) => {
@@ -59,7 +70,7 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Add parens to arrow function parameter';
+codeMod.title = 'Wrap parameter with ()';
 
 codeMod.description = '';
 
