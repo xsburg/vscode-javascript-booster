@@ -14,6 +14,7 @@ import {
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
+import * as astHelpers from '../utils/astHelpers';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -79,10 +80,9 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
-    const target = options.target;
-    const node = target.firstNode();
+    const path = options.target.firstPath();
 
-    return Boolean(node && j.StringLiteral.check(node));
+    return astHelpers.isStringExpression(j, path);
 };
 
 codeMod.scope = 'cursor';

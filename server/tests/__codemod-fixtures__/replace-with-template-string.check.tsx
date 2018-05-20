@@ -28,3 +28,21 @@ import React from 'react'; /*# { pos: 23 } #*/
 import React from 'react';
 
 const data = <div className="foo"></div>  /*# { pos: 31 } #*/
+
+/*$ { fixture: 'should-not-trigger-on-ts-string-enums', expected: false } $*/
+
+enum Foo {
+    Bar = 'bar' /*# { pos: 14 } #*/
+}
+
+/*$ { fixture: 'should-not-trigger-on-object-property', expected: false } $*/
+
+const foo = {
+    'bar': 'baz' /*# { pos: 8 } #*/
+}
+
+/*$ { fixture: 'should-not-trigger-on-object-method', expected: false } $*/
+
+const foo = {
+    'bar'() {} /*# { pos: 8 } #*/
+}

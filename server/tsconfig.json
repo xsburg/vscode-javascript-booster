@@ -12,5 +12,5 @@
         "rootDir": "./"
     },
     "include": ["./src/**/*", "./tests/**/*", "./typings/**/*"],
-    "exclude": ["node_modules", ".vscode-test"]
+    "exclude": ["node_modules", ".vscode-test", "./tests/__codemod-fixtures__/**/*"]
 }

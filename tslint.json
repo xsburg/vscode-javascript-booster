@@ -1,10 +1,24 @@
 {
-    "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+    "extends": [
+        "tslint:recommended",
+        "tslint-react",
+        "tslint-config-prettier"
+    ],
     "rules": {
-        "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-leading-underscore"
+        ],
         "object-literal-sort-keys": false,
         "interface-name": false,
         "no-empty": false,
         "prefer-const": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "server/tests/__codemod-fixtures__/**/*"
+        ]
     }
 }

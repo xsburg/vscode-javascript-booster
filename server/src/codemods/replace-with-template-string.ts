@@ -11,6 +11,7 @@ import {
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
+import * as astHelpers from '../utils/astHelpers';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -93,16 +94,12 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
 
     let path = target.firstPath();
-    if (
-        !path ||
-        j.ImportDeclaration.check(path.parent.node) ||
-        j.JSXAttribute.check(path.parent.node)
-    ) {
-        return false;
-    }
 
-    if (j.StringLiteral.check(path.node)) {
+    if (astHelpers.isStringExpression(j, path)) {
         return true;
+    } else if (!path || j.StringLiteral.check(path.node)) {
+        // Is string literal but not a string expression (cannot be replaced with expression)
+        return false;
     }
 
     while (path.parent && path.parent.node.type === 'BinaryExpression') {

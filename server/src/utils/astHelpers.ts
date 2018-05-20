@@ -1,4 +1,4 @@
-import { Expression, UnaryExpression } from 'ast-types';
+import { AstNode, Expression, NodePath, UnaryExpression } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 
 export function negateExpression(j: JsCodeShift, expr: Expression) {
@@ -27,4 +27,23 @@ export function negateExpression(j: JsCodeShift, expr: Expression) {
 
     // Fallback: a => !a
     return j.unaryExpression('!', expr);
+}
+
+export function isStringExpression(j: JsCodeShift, path: NodePath<AstNode> | null) {
+    if (!path || !j.StringLiteral.check(path.node)) {
+        return false;
+    }
+
+    const parentNode = path.parent && path.parent.node;
+    if (
+        j.ImportDeclaration.check(parentNode) ||
+        j.JSXAttribute.check(parentNode) ||
+        j.TSEnumMember.check(parentNode) ||
+        ((j.ObjectProperty.check(parentNode) || j.ObjectMethod.check(parentNode)) &&
+            parentNode.key === path.node)
+    ) {
+        return false;
+    }
+
+    return true;
 }
