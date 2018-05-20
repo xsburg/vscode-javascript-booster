@@ -25,18 +25,22 @@ function createSelectionFromPos(line: number, col: number) {
     );
 }
 
-suiteSetup(async () => {
-    // trigger the extension and give some time for the language server to start
-    vscode.commands.executeCommand(commandIds.reloadCodeMods);
-    await new Promise(resolve => setTimeout(resolve, 3000));
+async function openFileInEditor(filePath: string) {
+    const fileUri = vscode.Uri.file(getWorkspaceFilePath('simple-workspace', 'file1.js'));
+    const textDocument = await vscode.workspace.openTextDocument(fileUri);
+    const editor = await vscode.window.showTextDocument(textDocument);
+    // Opening the document triggers this extension to start.
+    // Wait until the language server has started.
+    await new Promise(resolve => setTimeout(resolve, 500));
     await langService.ready();
-});
+    return { fileUri, textDocument, editor };
+}
 
 suite(`Integration tests`, () => {
     test('CodeActionProvider should suggest code action', async () => {
-        const fileUri = vscode.Uri.file(getWorkspaceFilePath('simple-workspace', 'file1.js'));
-        const textDocument = await vscode.workspace.openTextDocument(fileUri);
-        const editor = await vscode.window.showTextDocument(textDocument);
+        const { textDocument, editor } = await openFileInEditor(
+            getWorkspaceFilePath('simple-workspace', 'file1.js')
+        );
 
         editor.selection = createSelectionFromPos(2, 19);
 
@@ -54,9 +58,9 @@ suite(`Integration tests`, () => {
     });
 
     test('runCodeModCommand should update text in editor', async () => {
-        const fileUri = vscode.Uri.file(getWorkspaceFilePath('simple-workspace', 'file1.js'));
-        const textDocument = await vscode.workspace.openTextDocument(fileUri);
-        const editor = await vscode.window.showTextDocument(textDocument);
+        const { textDocument, editor } = await openFileInEditor(
+            getWorkspaceFilePath('simple-workspace', 'file1.js')
+        );
 
         editor.selection = createSelectionFromPos(2, 19);
 
