@@ -167,6 +167,8 @@ declare module 'ast-types' {
 
     export function use(plugin: (fork: any) => any): any;
 
+    export function visit(path: NodePath<AstNode>, visitor: any): void;
+
     export interface AstTypes {
         Path: typeof Path;
         NodePath: typeof NodePath;
