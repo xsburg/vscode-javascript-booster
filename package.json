@@ -1,7 +1,7 @@
 {
     "name": "vscode-javascript-booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
-    "version": "0.0.1",
+    "version": "0.8.0",
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
     "engines": {
@@ -22,6 +22,9 @@
         "watch:client": "cd client && npm run watch",
         "compile:server": "cd server && npm run compile && cd ..",
         "watch:server": "cd server && npm run watch",
-        "test": "cd server && npm test -- --coverage && cd ../client && npm test && cd .."
+        "test": "cd server && npm test -- --coverage && cd ../client && npm test && cd ..",
+        "preversion": "npm test",
+        "version": "cd client && npm version $npm_package_version && git add -A",
+        "postversion": "git push && git push --tags"
     }
 }
