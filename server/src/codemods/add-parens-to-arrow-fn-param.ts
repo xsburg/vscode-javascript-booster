@@ -9,8 +9,7 @@ import {
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
-
-const SELECTION_ANCHOR = '$a605add6-6288-4061-8727-c878c27e0d20$';
+import { extractSelectionAnchor, SELECTION_ANCHOR } from '../utils/extractSelectionAnchor';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -22,16 +21,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const param = node.params[0] as Identifier;
     param.name = `(${param.name}${SELECTION_ANCHOR})`;
 
-    let source = ast.toSource();
-    const selectionPos = source.indexOf(SELECTION_ANCHOR);
-    source = source.replace(SELECTION_ANCHOR, '');
-    return {
-        source,
-        selection: {
-            anchor: selectionPos,
-            active: selectionPos
-        }
-    };
+    return extractSelectionAnchor(ast.toSource());
 };
 
 codeMod.canRun = (fileInfo, api, options) => {

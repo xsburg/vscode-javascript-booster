@@ -9,6 +9,7 @@ import {
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
+import { extractSelectionAnchor, SELECTION_ANCHOR } from '../utils/extractSelectionAnchor';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -20,9 +21,9 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const jsxElement = path.parent.node as JSXElement;
     jsxElement.closingElement = j.jsxClosingElement(path.node.name);
     path.node.selfClosing = false;
+    jsxElement.children = [j.jsxText(SELECTION_ANCHOR)];
 
-    const resultText = ast.toSource();
-    return resultText;
+    return extractSelectionAnchor(ast.toSource());
 };
 
 codeMod.canRun = (fileInfo, api, options) => {
