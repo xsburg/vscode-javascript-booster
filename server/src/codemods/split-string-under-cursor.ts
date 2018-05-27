@@ -15,6 +15,7 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 import * as astHelpers from '../utils/astHelpers';
+import { extractSelectionAnchor, SELECTION_ANCHOR } from '../utils/extractSelectionAnchor';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -48,7 +49,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const index = leftValue.lastIndexOf('\\');
 
     const leftNode = j.identifier(leftValue + quoteChar);
-    const rightNode = j.identifier(quoteChar + rightValue);
+    const rightNode = j.identifier(SELECTION_ANCHOR + quoteChar + rightValue);
 
     let replacementTarget = path as NodePath<AstNode>;
     while (
@@ -73,8 +74,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         );
     }
 
-    const resultText = ast.toSource();
-    return resultText;
+    return extractSelectionAnchor(ast.toSource());
 };
 
 codeMod.canRun = (fileInfo, api, options) => {
@@ -82,7 +82,12 @@ codeMod.canRun = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const path = options.target.firstPath();
 
-    return astHelpers.isStringExpression(j, path);
+    if (!path || !astHelpers.isStringExpression(j, path)) {
+        return false;
+    }
+
+    // can only trigger inside quotes
+    return options.selection.active - path.node.start > 0;
 };
 
 codeMod.scope = 'cursor';

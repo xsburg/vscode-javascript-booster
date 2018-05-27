@@ -2,6 +2,10 @@
 
 const a = 'foo' + 'bar';
 
+/*$ { fixture: 'should-split-into-two-and-adjust-selection', validateOutPos: true } $*/
+
+const a = 'foo' + 'bar'; /*# { pos: 19 } #*/
+
 /*$ { fixture: 'should-split-corner-case-start' } $*/
 
 const a = '' + 'foo';
