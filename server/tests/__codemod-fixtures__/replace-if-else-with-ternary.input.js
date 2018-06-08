@@ -19,3 +19,12 @@ function test() {
         return 0;
     }
 }
+
+/*$ { fixture: 'should-transform-return-without-else' } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return 1;
+    }
+    return 0;
+}

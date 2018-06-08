@@ -11,3 +11,9 @@ function test() {
 function test() {
     return (true ? 1 : 0);
 }
+
+/*$ { fixture: 'should-transform-return-without-else' } $*/
+
+function test() {
+    return (true ? 1 : 0);
+}

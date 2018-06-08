@@ -30,6 +30,15 @@ function test() {
     }
 }
 
+/*$ { fixture: 'should-trigger-with-return', expected: true } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return 1;
+    }
+    return 0;
+}
+
 /*$ { fixture: 'should-not-trigger-if-if-has-other-statements', expected: false } $*/
 
 function test() {
