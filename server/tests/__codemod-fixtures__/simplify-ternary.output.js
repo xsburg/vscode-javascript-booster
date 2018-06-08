@@ -7,7 +7,7 @@ function test() {
 /*$ { fixture: 'should-return-else-branch' } $*/
 
 function test() {
-    return 1;
+    return 0;
 }
 
 /*$ { fixture: 'should-return-condition' } $*/

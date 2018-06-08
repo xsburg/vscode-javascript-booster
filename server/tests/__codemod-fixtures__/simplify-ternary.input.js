@@ -21,7 +21,7 @@ function test() {
 
 function test() {
     let a = 'foo';
-    return a ? true : false; /*# { pos: 14 } #*/
+    return a ? false : true; /*# { pos: 14 } #*/
 }
 
 /*$ { fixture: 'should-transform-into-or' } $*/

@@ -56,6 +56,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         statements.reverse().forEach(st => path.insertAfter(st));
         path.prune();
     } else {
+        // Case 2. if-return-bool-else-return-bool
         const conStatement = getSingleStatement(j, path.node.consequent)!;
         const altStatement = getSingleStatement(j, path.node.alternate);
         const nextStatement = getNextStatementInBlock(j, path);

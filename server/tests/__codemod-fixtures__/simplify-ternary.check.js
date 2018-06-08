@@ -10,6 +10,13 @@ function test() {
     return true ? 1 : 0; /*# { pos: 14 } #*/
 }
 
+/*$ { fixture: 'should-trigger-with-bool-branches', expected: true } $*/
+
+function test() {
+    let foo = 'bar';
+    return foo ? true : false; /*# { pos: 14 } #*/
+}
+
 /*$ { fixture: 'should-not-trigger-on-normal-ternary', expected: false } $*/
 
 function test() {
