@@ -30,7 +30,7 @@ function test() {
     }
 }
 
-/*$ { fixture: 'should-trigger-with-return', expected: true } $*/
+/*$ { fixture: 'should-trigger-with-return-no-else', expected: true } $*/
 
 function test() {
     if (true) { /*# { pos: 6 } #*/
@@ -48,5 +48,15 @@ function test() {
         let b = 2;
     } else {
         a = 0;
+    }
+}
+
+/*$ { fixture: 'should-not-trigger-with-empty-return', expected: false } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return;
+    } else {
+        return 0;
     }
 }

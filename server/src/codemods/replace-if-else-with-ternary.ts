@@ -26,12 +26,24 @@ import { CodeModExports } from '../codeModTypes';
  * @param j codeshift
  * @param n node to check
  */
-function getSingleStatement(j: JsCodeShift, n: Node): Statement | null {
+function getSingleStatement(j: JsCodeShift, n: Node | null): Statement | null {
     if (j.BlockStatement.check(n) && n.body.length === 1) {
         return getSingleStatement(j, n.body[0]);
     }
     if (j.Statement.check(n)) {
         return n;
+    }
+    return null;
+}
+
+function getNextStatementInBlock(j: JsCodeShift, p: NodePath<Statement>): Statement | null {
+    if (!p.parentPath) {
+        return null;
+    }
+    const blockNodes = p.parentPath.value;
+    const index = blockNodes.indexOf(p.node);
+    if (index !== -1 && index + 1 < blockNodes.length) {
+        return blockNodes[index + 1];
     }
     return null;
 }
@@ -43,13 +55,20 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     const path = target.thisOrClosest(j.IfStatement).firstPath()!;
 
     const conStatement = getSingleStatement(j, path.node.consequent)!;
-    const altStatement = getSingleStatement(j, path.node.alternate!)!;
+    const altStatement = getSingleStatement(j, path.node.alternate!);
+    const nextStatement = getNextStatementInBlock(j, path);
 
     let result;
-    if (j.ReturnStatement.check(conStatement) && j.ReturnStatement.check(altStatement)) {
+    if (j.ReturnStatement.check(conStatement)) {
         // if-return-else
-        const conExpr = conStatement.argument as AssignmentExpression;
-        const altExpr = altStatement.argument as AssignmentExpression;
+        const conExpr = conStatement.argument!;
+        let altExpr;
+        if (altStatement) {
+            altExpr = (altStatement as ReturnStatement).argument!;
+        } else {
+            altExpr = (nextStatement as ReturnStatement).argument!;
+            path.parentPath.value.splice(path.parentPath.value.indexOf(nextStatement), 1);
+        }
 
         result = j.returnStatement(j.conditionalExpression(path.node.test, conExpr, altExpr));
     } else {
@@ -78,43 +97,50 @@ codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const node = target.thisOrClosest(j.IfStatement).firstNode();
+    const path = target.thisOrClosest(j.IfStatement).firstPath();
 
-    if (!node || !node.alternate) {
+    if (!path) {
         return false;
     }
 
-    const conStatement = getSingleStatement(j, node.consequent);
-    const altStatement = getSingleStatement(j, node.alternate);
-    if (!conStatement || !altStatement) {
+    const conStatement = getSingleStatement(j, path.node.consequent);
+    const altStatement = getSingleStatement(j, path.node.alternate);
+    if (!conStatement) {
         return false;
     }
 
-    // 1. AssignmentExpression in both branches
-    // OR
-    // 2. Return expression in both branches
-    const conName =
-        j.ExpressionStatement.check(conStatement) &&
-        j.AssignmentExpression.check(conStatement.expression) &&
-        j.Identifier.check(conStatement.expression.left) &&
-        conStatement.expression.left.name;
-    const altName =
-        j.ExpressionStatement.check(altStatement) &&
-        j.AssignmentExpression.check(altStatement.expression) &&
-        j.Identifier.check(altStatement.expression.left) &&
-        altStatement.expression.left.name;
-    const isAssignmentToOneVar = Boolean(conName && altName && conName === altName);
+    let isAssignmentToOneVar;
+    const conIsReturn = j.ReturnStatement.check(conStatement) && conStatement.argument;
+    let altIsReturn;
 
-    const conIsReturn = j.ReturnStatement.check(conStatement);
-    const altIsReturn = j.ReturnStatement.check(altStatement);
-    const isIfElseReturn = conIsReturn && altIsReturn;
+    if (altStatement) {
+        // 1. AssignmentExpression in both branches
+        const conName =
+            j.ExpressionStatement.check(conStatement) &&
+            j.AssignmentExpression.check(conStatement.expression) &&
+            j.Identifier.check(conStatement.expression.left) &&
+            conStatement.expression.left.name;
+        const altName =
+            j.ExpressionStatement.check(altStatement) &&
+            j.AssignmentExpression.check(altStatement.expression) &&
+            j.Identifier.check(altStatement.expression.left) &&
+            altStatement.expression.left.name;
+        isAssignmentToOneVar = Boolean(conName && altName && conName === altName);
+        // 2.1 if () { return a; } else { return b; }
+        altIsReturn = j.ReturnStatement.check(altStatement) && altStatement.argument;
+    } else {
+        // 2.2 if() { return a; } return b;
+        const nextStatement = getNextStatementInBlock(j, path);
+        altIsReturn = j.ReturnStatement.check(nextStatement) && nextStatement.argument;
+    }
 
+    const isIfElseReturn = Boolean(conIsReturn && altIsReturn);
     return isAssignmentToOneVar || isIfElseReturn;
 };
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Replace if-else with ?:';
+codeMod.title = 'Replace with ?:';
 
 codeMod.description = '';
 

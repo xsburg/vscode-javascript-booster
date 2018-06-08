@@ -14,4 +14,5 @@ function test() {
         return;
     }
     let b = 3;
+    let c = 4;
 }

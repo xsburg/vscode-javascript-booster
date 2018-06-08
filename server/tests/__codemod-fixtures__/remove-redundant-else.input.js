@@ -15,5 +15,6 @@ function test() {
         return;
     } else {  /*# { pos: 8 } #*/
         let b = 3;
+        let c = 4;
     }
 }
