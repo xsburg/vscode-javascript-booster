@@ -20,33 +20,7 @@ import {
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
-
-/**
- * Returns one expression when the parameter n is: "{ oneExpression; }" or "oneExpression;"
- * @param j codeshift
- * @param n node to check
- */
-function getSingleStatement(j: JsCodeShift, n: Node | null): Statement | null {
-    if (j.BlockStatement.check(n) && n.body.length === 1) {
-        return getSingleStatement(j, n.body[0]);
-    }
-    if (j.Statement.check(n)) {
-        return n;
-    }
-    return null;
-}
-
-function getNextStatementInBlock(j: JsCodeShift, p: NodePath<Statement>): Statement | null {
-    if (!p.parentPath) {
-        return null;
-    }
-    const blockNodes = p.parentPath.value;
-    const index = blockNodes.indexOf(p.node);
-    if (index !== -1 && index + 1 < blockNodes.length) {
-        return blockNodes[index + 1];
-    }
-    return null;
-}
+import { getNextStatementInBlock, getSingleStatement } from '../utils/astHelpers';
 
 const codeMod: CodeModExports = (fileInfo, api, options) => {
     const j = api.jscodeshift;

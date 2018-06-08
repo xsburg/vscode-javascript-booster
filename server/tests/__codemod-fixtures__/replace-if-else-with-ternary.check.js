@@ -60,3 +60,14 @@ function test() {
         return 0;
     }
 }
+
+/*$ { fixture: 'should-not-trigger-with-empty-return', expected: false } $*/
+
+function test() {
+    let foo = 'bar';
+    if (foo)
+        if (true) { /*# { pos: 10 } #*/
+            return 1;
+        }
+    return 0;
+}
