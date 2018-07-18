@@ -7,5 +7,7 @@
             "path": "server"
         }
     ],
-    "settings": {}
+    "settings": {
+        "local-history.path": "${workspaceFolder}/../"
+    }
 }

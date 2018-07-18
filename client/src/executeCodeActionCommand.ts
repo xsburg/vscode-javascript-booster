@@ -1,4 +1,4 @@
-import { Position, Range, Selection, window } from 'vscode';
+import { Position, Range, Selection, TextDocument, window } from 'vscode';
 import { VersionedTextDocumentIdentifier } from 'vscode-languageclient';
 import langService from './services/langService';
 
@@ -10,7 +10,6 @@ export async function executeCodeActionCommand(
     if (!window.activeTextEditor) {
         return;
     }
-    const document = window.activeTextEditor.document;
 
     const result = await langService.executeTransform(modId, textDocument, selection);
     if (!result.edit) {

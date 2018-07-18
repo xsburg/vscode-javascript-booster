@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import { commandIds, isSupportedLanguage } from './const';
 import langService from './services/langService';
+import { isSelection } from './utils/isSelection';
 
 export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
     public async provideCodeActions(
         document: vscode.TextDocument,
-        range: vscode.Range,
+        selection: vscode.Range | vscode.Selection,
         context: vscode.CodeActionContext,
         token: vscode.CancellationToken
     ): Promise<vscode.Command[]> {
@@ -13,14 +14,11 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
             return [];
         }
 
-        const source = document.getText();
-        const textEditor = vscode.window.activeTextEditor;
-        if (!textEditor) {
+        if (!isSelection(selection)) {
             // Complex commands, run-on-save etc
             return [];
         }
 
-        const selection = textEditor.selection;
         const result = await langService.requestCodeActions(document.uri.toString(), selection);
 
         return result.codeMods.map(
