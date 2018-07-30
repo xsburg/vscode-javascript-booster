@@ -2,7 +2,6 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { CodeModCodeActionProvider } from '../src/CodeModCodeActionProvider';
-import { commandIds } from '../src/const';
 import { executeCodeActionCommand } from '../src/executeCodeActionCommand';
 import langService from '../src/services/langService';
 

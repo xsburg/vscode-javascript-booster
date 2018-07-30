@@ -16,7 +16,7 @@ import langService from './services/langService';
 import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
 export function activate(context: ExtensionContext) {
-    langService.initialize(context);
+    langService.initialize();
 
     context.subscriptions.push(
         langService.start(),
