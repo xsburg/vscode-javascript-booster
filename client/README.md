@@ -1,4 +1,4 @@
-# VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg)](https://travis-ci.org/xsburg/vscode-javascript-booster.svg?branch=master) [![Coverage Status](https://img.shields.io/coveralls/github/xsburg/vscode-javascript-booster.svg)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master) [![GitHub release](https://img.shields.io/github/release/xsburg/vscode-javascript-booster.svg)](https://github.com/xsburg/vscode-javascript-booster)
+# VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster) [![Coverage Status](https://img.shields.io/coveralls/github/xsburg/vscode-javascript-booster.svg)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master) [![GitHub release](https://img.shields.io/github/release/xsburg/vscode-javascript-booster.svg)](https://github.com/xsburg/vscode-javascript-booster)
 
 Make your life easier, use code actions to do repetitive tasks for you! They can help a lot, just follow the light bulb 💡!
 
