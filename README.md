@@ -21,7 +21,9 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 *   💥 Flip if-else
 *   💥 Remove redundant else
 *   💥 Replace if-else with ?:
+*   💥 Simplify if-else
 *   💥 Flip ?:
+*   💥 Simplify ?:
 *   💥 Convert shorthand arrow function to statement
 *   💥 Convert to shorthand arrow function
 *   💥 Add parens to single arrow function parameter
@@ -70,7 +72,6 @@ You can easily load and run your own code actions. -->
 
 ### Others
 
-*   Highlight unused imports
 *   Support loading code actions from user workspace: users can create their own, project-related refactorings! 😅
 
 ## Inspiration
@@ -78,6 +79,71 @@ You can easily load and run your own code actions. -->
 Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its variety of code refactorings. The extension uses [Babylon](https://github.com/babel/babel/tree/master/packages/babylon) to parse the code and then manipulates the abstract syntax tree using [jscodeshift](https://github.com/facebook/jscodeshift).
 
 ## Release Notes
+
+### 0.10.0
+
+*   [VSCode API] Switched to using selection parameter passed into `provideCodeActions()` (Fixes #5)
+*   `JSX: Expand empty tag` now puts the cursor between the tags when executed.
+*   `Split string under cursor` now puts selection before the second string when executed.
+*   `Split string under cursor` no longed triggers outside string quotes.
+*   `Remove redundant else` now supports the case when `if` branch ends with return statement:
+    ```javascript
+    if (condition) {
+        foo();
+        return;
+    } else {
+        bar();
+    }
+    // ==>
+    if (condition) {
+        foo();
+        return;
+    }
+    bar();
+    ```
+*   `Replace with ternary` can now replace conditional return statements:
+    ```javascript
+    if (cond) {
+        return a;
+    } else {
+        return b;
+    }
+    // ==>
+    return cond ? a : b;
+    ```
+*   Added new action: `Simplify if-else`.
+
+    ```javascript
+    // Removes unused conditional branches, e.g.:
+    if (false) {
+        foo();
+    } else {
+        bar();
+    }
+    // ==>
+    bar();
+
+    // Simplifies unnecessary if-else statements, e.g.:
+    if (cond) {
+        return true;
+    } else {
+        return false;
+    }
+    // ==>
+    return !!cond;
+    ```
+
+*   Added new action: `Simplify ?:`.
+
+    ```javascript
+    let foo = true ? 1 : 0;
+    let foo = cond ? true : false;
+    let bar = a ? a : b;
+    // ==>
+    let foo = 1;
+    let foo = !!cond;
+    let bar = a || b;
+    ```
 
 ### 0.9.0
 
