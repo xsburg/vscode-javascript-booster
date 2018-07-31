@@ -35,18 +35,17 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     let leftValue = raw.substring(0, offset);
     let rightValue = raw.substring(offset);
     if (leftValue.endsWith('\\')) {
-        if (rightValue.startsWith('\n')) {
+        const m = rightValue.match(/^[\r\n]+/);
+        if (m) {
             // Multiline literal with slash escaping new line. We remove both escapes.
             leftValue = leftValue.substring(0, leftValue.length - 1);
-            rightValue = rightValue.substring(1);
+            rightValue = rightValue.substring(m[0].length);
         } else {
             // Move the escape character into the right pair (so the strings keep being valid)
             leftValue = leftValue.substring(0, leftValue.length - 1);
             rightValue = '\\' + rightValue;
         }
     }
-
-    const index = leftValue.lastIndexOf('\\');
 
     const leftNode = j.identifier(leftValue + quoteChar);
     const rightNode = j.identifier(SELECTION_ANCHOR + quoteChar + rightValue);

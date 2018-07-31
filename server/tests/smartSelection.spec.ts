@@ -4,6 +4,7 @@ import {
     assertSmartSelection,
     assertSmartSelectionBulk,
     extractSelections,
+    normalizeNewLines,
     removeSelectionMarkers
 } from './utils/smartSelectionHelpers';
 
@@ -14,7 +15,7 @@ describe(`Smart selection`, () => {
         `;
         const actualSelections = extractSelections(before);
         const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
-        assert.equal(after, before);
+        assert.equal(normalizeNewLines(after), normalizeNewLines(before));
     });
 
     it('helpers should extract multiple selection position', () => {
@@ -24,14 +25,14 @@ describe(`Smart selection`, () => {
         `;
         const actualSelections = extractSelections(before);
         const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
-        assert.equal(after, before);
+        assert.equal(normalizeNewLines(after), normalizeNewLines(before));
     });
 
     it('helpers should extract selection from 0 offset', () => {
         const before = '|const company = selectors.company.getCompanyById(state, d.companyId);|';
         const actualSelections = extractSelections(before);
         const after = applySelectionMarkers(removeSelectionMarkers(before), actualSelections);
-        assert.equal(after, before);
+        assert.equal(normalizeNewLines(after), normalizeNewLines(before));
     });
 
     it('helpers should extract selection from 0 offset', () => {

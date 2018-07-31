@@ -4,8 +4,12 @@ import * as os from 'os';
 import astService, { LanguageId, Selection } from '../../src/services/astService';
 import smartSelectionService from '../../src/services/smartSelectionService';
 
+export function normalizeNewLines(code: string) {
+    return code.replace(/\r?\n/g, os.EOL);
+}
+
 export function extractSelections(code: string): Selection[] {
-    code = code.replace(/\r?\n/g, os.EOL);
+    code = normalizeNewLines(code);
 
     const re = /\|(?:(\d+)\|)?/g;
     let adjustedIndex = 0;
@@ -35,6 +39,8 @@ export function removeSelectionMarkers(code: string) {
 }
 
 export function applySelectionMarkers(code: string, selections: Selection[]) {
+    code = normalizeNewLines(code);
+
     const points: {
         [offset: number]: {
             indexes: number[];
@@ -105,8 +111,8 @@ export function assertSmartSelection(
 ) {
     const extractedData1 = extractAction(inputFixture);
     const extractedData2 = extractAction(outputFixture);
-    inputFixture = extractedData1.text.trim();
-    outputFixture = extractedData2.text.trim();
+    inputFixture = normalizeNewLines(extractedData1.text.trim());
+    outputFixture = normalizeNewLines(extractedData2.text.trim());
     const inputSelections = extractSelections(inputFixture);
     const expectedSelections = extractSelections(outputFixture);
     const cleanInputFixture = removeSelectionMarkers(inputFixture);

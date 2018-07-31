@@ -1,6 +1,6 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "configurations": [
         {
             "type": "node",
@@ -34,7 +34,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Server Tests [Selected] ",
+            "name": "Server Tests [Selected]",
             "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
             "cwd": "${workspaceFolder}",
             "args": ["--runInBand", "-t=${selectedText}"],
