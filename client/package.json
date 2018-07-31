@@ -34,7 +34,7 @@
         "vscode:prepublish": "cd .. && npm run compile",
         "compile": "npm run clean && tsc -p ./ && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
         "watch": "tsc -watch -p ./",
-        "test": "npm run compile && CODE_TESTS_PATH=${PWD}/out/tests node ./node_modules/vscode/bin/test"
+        "test": "cd .. && npm run compile && cd client && CODE_TESTS_PATH=${PWD}/out/tests node ./node_modules/vscode/bin/test"
     },
     "main": "./out/src/extension",
     "activationEvents": [
