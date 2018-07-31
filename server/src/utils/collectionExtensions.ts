@@ -2,7 +2,6 @@ import { AstNode, NamedType, NodePath, Printable } from 'ast-types';
 import * as astTypes from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import * as jscodeshift from 'jscodeshift';
-import { Position } from './Position';
 
 function isPositionWithinNode(position: number, node: Printable) {
     return node.start <= position && position < node.end;

@@ -38,16 +38,18 @@ class ConnectionService {
         this._documents = new TextDocuments();
         this._documents.listen(this._connection);
 
-        this._connection.onInitialize((params): InitializeResult => {
-            return {
-                capabilities: {
-                    textDocumentSync: this._documents.syncKind,
-                    executeCommandProvider: {
-                        commands: [commandIds.reloadCodeMods]
+        this._connection.onInitialize(
+            (params): InitializeResult => {
+                return {
+                    capabilities: {
+                        textDocumentSync: this._documents.syncKind,
+                        executeCommandProvider: {
+                            commands: [commandIds.reloadCodeMods]
+                        }
                     }
-                }
-            };
-        });
+                };
+            }
+        );
 
         this._connection.onDidChangeConfiguration(change => {
             this._settings = change.settings.javascriptBooster as JavaScriptBoosterSettings;
@@ -77,7 +79,7 @@ class ConnectionService {
     }
 
     public getDocument(uri: string) {
-        return this._documents.get(uri);
+        return this._documents.get(uri)!;
     }
 
     public getSettings() {
