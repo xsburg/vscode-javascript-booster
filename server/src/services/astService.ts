@@ -15,10 +15,10 @@ import logService from './logService';
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
 CollectionPrototype.toSource = function(options: PrinterOptions) {
-    const customOptions = connectionService.getSettings().formattingOptions;
-    logService.output('here are the options:' + JSON.stringify(customOptions));
+    const userFormattingOptions = connectionService.getSettings().formattingOptions;
     return toSource.call(this, {
         quote: 'single',
+        ...userFormattingOptions,
         ...options
     });
 };
