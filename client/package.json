@@ -88,6 +88,83 @@
                         "type": "string",
                         "default": "editor.action.smartSelect.shrink",
                         "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    },
+                    "javascriptBooster.formattingOptions": {
+                        "type": "object",
+                        "properties": {
+                            "tabWidth": {
+                                "type": "number",
+                                "default": "4",
+                                "description": "Number of spaces the pretty-printer should use per tab for indentation. If you do not pass this option explicitly, it will be inferred from the original code."
+                            },
+                            "useTabs": {
+                                "type": "boolean",
+                                "default": "false",
+                                "description": "If you want the pretty-printer to use tabs instead of spaces, make this option true."
+                            },
+                            "wrapColumn": {
+                                "type": "number",
+                                "default": "74",
+                                "description": "Some of the pretty-printer code (such as that for printing function parameter lists) makes a valiant attempt to prevent really long lines. You can adjust the limit by changing this option; however, there is no guarantee that line length will fit inside this limit."
+                            },
+                            "quote": {
+                                "enum": [
+                                    "single",
+                                    "double"
+                                ],
+                                "default": "single",
+                                "description": "If you have preferences for what type of quotes should be used in newly created string literals, specify this option."
+                            },
+                            "trailingComma": {
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "objects": {
+                                                "type": "boolean",
+                                                "default": "false"
+                                            },
+                                            "arrays": {
+                                                "type": "boolean",
+                                                "default": "false"
+                                            },
+                                            "parameters": {
+                                                "type": "boolean",
+                                                "default": "false"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "objects",
+                                            "arrays",
+                                            "parameters"
+                                        ]
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ],
+                                "default": "false",
+                                "description": "Controls the printing of trailing commas in object literals, array expressions and function parameters. You can provide an object to specify settings for individual contexts."
+                            },
+                            "arrowParensAlways": {
+                                "type": "boolean",
+                                "default": "false",
+                                "description": "If you want parenthesis to wrap single-argument arrow function parameter lists, pass true for this option."
+                            },
+                            "objectCurlySpacing": {
+                                "type": "boolean",
+                                "default": "true",
+                                "description": "Controls the printing of spaces inside object literals, destructuring assignments, and import/export specifiers."
+                            },
+                            "arrayBracketSpacing": {
+                                "type": "boolean",
+                                "default": "true",
+                                "description": "Controls the printing of spaces inside array brackets."
+                            }
+                        },
+                        "additionalProperties": false,
+                        "description": "Specifies formatting options that will be used for newly generated code. Only the code fragment affected by a chosen code action is reformatted."
                     }
                 }
             }
@@ -107,11 +184,11 @@
         "remap-istanbul": "0.11.0",
         "rimraf": "2.6.2",
         "tslint": "5.9.1",
-        "tslint-config-prettier": "1.10.0",
+        "tslint-config-prettier": "1.18.0",
         "tslint-react": "3.5.1",
         "typescript": "2.7.2",
         "coveralls": "3.0.2",
-        "prettier": "1.10.2",
+        "prettier": "1.16.4",
         "vscode": "1.1.18"
     },
     "dependencies": {

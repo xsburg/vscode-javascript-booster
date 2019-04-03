@@ -5,6 +5,7 @@ import * as os from 'os';
 import { PrinterOptions } from 'recast';
 import * as vscode from 'vscode-languageserver-types';
 import { registerCollectionExtensions } from '../utils/collectionExtensions';
+import connectionService from './connectionService';
 import logService from './logService';
 
 // Hack to adjust default recast options
@@ -14,6 +15,8 @@ import logService from './logService';
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
 CollectionPrototype.toSource = function(options: PrinterOptions) {
+    const customOptions = connectionService.getSettings().formattingOptions;
+    logService.output('here are the options:' + JSON.stringify(customOptions));
     return toSource.call(this, {
         quote: 'single',
         ...options

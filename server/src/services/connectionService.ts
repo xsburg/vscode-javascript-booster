@@ -22,6 +22,16 @@ import codeModService from './codeModService';
 
 interface JavaScriptBoosterSettings {
     codemodDir: string;
+    formattingOptions: {
+        tabWidth?: number;
+        useTabs?: boolean;
+        wrapColumn?: number;
+        quote?: 'single' | 'double';
+        trailingComma?: boolean;
+        arrayBracketSpacing?: boolean;
+        objectCurlySpacing?: boolean;
+        arrowParensAlways?: boolean;
+    };
 }
 
 class ConnectionService {
