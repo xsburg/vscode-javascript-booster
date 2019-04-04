@@ -9,3 +9,9 @@ const a = () => {
 const a = () => {
     this.bar = 'bar';
 };
+
+/*$ { fixture: 'should-transform-async-properly' } $*/
+
+const a = async () => {
+    let foo = 'foo';
+};

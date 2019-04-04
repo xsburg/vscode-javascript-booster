@@ -26,3 +26,14 @@ const a = function() {
 const a = function() { /*# { pos: 14 } #*/
     this.bar = 2;
 }.bind(this)
+
+/*$ { fixture: 'should-not-trigger-when-generator', expected: false } $*/
+
+const a = function*() { /*# { pos: 14 } #*/
+}
+
+/*$ { fixture: 'should-not-trigger-when-bound-this-generator', expected: false } $*/
+
+const a = function*() { /*# { pos: 14 } #*/
+    this.bar = 2;
+}.bind(this)

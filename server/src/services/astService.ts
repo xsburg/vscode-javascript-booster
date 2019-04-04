@@ -15,7 +15,8 @@ import logService from './logService';
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
 CollectionPrototype.toSource = function(options: PrinterOptions) {
-    const userFormattingOptions = connectionService.getSettings().formattingOptions;
+    const settings = connectionService.getSettings();
+    const userFormattingOptions = settings ? settings.formattingOptions : {};
     return toSource.call(this, {
         quote: 'single',
         ...userFormattingOptions,
