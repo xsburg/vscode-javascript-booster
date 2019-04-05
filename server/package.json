@@ -23,29 +23,29 @@
         "generate-ast-typings": "node ./typings/generate-ast-typings"
     },
     "dependencies": {
-        "babylon": "7.0.0-beta.47",
-        "fs-extra": "6.0.0",
-        "ast-types": "0.11.3",
+        "@babel/parser": "7.4.3",
+        "fs-extra": "7.0.1",
+        "ast-types": "0.12.3",
         "jscodeshift": "xsburg/jscodeshift",
-        "lodash": "4.17.10",
+        "lodash": "4.17.11",
         "vscode-languageserver": "4.1.2",
-        "vscode-uri": "1.0.3"
+        "vscode-uri": "1.0.6"
     },
     "devDependencies": {
-        "@types/fs-extra": "5.0.2",
+        "@types/fs-extra": "5.0.5",
         "@types/jest": "22.2.3",
-        "@types/lodash": "4.14.108",
-        "@types/node": "10.5.4",
-        "coveralls": "3.0.0",
+        "@types/lodash": "4.14.123",
+        "@types/node": "11.13.0",
+        "coveralls": "3.0.3",
         "cpx": "1.5.0",
         "jest": "22.4.3",
         "prettier": "1.16.4",
-        "react": "16.3.2",
-        "rimraf": "2.6.2",
+        "react": "16.8.6",
+        "rimraf": "2.6.3",
         "ts-jest": "22.4.5",
-        "tslint": "5.9.1",
+        "tslint": "5.15.0",
         "tslint-config-prettier": "1.18.0",
-        "tslint-react": "3.5.1",
+        "tslint-react": "4.0.0",
         "typescript": "2.7.2"
     },
     "jest": {

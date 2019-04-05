@@ -192,8 +192,8 @@
         "vscode": "1.1.18"
     },
     "dependencies": {
-        "fs-extra": "5.0.0",
-        "lodash": "4.17.5",
+        "fs-extra": "7.0.1",
+        "lodash": "4.17.11",
         "vscode-languageclient": "4.1.3"
     }
 }

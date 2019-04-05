@@ -292,32 +292,32 @@ describe(`Smart selection`, () => {
         assertSmartSelectionBulk([
             `
                 /*# { action: '+' } #*/
-                const company = selectors.company.|1|getCompanyById|1|(state, d.companyId);
-                const company = |2|selectors.company.getCompanyById|2|(state, d.companyId);
+                const company1 = selectors.company.|1|getCompanyById|1|(state, d.companyId);
+                const company2 = |2|selectors.company.getCompanyById|2|(state, d.companyId);
             `,
             `
                 /*# { action: '+' } #*/
-                const company = |1|selectors.company.getCompanyById|1|(state, d.companyId);
-                const company = |2|selectors.company.getCompanyById(state, d.companyId)|2|;
+                const company1 = |1|selectors.company.getCompanyById|1|(state, d.companyId);
+                const company2 = |2|selectors.company.getCompanyById(state, d.companyId)|2|;
             `,
             `
                 /*# { action: '-' } #*/
-                const company = |1|selectors.company.getCompanyById(state, d.companyId)|1|;
-                const |2|company = selectors.company.getCompanyById(state, d.companyId)|2|;
+                const company1 = |1|selectors.company.getCompanyById(state, d.companyId)|1|;
+                const |2|company2 = selectors.company.getCompanyById(state, d.companyId)|2|;
             `,
             `
                 /*# { action: '-' } #*/
-                const company = |1|selectors.company.getCompanyById|1|(state, d.companyId);
-                const company = |2|selectors.company.getCompanyById(state, d.companyId)|2|;
+                const company1 = |1|selectors.company.getCompanyById|1|(state, d.companyId);
+                const company2 = |2|selectors.company.getCompanyById(state, d.companyId)|2|;
             `,
             `
                 /*# { action: '-' } #*/
-                const company = selectors.company.|1|getCompanyById|1|(state, d.companyId);
-                const company = |2|selectors.company.getCompanyById|2|(state, d.companyId);
+                const company1 = selectors.company.|1|getCompanyById|1|(state, d.companyId);
+                const company2 = |2|selectors.company.getCompanyById|2|(state, d.companyId);
             `,
             `
-                const company = selectors.company.getCompanyById|1|(state, d.companyId);
-                const company = selectors.company.getCompanyById|2|(state, d.companyId);
+                const company1 = selectors.company.getCompanyById|1|(state, d.companyId);
+                const company2 = selectors.company.getCompanyById|2|(state, d.companyId);
             `
         ]);
     });

@@ -44,7 +44,7 @@ const supportedLanguages: LanguageId[] = [
 const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
     javascript: jscodeshift.withParser('babylon'),
     javascriptreact: jscodeshift.withParser('babylon'),
-    typescript: jscodeshift.withParser('typescript'),
+    typescript: jscodeshift.withParser('ts'),
     typescriptreact: jscodeshift.withParser('tsx')
 };
 
