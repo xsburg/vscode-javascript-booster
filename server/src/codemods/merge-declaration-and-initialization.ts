@@ -17,7 +17,7 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 
-const codeMod: CodeModExports = (fileInfo, api, options) => {
+const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -68,7 +68,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
     const resultText = ast.toSource();
     return resultText;
-};
+}) as CodeModExports;
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;

@@ -46,7 +46,7 @@
         "tslint": "5.15.0",
         "tslint-config-prettier": "1.18.0",
         "tslint-react": "4.0.0",
-        "typescript": "2.7.2"
+        "typescript": "3.4.1"
     },
     "jest": {
         "testEnvironment": "node",

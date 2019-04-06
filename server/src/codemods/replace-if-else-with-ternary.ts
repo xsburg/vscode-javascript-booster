@@ -22,7 +22,7 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 import { getNextStatementInBlock, getSingleStatement } from '../utils/astHelpers';
 
-const codeMod: CodeModExports = (fileInfo, api, options) => {
+const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -65,7 +65,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
     const resultText = ast.toSource();
     return resultText;
-};
+}) as CodeModExports;
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;

@@ -8,6 +8,7 @@
         }
     ],
     "settings": {
-        "local-history.path": "${workspaceFolder}/../"
+        "local-history.path": "${workspaceFolder}/../",
+        "typescript.tsdk": "server/node_modules/typescript/lib"
     }
 }

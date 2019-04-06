@@ -11,7 +11,7 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 import { extractSelectionAnchor, SELECTION_ANCHOR } from '../utils/extractSelectionAnchor';
 
-const codeMod: CodeModExports = (fileInfo, api, options) => {
+const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -22,7 +22,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     param.name = `(${param.name}${SELECTION_ANCHOR})`;
 
     return extractSelectionAnchor(ast.toSource());
-};
+}) as CodeModExports;
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
