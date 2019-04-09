@@ -3070,4 +3070,8 @@ declare module 'ast-types' {
         TSInterfaceDeclaration: NamedType<TSInterfaceDeclaration>;
         TSParameterProperty: NamedType<TSParameterProperty>;
     }
+
+    export type ASTNode = AstNode;
+    let astTypes: AstTypes;
+    export default astTypes;
 }

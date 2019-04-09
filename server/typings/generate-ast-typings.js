@@ -5,8 +5,8 @@ function loadTypes() {
         require('ast-types/def/core'),
         require('ast-types/def/es6'),
         require('ast-types/def/es7'),
-        require('ast-types/def/mozilla'),
-        require('ast-types/def/e4x'),
+        require('ast-types/def/es-proposals'),
+        require('ast-types/def/type-annotations'),
         require('ast-types/def/jsx'),
         require('ast-types/def/flow'),
         require('ast-types/def/esprima'),
@@ -28,7 +28,7 @@ function loadTypes() {
         return usedResult[idx];
     }
     fork.use = use;
-    const types = use(require('ast-types/lib/types'));
+    const types = use(require('ast-types/lib/types').default);
 
     defs.forEach(use);
     types.finalize();
@@ -203,6 +203,13 @@ function generateNamedTypesObject(types, typeDefs) {
     return `    export interface NamedTypes {\n${fields}\n    }`;
 }
 
+function generateFooter() {
+    return `
+    export type ASTNode = AstNode;
+    let astTypes: AstTypes;
+    export default astTypes;`;
+}
+
 const types = loadTypes();
 const typeDefs = {};
 Object.keys(types.namedTypes).forEach(typeName => {
@@ -214,7 +221,8 @@ const result = [
     generateTypeNameUnion(types, typeDefs),
     generateTypeUnion(types, typeDefs),
     generateBuildersInterface(types, typeDefs),
-    generateNamedTypesObject(types, typeDefs)
+    generateNamedTypesObject(types, typeDefs),
+    generateFooter()
 ];
 
 const data = `declare module 'ast-types' {\n${result.join('\n')}\n}\n`;

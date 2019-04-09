@@ -186,5 +186,6 @@ declare module 'ast-types' {
         astNodesAreEquivalent: typeof astNodesAreEquivalent;
         finalize: typeof finalize;
         use: typeof use;
+        visit: any;
     }
 }

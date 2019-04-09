@@ -6,7 +6,7 @@
             "type": "node",
             "request": "launch",
             "name": "Generate ast-types typings",
-            "program": "${workspaceFolder}/client/typings/generate-ast-typings.js"
+            "program": "${workspaceFolder}/typings/generate-ast-typings.js"
         },
         {
             "name": "Attach to Server",
