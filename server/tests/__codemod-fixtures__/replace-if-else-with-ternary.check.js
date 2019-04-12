@@ -71,3 +71,14 @@ function test() {
         }
     return 0;
 }
+
+/*$ { fixture: 'should-trigger-with-two-statements', expected: true } $*/
+
+function test() {
+    let foo = 'foo';
+    if (foo) { /*# { pos: 6 } #*/
+        this.setAction(foo);
+    } else {
+        this.setAction('bar');
+    }
+}
