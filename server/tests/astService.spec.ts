@@ -6,6 +6,27 @@ import astService from '../src/services/astService';
 describe('astService', () => {
     const eolLength = os.EOL.length;
 
+    it('Should support decorators', () => {
+        const actual = astService.getAstTree({
+            languageId: 'typescript',
+            fileName: 'foo.ts',
+            source: `
+                    import { Component } from '@angular/core';
+
+                    @Component({
+                        selector: 'app-root',
+                        templateUrl: './app.component.html',
+                        styleUrls: ['./app.component.css']
+                    })
+                    export class AppComponent {
+                        title = 'Tour of Heroes';
+                    }
+                `
+        });
+
+        expect(actual).toBeTruthy();
+    });
+
     it('offsetAt() should compute line', () => {
         const actual = astService.offsetAt(
             `let a;\nlet b;\r\nlet c;\nlet d;`,

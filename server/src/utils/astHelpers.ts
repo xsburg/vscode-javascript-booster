@@ -1,4 +1,12 @@
-import { AstNode, Expression, NodePath, UnaryExpression } from 'ast-types';
+import {
+    AstNode,
+    Expression,
+    Node,
+    NodePath,
+    Statement,
+    StringLiteral,
+    UnaryExpression
+} from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 
 export function negateExpression(j: JsCodeShift, expr: Expression) {
@@ -29,7 +37,14 @@ export function negateExpression(j: JsCodeShift, expr: Expression) {
     return j.unaryExpression('!', expr);
 }
 
-export function isStringExpression(j: JsCodeShift, path: NodePath<AstNode> | null) {
+/**
+ * Checks if the asked node is a StringLiteral AND also checks
+ * if it's a proper string inside a JS expression, not inside imports, TS string Enums etc.
+ */
+export function isStringExpression(
+    j: JsCodeShift,
+    path: NodePath<AstNode> | null
+): path is NodePath<StringLiteral> {
     if (!path || !j.StringLiteral.check(path.node)) {
         return false;
     }
@@ -46,4 +61,51 @@ export function isStringExpression(j: JsCodeShift, path: NodePath<AstNode> | nul
     }
 
     return true;
+}
+
+/**
+ * When node is one of these: `expression;`, `{ expression; }`, `{ { expression; } }` etc.
+ *
+ * Returns `expression`.
+ *
+ * Otherwise, `null`.
+ *
+ * Useful e.g. when you want to get the content of `if` consequent branch etc.
+ * @param j codeshift
+ * @param n node to check
+ */
+export function getSingleStatement(j: JsCodeShift, n: Node | null): Statement | null {
+    if (j.BlockStatement.check(n) && n.body.length === 1) {
+        return getSingleStatement(j, n.body[0]);
+    }
+    if (j.Statement.check(n)) {
+        return n;
+    }
+    return null;
+}
+
+/**
+ * When given the following example:
+ * ```
+ * {
+ *     //...
+ *     thisStatement;
+ *     nextStatement;
+ *     //...
+ * }
+ * ```
+ * Returns the `nextStatement` or `null` if not inside a block, target is the last statement etc.
+ * @param j codeshift
+ * @param p path to work with
+ */
+export function getNextStatementInBlock(j: JsCodeShift, p: NodePath<Statement>): Statement | null {
+    if (!p.parent || !j.BlockStatement.check(p.parent.node)) {
+        return null;
+    }
+    const blockBody = p.parent.node.body;
+    const index = blockBody.indexOf(p.node);
+    if (index !== -1 && index + 1 < blockBody.length) {
+        return blockBody[index + 1];
+    }
+    return null;
 }

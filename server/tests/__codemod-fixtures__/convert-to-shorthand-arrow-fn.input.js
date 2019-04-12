@@ -42,3 +42,11 @@ function test() {
         b = 3;
     };
 }
+
+/*$ { fixture: 'should-transform-arrow' } $*/
+
+function test() {
+    const a = async () => { /*# { pos: 19 } #*/
+        return 1;
+    };
+}

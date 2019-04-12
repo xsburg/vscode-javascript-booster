@@ -2,7 +2,6 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { CodeModCodeActionProvider } from '../src/CodeModCodeActionProvider';
-import { commandIds } from '../src/const';
 import { executeCodeActionCommand } from '../src/executeCodeActionCommand';
 import langService from '../src/services/langService';
 
@@ -47,7 +46,7 @@ suite(`Integration tests`, () => {
         const codeActionProvider = new CodeModCodeActionProvider();
         const codeActions = await codeActionProvider.provideCodeActions(
             textDocument,
-            new vscode.Range(0, 0, 0, 0),
+            editor.selection,
             createDiagnosticsMock(),
             createCancellationTokenMock()
         );
@@ -67,13 +66,14 @@ suite(`Integration tests`, () => {
         const codeActionProvider = new CodeModCodeActionProvider();
         const codeActions = await codeActionProvider.provideCodeActions(
             textDocument,
-            new vscode.Range(0, 0, 0, 0),
+            editor.selection,
             createDiagnosticsMock(),
             createCancellationTokenMock()
         );
 
-        const [arg1, arg2, arg3] = codeActions[0].arguments!;
-        await executeCodeActionCommand(arg1, arg2, arg3);
+        assert.equal(codeActions[0].arguments!.length, executeCodeActionCommand.length);
+
+        await (executeCodeActionCommand as any)(...codeActions[0].arguments!);
 
         const actualText = textDocument.getText();
         assert.equal(

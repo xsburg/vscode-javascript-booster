@@ -16,6 +16,17 @@ if (a) {
 } else {  /*# { pos: 3 } #*/
 }
 
+/*$ { fixture: 'should-trigger-when-if-returns', expected: true } $*/
+
+function test() {
+    if (true) {
+        let b = 2;
+        return;
+    } else {  /*# { pos: 8 } #*/
+        let b = 3;
+    }
+}
+
 /*$ { fixture: 'should-not-trigger-else-not-empty', expected: false } $*/
 
 const a = 1;

@@ -32,3 +32,9 @@ function test() {
     let b;
     const a = () => b = 3;
 }
+
+/*$ { fixture: 'should-transform-arrow' } $*/
+
+function test() {
+    const a = async () => 1;
+}

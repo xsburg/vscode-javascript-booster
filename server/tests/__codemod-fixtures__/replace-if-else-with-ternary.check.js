@@ -30,6 +30,15 @@ function test() {
     }
 }
 
+/*$ { fixture: 'should-trigger-with-return-no-else', expected: true } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return 1;
+    }
+    return 0;
+}
+
 /*$ { fixture: 'should-not-trigger-if-if-has-other-statements', expected: false } $*/
 
 function test() {
@@ -39,5 +48,37 @@ function test() {
         let b = 2;
     } else {
         a = 0;
+    }
+}
+
+/*$ { fixture: 'should-not-trigger-with-empty-return', expected: false } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return;
+    } else {
+        return 0;
+    }
+}
+
+/*$ { fixture: 'should-not-trigger-with-empty-return', expected: false } $*/
+
+function test() {
+    let foo = 'bar';
+    if (foo)
+        if (true) { /*# { pos: 10 } #*/
+            return 1;
+        }
+    return 0;
+}
+
+/*$ { fixture: 'should-trigger-with-two-statements', expected: true } $*/
+
+function test() {
+    let foo = 'foo';
+    if (foo) { /*# { pos: 6 } #*/
+        this.setAction(foo);
+    } else {
+        this.setAction('bar');
     }
 }

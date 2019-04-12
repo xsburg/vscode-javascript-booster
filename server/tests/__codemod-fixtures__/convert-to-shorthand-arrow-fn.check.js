@@ -28,3 +28,10 @@ let b;
 const a = () => { /*# { pos: 15 } #*/
     b = 3;
 };
+
+/*$ { fixture: 'should-trigger-at-async', expected: true } $*/
+
+let b;
+const a = async () => { /*# { pos: 15 } #*/
+    b = 3;
+};

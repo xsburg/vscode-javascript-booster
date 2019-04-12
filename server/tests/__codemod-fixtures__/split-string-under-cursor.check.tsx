@@ -6,6 +6,14 @@ const a = 'foo'; /*# { pos: 14 } #*/
 
 const a = 1; /*# { pos: 2 } #*/
 
+/*$ { fixture: 'should-not-trigger-when-at-start-quote', expected: false } $*/
+
+const a = 'foo' /*# { pos: 11 } #*/
+
+/*$ { fixture: 'should-not-trigger-when-at-end-quote', expected: false } $*/
+
+const a = 'foo' /*# { pos: 16 } #*/
+
 /*$ { fixture: 'should-not-trigger-on-import', expected: false } $*/
 
 import React from 'react'; /*# { pos: 23 } #*/

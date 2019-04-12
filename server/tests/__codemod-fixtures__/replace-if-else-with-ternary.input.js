@@ -19,3 +19,23 @@ function test() {
         return 0;
     }
 }
+
+/*$ { fixture: 'should-transform-return-without-else' } $*/
+
+function test() {
+    if (true) { /*# { pos: 6 } #*/
+        return 1;
+    }
+    return 0;
+}
+
+/*$ { fixture: 'should-transform-two-statements' } $*/
+
+function test() {
+    let foo = 'foo';
+    if (foo) { /*# { pos: 6 } #*/
+        this.setAction(foo);
+    } else {
+        this.setAction('bar');
+    }
+}

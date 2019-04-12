@@ -15,8 +15,9 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 import * as astHelpers from '../utils/astHelpers';
+import { extractSelectionAnchor, SELECTION_ANCHOR } from '../utils/extractSelectionAnchor';
 
-const codeMod: CodeModExports = (fileInfo, api, options) => {
+const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -34,10 +35,11 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
     let leftValue = raw.substring(0, offset);
     let rightValue = raw.substring(offset);
     if (leftValue.endsWith('\\')) {
-        if (rightValue.startsWith('\n')) {
+        const m = rightValue.match(/^[\r\n]+/);
+        if (m) {
             // Multiline literal with slash escaping new line. We remove both escapes.
             leftValue = leftValue.substring(0, leftValue.length - 1);
-            rightValue = rightValue.substring(1);
+            rightValue = rightValue.substring(m[0].length);
         } else {
             // Move the escape character into the right pair (so the strings keep being valid)
             leftValue = leftValue.substring(0, leftValue.length - 1);
@@ -45,10 +47,8 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         }
     }
 
-    const index = leftValue.lastIndexOf('\\');
-
     const leftNode = j.identifier(leftValue + quoteChar);
-    const rightNode = j.identifier(quoteChar + rightValue);
+    const rightNode = j.identifier(SELECTION_ANCHOR + quoteChar + rightValue);
 
     let replacementTarget = path as NodePath<AstNode>;
     while (
@@ -73,16 +73,20 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         );
     }
 
-    const resultText = ast.toSource();
-    return resultText;
-};
+    return extractSelectionAnchor(ast.toSource());
+}) as CodeModExports;
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const path = options.target.firstPath();
 
-    return astHelpers.isStringExpression(j, path);
+    if (!path || !astHelpers.isStringExpression(j, path)) {
+        return false;
+    }
+
+    // can only trigger inside quotes
+    return options.selection.active - path.node.start > 0;
 };
 
 codeMod.scope = 'cursor';

@@ -90,6 +90,7 @@ async function runInlineTransformTest(
     expect(actualOutput).toBe(expectedOutput);
 
     if (output.selection) {
+        // execute() must return new selection
         expect(result.selection).toBeTruthy();
         const actualActivePos = Position.fromZeroBased(
             astService.positionAt(result.source, result.selection!.active)

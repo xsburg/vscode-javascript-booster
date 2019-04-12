@@ -2,6 +2,10 @@
 
 const a = 'foobar'; /*# { pos: 15 } #*/
 
+/*$ { fixture: 'should-split-into-two-and-adjust-selection' } $*/
+
+const a = 'foobar'; /*# { pos: 15 } #*/
+
 /*$ { fixture: 'should-split-corner-case-start' } $*/
 
 const a = 'foo'; /*# { pos: 12 } #*/

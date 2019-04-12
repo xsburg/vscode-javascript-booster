@@ -71,7 +71,7 @@ export const shrinkSelectionRequestType = new RequestType<
 class LangService {
     private _languageClient!: LanguageClient;
 
-    public initialize(context: vscode.ExtensionContext) {
+    public initialize() {
         if (this._languageClient) {
             // Already initialized
             return;

@@ -5,6 +5,7 @@ import * as os from 'os';
 import { PrinterOptions } from 'recast';
 import * as vscode from 'vscode-languageserver-types';
 import { registerCollectionExtensions } from '../utils/collectionExtensions';
+import connectionService from './connectionService';
 import logService from './logService';
 
 // Hack to adjust default recast options
@@ -14,8 +15,11 @@ import logService from './logService';
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
 CollectionPrototype.toSource = function(options: PrinterOptions) {
+    const settings = connectionService.getSettings();
+    const userFormattingOptions = settings ? settings.formattingOptions : {};
     return toSource.call(this, {
         quote: 'single',
+        ...userFormattingOptions,
         ...options
     });
 };
@@ -40,7 +44,7 @@ const supportedLanguages: LanguageId[] = [
 const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
     javascript: jscodeshift.withParser('babylon'),
     javascriptreact: jscodeshift.withParser('babylon'),
-    typescript: jscodeshift.withParser('typescript'),
+    typescript: jscodeshift.withParser('ts'),
     typescriptreact: jscodeshift.withParser('tsx')
 };
 

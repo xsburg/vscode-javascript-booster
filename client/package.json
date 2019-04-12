@@ -3,7 +3,7 @@
     "displayName": "JavaScript Booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
     "icon": "resources/icon.png",
-    "version": "0.8.0",
+    "version": "0.10.2",
     "publisher": "sburg",
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
@@ -15,7 +15,7 @@
         "url": "https://github.com/xsburg/vscode-javascript-booster/issues"
     },
     "engines": {
-        "vscode": "^1.19.0",
+        "vscode": "^1.24.0",
         "node": ">=8.0.0",
         "npm": ">=5.6.0"
     },
@@ -34,9 +34,7 @@
         "vscode:prepublish": "cd .. && npm run compile",
         "compile": "npm run clean && tsc -p ./ && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
         "watch": "tsc -watch -p ./",
-        "test": "npm run compile && CODE_TESTS_PATH=${PWD}/out/tests node ./node_modules/vscode/bin/test",
-        "preversion": "npm test",
-        "postversion": "git push && git push --tags"
+        "test": "cd .. && npm run compile && cd client && CODE_TESTS_PATH=${PWD}/out/tests node ./node_modules/vscode/bin/test"
     },
     "main": "./out/src/extension",
     "activationEvents": [
@@ -90,35 +88,112 @@
                         "type": "string",
                         "default": "editor.action.smartSelect.shrink",
                         "description": "Specifies the fallback command that should be executed if the file is not supported by smart selection."
+                    },
+                    "javascriptBooster.formattingOptions": {
+                        "type": "object",
+                        "properties": {
+                            "tabWidth": {
+                                "type": "number",
+                                "default": "4",
+                                "description": "Number of spaces the pretty-printer should use per tab for indentation. If you do not pass this option explicitly, it will be inferred from the original code."
+                            },
+                            "useTabs": {
+                                "type": "boolean",
+                                "default": "false",
+                                "description": "If you want the pretty-printer to use tabs instead of spaces, make this option true."
+                            },
+                            "wrapColumn": {
+                                "type": "number",
+                                "default": "74",
+                                "description": "Some of the pretty-printer code (such as that for printing function parameter lists) makes a valiant attempt to prevent really long lines. You can adjust the limit by changing this option; however, there is no guarantee that line length will fit inside this limit."
+                            },
+                            "quote": {
+                                "enum": [
+                                    "single",
+                                    "double"
+                                ],
+                                "default": "single",
+                                "description": "If you have preferences for what type of quotes should be used in newly created string literals, specify this option."
+                            },
+                            "trailingComma": {
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "objects": {
+                                                "type": "boolean",
+                                                "default": "false"
+                                            },
+                                            "arrays": {
+                                                "type": "boolean",
+                                                "default": "false"
+                                            },
+                                            "parameters": {
+                                                "type": "boolean",
+                                                "default": "false"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "objects",
+                                            "arrays",
+                                            "parameters"
+                                        ]
+                                    },
+                                    {
+                                        "type": "boolean"
+                                    }
+                                ],
+                                "default": "false",
+                                "description": "Controls the printing of trailing commas in object literals, array expressions and function parameters. You can provide an object to specify settings for individual contexts."
+                            },
+                            "arrowParensAlways": {
+                                "type": "boolean",
+                                "default": "false",
+                                "description": "If you want parenthesis to wrap single-argument arrow function parameter lists, pass true for this option."
+                            },
+                            "objectCurlySpacing": {
+                                "type": "boolean",
+                                "default": "true",
+                                "description": "Controls the printing of spaces inside object literals, destructuring assignments, and import/export specifiers."
+                            },
+                            "arrayBracketSpacing": {
+                                "type": "boolean",
+                                "default": "true",
+                                "description": "Controls the printing of spaces inside array brackets."
+                            }
+                        },
+                        "additionalProperties": false,
+                        "description": "Specifies formatting options that will be used for newly generated code. Only the code fragment affected by a chosen code action is reformatted."
                     }
                 }
             }
         ]
     },
     "devDependencies": {
-        "@types/fs-extra": "^5.0.1",
-        "@types/lodash": "^4.14.104",
-        "@types/glob": "^5.0.35",
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "cpx": "^1.5.0",
-        "decache": "^4.4.0",
-        "glob": "^7.1.2",
-        "istanbul": "^0.4.5",
-        "react": "^16.2.0",
-        "remap-istanbul": "^0.11.0",
-        "rimraf": "^2.6.2",
-        "tslint": "^5.9.1",
-        "tslint-config-prettier": "^1.10.0",
-        "tslint-react": "^3.5.1",
-        "typescript": "2.7.2",
-        "coveralls": "^3.0.0",
-        "prettier": "^1.10.2",
-        "vscode": "^1.1.17"
+        "@types/fs-extra": "5.0.5",
+        "@types/lodash": "4.14.123",
+        "@types/glob": "7.1.1",
+        "@types/mocha": "5.2.6",
+        "@types/node": "11.13.0",
+        "cpx": "1.5.0",
+        "decache": "4.5.1",
+        "glob": "7.1.3",
+        "istanbul": "0.4.5",
+        "react": "16.8.6",
+        "remap-istanbul": "0.13.0",
+        "rimraf": "2.6.3",
+        "tslint": "5.15.0",
+        "tslint-config-prettier": "1.18.0",
+        "tslint-react": "4.0.0",
+        "typescript": "3.4.1",
+        "coveralls": "3.0.3",
+        "prettier": "1.16.4",
+        "vscode": "1.1.33"
     },
     "dependencies": {
-        "fs-extra": "^5.0.0",
-        "lodash": "^4.17.5",
-        "vscode-languageclient": "^4.1.3"
+        "fs-extra": "7.0.1",
+        "lodash": "4.17.11",
+        "vscode-languageclient": "4.1.3"
     }
 }

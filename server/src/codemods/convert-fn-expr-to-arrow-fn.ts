@@ -21,6 +21,7 @@ function canRunBindExprTransform(j: JsCodeShift, target: Collection) {
     }
 
     const functionExpression = target.closest(j.FunctionExpression).firstNode();
+
     const isBoundFunctionExpression =
         j.MemberExpression.check(callExpression.callee) &&
         j.FunctionExpression.check(callExpression.callee.object) &&
@@ -30,21 +31,24 @@ function canRunBindExprTransform(j: JsCodeShift, target: Collection) {
 
     // 1. Somewhere over function(){}.bind()
     // 2. Outside the function definition
+    // 3. Function definition is not a generator
     return (
         isBoundFunctionExpression &&
-        (callExpression.callee as MemberExpression).object !== functionExpression
+        (callExpression.callee as MemberExpression).object !== functionExpression &&
+        !((callExpression.callee as MemberExpression).object as FunctionExpression).generator
     );
 }
 
 function canRunFunctionExprTransform(j: JsCodeShift, target: Collection) {
-    if (!j.FunctionExpression.check(target.firstNode())) {
+    const functionExpr = target.firstNode();
+    if (!j.FunctionExpression.check(functionExpr)) {
         return false;
     }
 
-    return target.find(j.ThisExpression).length === 0;
+    return !functionExpr.generator && target.find(j.ThisExpression).length === 0;
 }
 
-const codeMod: CodeModExports = (fileInfo, api, options) => {
+const codeMod = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -57,6 +61,7 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         if (functionExpr.returnType) {
             arrowExpr.returnType = functionExpr.returnType;
         }
+        arrowExpr.async = functionExpr.async;
         $callExpression.replaceWith(arrowExpr);
     } else if (canRunFunctionExprTransform(j, target)) {
         const functionExpr = target.firstNode() as FunctionExpression;
@@ -64,12 +69,13 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
         if (functionExpr.returnType) {
             arrowExpr.returnType = functionExpr.returnType;
         }
+        arrowExpr.async = functionExpr.async;
         target.replaceWith(arrowExpr);
     }
 
     const resultText = ast.toSource();
     return resultText;
-};
+}) as CodeModExports;
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;

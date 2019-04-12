@@ -1,9 +1,16 @@
 import { AstNode, NamedType, NodePath, Printable } from 'ast-types';
+import * as astTypes from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
-import { Position } from './Position';
+import * as jscodeshift from 'jscodeshift';
 
 function isPositionWithinNode(position: number, node: Printable) {
     return node.start <= position && position < node.end;
+}
+
+function createCollection<TNode>(
+    nodeOrPathOrArray: TNode | NodePath<TNode> | TNode[] | Array<NodePath<TNode>>
+) {
+    return (jscodeshift as any)(nodeOrPathOrArray);
 }
 
 export function registerCollectionExtensions(j: JsCodeShift) {
@@ -37,22 +44,60 @@ export function registerCollectionExtensions(j: JsCodeShift) {
             return result;
         },
 
-        findNodeAtPosition<TNode>(this: Collection<TNode>, pos: number): Collection {
-            const matched = this.find(j.Node).filter(path => isPositionWithinNode(pos, path.node));
-            const c = matched.at(-1);
-            return c as Collection;
+        findNodeAtPosition<TNode extends AstNode>(
+            this: Collection<TNode>,
+            pos: number
+        ): Collection {
+            const path = this.firstPath();
+            if (!path) {
+                return createCollection([]);
+            }
+            let targets: Array<NodePath<AstNode>> = [];
+            let r = astTypes.visit(path, {
+                visitNode(p: NodePath<AstNode>) {
+                    if (isPositionWithinNode(pos, p.node as Printable)) {
+                        targets.push(p);
+                        this.traverse(p);
+                        return;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+            const last = targets[targets.length - 1];
+            return createCollection(last || []);
         },
 
-        findNodeInRange<TNode>(this: Collection<TNode>, start: number, end: number): Collection {
+        findNodeInRange<TNode extends AstNode>(
+            this: Collection<TNode>,
+            start: number,
+            end: number
+        ): Collection {
             if (start > end) {
                 [start, end] = [end, start];
             }
 
-            const matched = this.find(j.Node).filter(
-                path => path.node.start <= start && end <= path.node.end
-            );
-            const c = matched.at(-1);
-            return c as Collection;
+            const path = this.firstPath();
+            if (!path) {
+                return createCollection([]);
+            }
+            let targets: Array<NodePath<AstNode>> = [];
+            let r = astTypes.visit(path, {
+                visitNode(p: NodePath<AstNode>) {
+                    const n = p.node as Printable;
+                    if (n.start <= start && end <= n.end) {
+                        targets.push(p);
+                        this.traverse(p);
+                        return;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+            const last = targets[targets.length - 1];
+            return createCollection(last || []);
         },
 
         thisOrClosest<TNode>(
