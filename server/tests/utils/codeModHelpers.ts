@@ -168,37 +168,57 @@ function getLanguageIdByFileName(fileName: string): LanguageId {
 /*
     Extracts position from a json comment, example:
     /* { pos: 1 [,nextLine: true]  } *\/
-    /* { startPos: 1 [,nextLine: true]  } *\/
-    /* { endPos: 1 [,nextLine: true]  } *\/
+    /* { activePos: 1 [,nextLine: true]  } *\/
+    /* { anchorPos: 1 [,nextLine: true]  } *\/
  */
-function extractPosition(modId: string, source: string): (IPosition & { source: string }) | null {
-    const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
-    const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
-    const match = re.exec(source);
-    if (!match || !match[0]) {
-        return null;
-    }
-    // tslint:disable-next-line:no-eval
-    const posDef = eval('(' + match[1] + ')');
-    if (!Number.isFinite(posDef.pos)) {
-        throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
-    }
-    const column: number = posDef.pos;
-    let line: number = source.split('\n').findIndex(l => l.includes(match[0])) + 1;
-    if (posDef.nextLine) {
-        line++;
+function extractPosition(
+    modId: string,
+    source: string
+): ({ source: string; pos: { anchor: IPosition; active: IPosition } }) | null {
+    function extractPosInternal(posKey: string) {
+        const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
+        // TODO: iterate through all matches
+        const match = re.exec(source);
+        if (!match || !match[0]) {
+            return null;
+        }
+        // tslint:disable-next-line:no-eval
+        const posDef = eval('(' + match[1] + ')');
+        const pos = posDef[posKey] || posDef.pos;
+        if (!Number.isFinite(pos)) {
+            throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
+        }
+        const column: number = pos;
+        let line: number = source.split('\n').findIndex(l => l.includes(match[0])) + 1;
+        if (posDef.nextLine) {
+            line++;
+        }
+        return {
+            line,
+            column
+        };
     }
 
+    const anchorPos = extractPosInternal('anchorPos');
+    const activePos = extractPosInternal('activePos');
+    if (!anchorPos || !activePos) {
+        return null;
+    }
+
+    const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
     let cleanSource = source.replace(reClean, '');
     if (cleanSource.startsWith('\n')) {
         cleanSource = cleanSource.substring(1);
-        line--;
+        anchorPos.line--;
+        activePos.line--;
     }
 
     return {
         source: cleanSource,
-        line,
-        column
+        pos: {
+            anchor: anchorPos,
+            active: activePos
+        }
     };
 }
 
@@ -251,15 +271,18 @@ function extractFixtures(
         validateOutPos: boolean;
         skip: boolean;
         source: string;
-        pos: IPosition;
+        pos: {
+            anchor: IPosition;
+            active: IPosition;
+        };
     }> = fixtures.map(fx => {
         const inputFragment = input.substring(fx.inputStart, fx.inputEnd);
         let source = inputFragment.trim();
-        let pos = extractPosition(modId, source);
-        if (pos) {
-            source = pos.source;
+        let posInfo = extractPosition(modId, source);
+        if (posInfo) {
+            source = posInfo.source;
         }
-        if (!pos && (hasPosition || fx.validateOutPos)) {
+        if (!posInfo && (hasPosition || fx.validateOutPos)) {
             throw new Error(
                 `[${modId}][${fx.name ||
                     ''}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
@@ -272,16 +295,21 @@ function extractFixtures(
             validateOutPos: Boolean(fx.validateOutPos),
             skip: fx.skip || false,
             source,
-            pos: pos || new Position(1, 1)
+            pos: posInfo
+                ? posInfo.pos
+                : {
+                      anchor: new Position(1, 1),
+                      active: new Position(1, 1)
+                  }
         };
     });
     if (fullFixtures.length === 0) {
         let source = input.trim();
-        let pos = extractPosition(modId, source);
-        if (pos) {
-            source = pos.source;
+        let posInfo = extractPosition(modId, source);
+        if (posInfo) {
+            source = posInfo.source;
         }
-        if (!pos && hasPosition) {
+        if (!posInfo && hasPosition) {
             throw new Error(
                 `[${modId}][${fallbackFixtureName}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
             );
@@ -293,10 +321,25 @@ function extractFixtures(
             validateOutPos: false,
             skip: false,
             source,
-            pos: pos || new Position(1, 1)
+            pos: posInfo
+                ? posInfo.pos
+                : {
+                      anchor: new Position(1, 1),
+                      active: new Position(1, 1)
+                  }
         });
     }
     return fullFixtures;
+}
+
+function posToString(pos: { anchor: IPosition; active: IPosition }) {
+    if (pos.active.column === pos.anchor.column && pos.active.line === pos.anchor.line) {
+        return `pos ${pos.active.line}:${pos.active.column}`;
+    } else {
+        return `pos ${pos.anchor.line}:${pos.anchor.column}->${pos.active.line}:${
+            pos.active.column
+        }`;
+    }
 }
 
 function defineTransformTests(
@@ -324,8 +367,8 @@ function defineTransformTests(
     describe(`${modId} transform`, () => {
         inputFixtures.forEach(fx => {
             const testName = fx.name
-                ? `"${modId}:${fx.name}" transforms correctly (pos ${fx.pos.line}:${fx.pos.column})`
-                : `"${modId}" transforms correctly (pos ${fx.pos.line}:${fx.pos.column})`;
+                ? `"${modId}:${fx.name}" transforms correctly (${posToString(fx.pos)})`
+                : `"${modId}" transforms correctly (${posToString(fx.pos)})`;
             const outputFx = outputFixtures.find(x => x.name === fx.name);
             if (!outputFx) {
                 throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
@@ -340,13 +383,15 @@ function defineTransformTests(
                         source: outputFx.source,
                         selection: outputFx.validateOutPos
                             ? {
-                                  active: outputFx.pos
+                                  active: outputFx.pos.active,
+                                  anchor: outputFx.pos.anchor
                               }
                             : undefined
                     },
                     {
                         fileName: options.fileName,
-                        active: fx.pos
+                        active: fx.pos.active,
+                        anchor: fx.pos.anchor
                     }
                 );
             });
@@ -381,12 +426,10 @@ function defineCanRunTests(
             }
             const expected: boolean = fx.raw.expected;
             const testName = fx.name
-                ? `"${modId}:${fx.name}" ${expected ? 'can' : 'cannot'} run (pos ${fx.pos.line}:${
-                      fx.pos.column
-                  })`
-                : `"${modId}" ${expected ? 'can' : 'cannot'} run (pos ${fx.pos.line}:${
-                      fx.pos.column
-                  })`;
+                ? `"${modId}:${fx.name}" ${expected ? 'can' : 'cannot'} run (${posToString(
+                      fx.pos
+                  )})`
+                : `"${modId}" ${expected ? 'can' : 'cannot'} run (${posToString(fx.pos)})`;
             const fn = fx.skip ? it.skip : it;
             fn(testName, async () => {
                 await runInlineCanRunTest(
@@ -396,7 +439,8 @@ function defineCanRunTests(
                     expected,
                     {
                         fileName: options.fileName,
-                        active: fx.pos
+                        active: fx.pos.active,
+                        anchor: fx.pos.anchor
                     }
                 );
             });

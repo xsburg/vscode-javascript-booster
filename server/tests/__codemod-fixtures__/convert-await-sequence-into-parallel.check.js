@@ -1,6 +1,6 @@
 /*$ { fixture: 'should-trigger', expected: true } $*/
 
 async function foo() {
-    await bar('test');
-    await bar('test'); /*# { pos: 6 } #*/
+    await bar('test'); /*# { anchorPos: 5 } #*/
+    await bar('test'); /*# { activePos: 23 } #*/
 }
