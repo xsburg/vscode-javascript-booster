@@ -165,6 +165,12 @@ function getLanguageIdByFileName(fileName: string): LanguageId {
     return def.parser;
 }
 
+/*
+    Extracts position from a json comment, example:
+    /* { pos: 1 [,nextLine: true]  } *\/
+    /* { startPos: 1 [,nextLine: true]  } *\/
+    /* { endPos: 1 [,nextLine: true]  } *\/
+ */
 function extractPosition(modId: string, source: string): (IPosition & { source: string }) | null {
     const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
     const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;

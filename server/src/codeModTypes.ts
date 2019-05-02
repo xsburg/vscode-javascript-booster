@@ -8,6 +8,7 @@ type CodeModTransform = (
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
+        anchorTarget: Collection;
         selection: Selection;
     }
 ) =>
@@ -24,6 +25,7 @@ type CanRunFunction = (
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
+        anchorTarget: Collection;
         selection: Selection;
     }
 ) => boolean;

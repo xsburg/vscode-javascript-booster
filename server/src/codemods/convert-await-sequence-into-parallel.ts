@@ -1,14 +1,12 @@
 import {
-    ArrowFunctionExpression,
+    AssignmentExpression,
     AstNode,
     AwaitExpression,
     BlockStatement,
-    Expression,
     ExpressionStatement,
-    FunctionDeclaration,
-    IfStatement,
-    Printable,
-    UnaryExpression
+    Statement,
+    VariableDeclaration,
+    VariableDeclarator
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -25,7 +23,7 @@ function isAwaitStatement(j: JsCodeShift, stmt: AstNode) {
     );
 }
 
-const codeMod: CodeModExports = (fileInfo, api, options) => {
+const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
@@ -59,7 +57,56 @@ const codeMod: CodeModExports = (fileInfo, api, options) => {
 
     const resultText = ast.toSource();
     return resultText;
-};
+}) as CodeModExports;
+
+function getContainingStatement(
+    j: JsCodeShift,
+    c: Collection<AstNode>
+): Collection<Statement> | null {
+    const s = c.thisOrClosest(j.Statement);
+    if (
+        j.match<ExpressionStatement>(s, {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'AwaitExpression'
+            } as AssignmentExpression
+        })
+    ) {
+        // Example: 'await foo();'
+        return s;
+    }
+    if (
+        j.match<ExpressionStatement>(s, {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'AssignmentExpression',
+                right: {
+                    type: 'AwaitExpression'
+                }
+            } as AssignmentExpression
+        })
+    ) {
+        // Example: 'result = await foo();'
+        return s;
+    }
+    if (
+        j.match<VariableDeclaration>(s, {
+            type: 'VariableDeclaration',
+            declarations: [
+                {
+                    type: 'VariableDeclarator',
+                    init: {
+                        type: 'AwaitExpression'
+                    }
+                } as VariableDeclarator
+            ]
+        })
+    ) {
+        // Example: 'let result = await foo();'
+        return s;
+    }
+    return null;
+}
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -70,27 +117,37 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    const isAwaitStmt =
-        j.AwaitExpression.check(path.node) &&
-        j.ExpressionStatement.check(path.parent.node) &&
-        j.BlockStatement.check(path.parent.parent.node);
-    if (!isAwaitStmt) {
+    if (options.selection.anchor === options.selection.active) {
+        // Works on range selections only
         return false;
     }
 
-    const stmt = path.parent.node as ExpressionStatement;
-    const block = path.parent.parent.node as BlockStatement;
-    const index = block.body.indexOf(stmt);
-    const prevStmt = block.body[index - 1];
-    if (isAwaitStatement(j, prevStmt)) {
-        return true;
-    }
-    const nextStmt = block.body[index + 1];
-    if (isAwaitStatement(j, nextStmt)) {
-        return true;
+    const s1 = getContainingStatement(j, options.target);
+    if (!s1) {
+        return false;
     }
 
-    return false;
+    const s2 = getContainingStatement(j, options.anchorTarget);
+    if (!s2) {
+        return false;
+    }
+
+    const s1Parent = s1.parents()[0];
+    const s2Parent = s2.parents()[0];
+    if (!j.BlockStatement.check(s1Parent) || s1Parent !== s2Parent) {
+        // Block statement mismatch
+        return false;
+    }
+
+    const from = s1Parent.body.indexOf(s1.firstNode()!);
+    const to = s1Parent.body.indexOf(s2.firstNode()!);
+    for (let i = from + 1; i < to; i++) {
+        if (!getContainingStatement(j, j(s1Parent.body[i]))) {
+            return false;
+        }
+    }
+
+    return true;
 };
 
 codeMod.scope = 'cursor';

@@ -145,6 +145,10 @@ class CodeModService {
         }
 
         const target = ast.findNodeAtPosition(options.selection.active);
+        let anchorTarget = target;
+        if (options.selection.active !== options.selection.anchor) {
+            anchorTarget = ast.findNodeAtPosition(options.selection.anchor);
+        }
         const stats = () => {};
         return mods.filter(m => {
             const r = m.canRun(
@@ -159,6 +163,7 @@ class CodeModService {
                 },
                 {
                     target,
+                    anchorTarget,
                     selection: options.selection
                 }
             );
