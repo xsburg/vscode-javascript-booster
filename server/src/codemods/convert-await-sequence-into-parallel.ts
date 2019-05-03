@@ -16,7 +16,7 @@ import { CodeModExports } from '../codeModTypes';
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
-    debugger;
+
     let s1 = getContainingStatement(j, options.anchorTarget)!;
     let s2 = getContainingStatement(j, options.target)!;
     const parentBlock = s1.parents()[0] as BlockStatement;
@@ -66,14 +66,30 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         }
     });
 
-    const newStatement = j.expressionStatement(
-        j.awaitExpression(
-            j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
-                j.arrayExpression(dataList.map(x => x.awaitArgument))
-            ])
-        )
+    const awaitExpr = j.awaitExpression(
+        j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
+            j.arrayExpression(dataList.map(x => x.awaitArgument))
+        ])
     );
 
+    // Trailing nulls are truncated, e.g.: [,,result,,] => [,,result]
+    let varList = dataList.map(x => x.targetVar);
+    while (varList.length > 0 && !varList[varList.length - 1]) {
+        varList.pop();
+    }
+
+    let newStatement;
+    if (needsVarDeclaration) {
+        const targetArray = j.arrayPattern(varList);
+        newStatement = j.variableDeclaration('let', [j.variableDeclarator(targetArray, awaitExpr)]);
+    } else if (needsAssignment) {
+        const targetArray = j.arrayPattern(varList);
+        newStatement = j.expressionStatement(j.assignmentExpression('=', targetArray, awaitExpr));
+    } else {
+        newStatement = j.expressionStatement(awaitExpr);
+    }
+
+    parentBlock.body.splice(from, to - from + 1, newStatement);
     const resultText = ast.toSource();
     return resultText;
     // TODO
