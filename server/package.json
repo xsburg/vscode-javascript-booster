@@ -26,6 +26,7 @@
         "@babel/parser": "7.4.3",
         "fs-extra": "7.0.1",
         "ast-types": "0.12.3",
+        "recast": "0.17.5",
         "jscodeshift": "xsburg/jscodeshift",
         "lodash": "4.17.11",
         "vscode-languageserver": "4.1.2",
