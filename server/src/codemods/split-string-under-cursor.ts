@@ -86,7 +86,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     }
 
     // can only trigger inside quotes
-    return options.selection.active - path.node.start > 0;
+    return options.selection.active > path.node.start && options.selection.active < path.node.end;
 };
 
 codeMod.scope = 'cursor';

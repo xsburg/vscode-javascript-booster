@@ -11,21 +11,40 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 
-function isAwaitStatement(j: JsCodeShift, stmt: AstNode) {
-    return (
-        stmt &&
-        j.match(stmt, {
-            type: 'ExpressionStatement',
-            expression: {
-                type: 'AwaitExpression'
-            }
-        } as any)
-    );
-}
-
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
+
+    let s1 = getContainingStatement(j, options.anchorTarget)!;
+    let s2 = getContainingStatement(j, options.target)!;
+    const parentBlock = s1.parents()[0] as BlockStatement;
+
+    let from = parentBlock.body.indexOf(s1.firstNode()!);
+    let to = parentBlock.body.indexOf(s2.firstNode()!);
+    if (from > to) {
+        [from, to] = [to, from];
+        [s2, s1] = [s1, s2];
+    }
+    let statements = [s1];
+    for (let i = from + 1; i < to; i++) {
+        statements.push(getContainingStatement(j, j(parentBlock.body[i]))!);
+    }
+    statements.push(s2);
+
+    // TODO
+
+    function isAwaitStatement(j: JsCodeShift, stmt: AstNode) {
+        return (
+            stmt &&
+            j.match(stmt, {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'AwaitExpression'
+                }
+            } as any)
+        );
+    }
+
     const target = options.target;
     const path = target.firstPath()!;
 
@@ -59,49 +78,55 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     return resultText;
 }) as CodeModExports;
 
+function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
+    return j.match<ExpressionStatement>(s, {
+        type: 'ExpressionStatement',
+        expression: {
+            type: 'AwaitExpression'
+        } as AssignmentExpression
+    });
+}
+
+function isAssignmentStatement(j: JsCodeShift, s: Collection<Statement>) {
+    return j.match<ExpressionStatement>(s, {
+        type: 'ExpressionStatement',
+        expression: {
+            type: 'AssignmentExpression',
+            right: {
+                type: 'AwaitExpression'
+            }
+        } as AssignmentExpression
+    });
+}
+
+function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
+    return j.match<VariableDeclaration>(s, {
+        type: 'VariableDeclaration',
+        declarations: [
+            {
+                type: 'VariableDeclarator',
+                init: {
+                    type: 'AwaitExpression'
+                }
+            } as VariableDeclarator
+        ]
+    });
+}
+
 function getContainingStatement(
     j: JsCodeShift,
     c: Collection<AstNode>
 ): Collection<Statement> | null {
     const s = c.thisOrClosest(j.Statement);
-    if (
-        j.match<ExpressionStatement>(s, {
-            type: 'ExpressionStatement',
-            expression: {
-                type: 'AwaitExpression'
-            } as AssignmentExpression
-        })
-    ) {
+    if (isExpressionStatement(j, s)) {
         // Example: 'await foo();'
         return s;
     }
-    if (
-        j.match<ExpressionStatement>(s, {
-            type: 'ExpressionStatement',
-            expression: {
-                type: 'AssignmentExpression',
-                right: {
-                    type: 'AwaitExpression'
-                }
-            } as AssignmentExpression
-        })
-    ) {
+    if (isAssignmentStatement(j, s)) {
         // Example: 'result = await foo();'
         return s;
     }
-    if (
-        j.match<VariableDeclaration>(s, {
-            type: 'VariableDeclaration',
-            declarations: [
-                {
-                    type: 'VariableDeclarator',
-                    init: {
-                        type: 'AwaitExpression'
-                    }
-                } as VariableDeclarator
-            ]
-        })
-    ) {
+    if (isVariableDeclaration(j, s)) {
         // Example: 'let result = await foo();'
         return s;
     }
@@ -110,8 +135,7 @@ function getContainingStatement(
 
 codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
-    const target = options.target;
-    const path = target.firstPath();
+    const path = options.target.firstPath();
 
     if (!path) {
         return false;
@@ -122,12 +146,12 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    const s1 = getContainingStatement(j, options.target);
+    const s1 = getContainingStatement(j, options.anchorTarget);
     if (!s1) {
         return false;
     }
 
-    const s2 = getContainingStatement(j, options.anchorTarget);
+    const s2 = getContainingStatement(j, options.target);
     if (!s2) {
         return false;
     }
@@ -139,8 +163,13 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    const from = s1Parent.body.indexOf(s1.firstNode()!);
-    const to = s1Parent.body.indexOf(s2.firstNode()!);
+    let from = s1Parent.body.indexOf(s1.firstNode()!);
+    let to = s1Parent.body.indexOf(s2.firstNode()!);
+    if (from > to) {
+        to = from + to;
+        from = to - from;
+        to = to - from;
+    }
     for (let i = from + 1; i < to; i++) {
         if (!getContainingStatement(j, j(s1Parent.body[i]))) {
             return false;

@@ -177,37 +177,51 @@ function extractPosition(
 ): ({ source: string; pos: { anchor: IPosition; active: IPosition } }) | null {
     function extractPosInternal(posKey: string) {
         const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
-        // TODO: iterate through all matches
-        const match = re.exec(source);
-        if (!match || !match[0]) {
-            return null;
+        let match: RegExpExecArray | null;
+        // tslint:disable-next-line:no-conditional-assignment
+        while ((match = re.exec(source)) !== null) {
+            if (!match[0]) {
+                continue;
+            }
+            // tslint:disable-next-line:no-eval
+            const posDef = eval('(' + match[1] + ')');
+            if (posDef[posKey]) {
+                let pos1 = posDef[posKey];
+                if (!Number.isFinite(pos1)) {
+                    throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
+                }
+                const column: number = pos1;
+                let line: number = source.split('\n').findIndex(l => l.includes(match![0])) + 1;
+                if (posDef.nextLine) {
+                    line++;
+                }
+                return {
+                    line,
+                    column
+                };
+            }
         }
-        // tslint:disable-next-line:no-eval
-        const posDef = eval('(' + match[1] + ')');
-        const pos = posDef[posKey] || posDef.pos;
-        if (!Number.isFinite(pos)) {
-            throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
-        }
-        const column: number = pos;
-        let line: number = source.split('\n').findIndex(l => l.includes(match[0])) + 1;
-        if (posDef.nextLine) {
-            line++;
-        }
-        return {
-            line,
-            column
-        };
+        return null;
     }
 
-    const anchorPos = extractPosInternal('anchorPos');
-    const activePos = extractPosInternal('activePos');
-    if (!anchorPos || !activePos) {
-        return null;
+    let anchorPos = extractPosInternal('anchorPos');
+    let activePos = extractPosInternal('activePos');
+    const pos = extractPosInternal('pos');
+    if (!(anchorPos && activePos)) {
+        if (!pos) {
+            return null;
+        } else {
+            activePos = pos;
+            anchorPos = {
+                line: pos.line,
+                column: pos.column
+            };
+        }
     }
 
     const reClean = /\s*\/\*#\s*([^#]+?)\s*#\*\//g;
     let cleanSource = source.replace(reClean, '');
-    if (cleanSource.startsWith('\n')) {
+    while (cleanSource.startsWith('\n')) {
         cleanSource = cleanSource.substring(1);
         anchorPos.line--;
         activePos.line--;

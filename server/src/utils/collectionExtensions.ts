@@ -4,7 +4,7 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 import * as jscodeshift from 'jscodeshift';
 
 function isPositionWithinNode(position: number, node: Printable) {
-    return node.start <= position && position < node.end;
+    return node.start <= position && position <= node.end;
 }
 
 function createCollection<TNode>(
