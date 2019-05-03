@@ -13,122 +13,6 @@ import {
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 
-const codeMod: CodeModExports = ((fileInfo, api, options) => {
-    const j = api.jscodeshift;
-    const ast = fileInfo.ast;
-
-    let s1 = getContainingStatement(j, options.anchorTarget)!;
-    let s2 = getContainingStatement(j, options.target)!;
-    const parentBlock = s1.parents()[0] as BlockStatement;
-
-    let from = parentBlock.body.indexOf(s1.firstNode()!);
-    let to = parentBlock.body.indexOf(s2.firstNode()!);
-    if (from > to) {
-        [from, to] = [to, from];
-        [s2, s1] = [s1, s2];
-    }
-    let statements = [s1];
-    for (let i = from + 1; i < to; i++) {
-        statements.push(getContainingStatement(j, j(parentBlock.body[i]))!);
-    }
-    statements.push(s2);
-
-    let needsVarDeclaration = false;
-    let needsAssignment = false;
-    let dataList: Array<{
-        targetVar: Pattern | null;
-        awaitArgument: Expression;
-    }> = [];
-    statements.forEach(s => {
-        const node = s.firstNode();
-        if (isExpressionStatement(j, s)) {
-            dataList.push({
-                targetVar: null,
-                awaitArgument: ((node as ExpressionStatement).expression as AwaitExpression)
-                    .argument!
-            });
-        } else if (isVariableDeclaration(j, s)) {
-            needsVarDeclaration = true;
-            const declarator = (node as VariableDeclaration).declarations[0] as VariableDeclarator;
-            dataList.push({
-                targetVar: declarator.id,
-                awaitArgument: (declarator.init as AwaitExpression).argument!
-            });
-        } else if (isAssignmentStatement(j, s)) {
-            needsAssignment = true;
-            const assignmentExpr = (node as ExpressionStatement).expression as AssignmentExpression;
-            dataList.push({
-                targetVar: assignmentExpr.left,
-                awaitArgument: (assignmentExpr.right as AwaitExpression).argument!
-            });
-        } else {
-            throw new Error('Not supported');
-        }
-    });
-
-    const awaitExpr = j.awaitExpression(
-        j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
-            j.arrayExpression(dataList.map(x => x.awaitArgument))
-        ])
-    );
-
-    // Trailing nulls are truncated, e.g.: [,,result,,] => [,,result]
-    let varList = dataList.map(x => x.targetVar);
-    while (varList.length > 0 && !varList[varList.length - 1]) {
-        varList.pop();
-    }
-
-    let newStatement;
-    if (needsVarDeclaration) {
-        const targetArray = j.arrayPattern(varList);
-        newStatement = j.variableDeclaration('let', [j.variableDeclarator(targetArray, awaitExpr)]);
-    } else if (needsAssignment) {
-        const targetArray = j.arrayPattern(varList);
-        newStatement = j.expressionStatement(j.assignmentExpression('=', targetArray, awaitExpr));
-    } else {
-        newStatement = j.expressionStatement(awaitExpr);
-    }
-
-    parentBlock.body.splice(from, to - from + 1, newStatement);
-    const resultText = ast.toSource();
-    return resultText;
-    // TODO
-
-    function isAwaitStatement(j: JsCodeShift, stmt: AstNode) {
-        return (
-            stmt &&
-            j.match(stmt, {
-                type: 'ExpressionStatement',
-                expression: {
-                    type: 'AwaitExpression'
-                }
-            } as any)
-        );
-    }
-
-    const target = options.target;
-    const path = target.firstPath()!;
-
-    const targetStmt = path.parent.node as ExpressionStatement;
-    const block = path.parent.parent.node as BlockStatement;
-    let sequence = [];
-    const index = block.body.indexOf(targetStmt);
-    let startIndex = index;
-    while (startIndex > 0 && isAwaitStatement(j, block.body[startIndex - 1])) {
-        startIndex--;
-    }
-    let endIndex = index;
-    while (endIndex < block.body.length - 1 && isAwaitStatement(j, block.body[endIndex + 1])) {
-        endIndex++;
-    }
-
-    const items = block.body
-        .slice(startIndex, endIndex + 1)
-        .map(n => ((n as ExpressionStatement).expression as AwaitExpression).argument!);
-
-    block.body.splice(startIndex, endIndex - startIndex + 1, newStatement);
-}) as CodeModExports;
-
 function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
     return j.match<ExpressionStatement>(s, {
         type: 'ExpressionStatement',
@@ -165,6 +49,89 @@ function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
         }) && (s.firstNode() as VariableDeclaration).declarations.length === 1
     );
 }
+
+const codeMod: CodeModExports = ((fileInfo, api, options) => {
+    const j = api.jscodeshift;
+    const ast = fileInfo.ast;
+
+    // Collect all await statements
+    let s1 = getContainingStatement(j, options.anchorTarget)!;
+    let s2 = getContainingStatement(j, options.target)!;
+    const parentBlock = s1.parents()[0] as BlockStatement;
+    let from = parentBlock.body.indexOf(s1.firstNode()!);
+    let to = parentBlock.body.indexOf(s2.firstNode()!);
+    if (from > to) {
+        [from, to] = [to, from];
+        [s2, s1] = [s1, s2];
+    }
+    let statements = [s1];
+    for (let i = from + 1; i < to; i++) {
+        statements.push(getContainingStatement(j, j(parentBlock.body[i]))!);
+    }
+    statements.push(s2);
+
+    // Extract necessary data from the old code
+    let needsVarDeclaration = false;
+    let needsAssignment = false;
+    let dataList: Array<{
+        targetVar: Pattern | null;
+        awaitArgument: Expression;
+    }> = [];
+    statements.forEach(s => {
+        const node = s.firstNode();
+        if (isExpressionStatement(j, s)) {
+            dataList.push({
+                targetVar: null,
+                awaitArgument: ((node as ExpressionStatement).expression as AwaitExpression)
+                    .argument!
+            });
+        } else if (isVariableDeclaration(j, s)) {
+            needsVarDeclaration = true;
+            const declarator = (node as VariableDeclaration).declarations[0] as VariableDeclarator;
+            dataList.push({
+                targetVar: declarator.id,
+                awaitArgument: (declarator.init as AwaitExpression).argument!
+            });
+        } else if (isAssignmentStatement(j, s)) {
+            needsAssignment = true;
+            const assignmentExpr = (node as ExpressionStatement).expression as AssignmentExpression;
+            dataList.push({
+                targetVar: assignmentExpr.left,
+                awaitArgument: (assignmentExpr.right as AwaitExpression).argument!
+            });
+        } else {
+            throw new Error('Not supported');
+        }
+    });
+
+    // Trailing nulls are truncated, e.g.: [,,result,,] => [,,result]
+    let varList = dataList.map(x => x.targetVar);
+    while (varList.length > 0 && !varList[varList.length - 1]) {
+        varList.pop();
+    }
+
+    // Generating new code
+    const awaitExpr = j.awaitExpression(
+        j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
+            j.arrayExpression(dataList.map(x => x.awaitArgument))
+        ])
+    );
+
+    let newStatement;
+    if (needsVarDeclaration) {
+        const targetArray = j.arrayPattern(varList);
+        newStatement = j.variableDeclaration('let', [j.variableDeclarator(targetArray, awaitExpr)]);
+    } else if (needsAssignment) {
+        const targetArray = j.arrayPattern(varList);
+        newStatement = j.expressionStatement(j.assignmentExpression('=', targetArray, awaitExpr));
+    } else {
+        newStatement = j.expressionStatement(awaitExpr);
+    }
+
+    parentBlock.body.splice(from, to - from + 1, newStatement);
+    const resultText = ast.toSource();
+    return resultText;
+}) as CodeModExports;
 
 function getContainingStatement(
     j: JsCodeShift,
