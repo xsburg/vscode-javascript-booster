@@ -3,7 +3,9 @@ import {
     AstNode,
     AwaitExpression,
     BlockStatement,
+    Expression,
     ExpressionStatement,
+    Pattern,
     Statement,
     VariableDeclaration,
     VariableDeclarator
@@ -14,7 +16,7 @@ import { CodeModExports } from '../codeModTypes';
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
-
+    debugger;
     let s1 = getContainingStatement(j, options.anchorTarget)!;
     let s2 = getContainingStatement(j, options.target)!;
     const parentBlock = s1.parents()[0] as BlockStatement;
@@ -31,6 +33,49 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     }
     statements.push(s2);
 
+    let needsVarDeclaration = false;
+    let needsAssignment = false;
+    let dataList: Array<{
+        targetVar: Pattern | null;
+        awaitArgument: Expression;
+    }> = [];
+    statements.forEach(s => {
+        const node = s.firstNode();
+        if (isExpressionStatement(j, s)) {
+            dataList.push({
+                targetVar: null,
+                awaitArgument: ((node as ExpressionStatement).expression as AwaitExpression)
+                    .argument!
+            });
+        } else if (isVariableDeclaration(j, s)) {
+            needsVarDeclaration = true;
+            const declarator = (node as VariableDeclaration).declarations[0] as VariableDeclarator;
+            dataList.push({
+                targetVar: declarator.id,
+                awaitArgument: (declarator.init as AwaitExpression).argument!
+            });
+        } else if (isAssignmentStatement(j, s)) {
+            needsAssignment = true;
+            const assignmentExpr = (node as ExpressionStatement).expression as AssignmentExpression;
+            dataList.push({
+                targetVar: assignmentExpr.left,
+                awaitArgument: (assignmentExpr.right as AwaitExpression).argument!
+            });
+        } else {
+            throw new Error('Not supported');
+        }
+    });
+
+    const newStatement = j.expressionStatement(
+        j.awaitExpression(
+            j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
+                j.arrayExpression(dataList.map(x => x.awaitArgument))
+            ])
+        )
+    );
+
+    const resultText = ast.toSource();
+    return resultText;
     // TODO
 
     function isAwaitStatement(j: JsCodeShift, stmt: AstNode) {
@@ -65,17 +110,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         .slice(startIndex, endIndex + 1)
         .map(n => ((n as ExpressionStatement).expression as AwaitExpression).argument!);
 
-    const newStatement = j.expressionStatement(
-        j.awaitExpression(
-            j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
-                j.arrayExpression(items)
-            ])
-        )
-    );
     block.body.splice(startIndex, endIndex - startIndex + 1, newStatement);
-
-    const resultText = ast.toSource();
-    return resultText;
 }) as CodeModExports;
 
 function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
@@ -100,17 +135,19 @@ function isAssignmentStatement(j: JsCodeShift, s: Collection<Statement>) {
 }
 
 function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
-    return j.match<VariableDeclaration>(s, {
-        type: 'VariableDeclaration',
-        declarations: [
-            {
-                type: 'VariableDeclarator',
-                init: {
-                    type: 'AwaitExpression'
-                }
-            } as VariableDeclarator
-        ]
-    });
+    return (
+        j.match<VariableDeclaration>(s, {
+            type: 'VariableDeclaration',
+            declarations: [
+                {
+                    type: 'VariableDeclarator',
+                    init: {
+                        type: 'AwaitExpression'
+                    }
+                } as VariableDeclarator
+            ]
+        }) && (s.firstNode() as VariableDeclaration).declarations.length === 1
+    );
 }
 
 function getContainingStatement(

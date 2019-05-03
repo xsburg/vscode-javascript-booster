@@ -190,6 +190,10 @@ class CodeModService {
             throw new Error('Syntax error');
         }
         const target = ast.findNodeAtPosition(options.selection.active);
+        let anchorTarget = target;
+        if (options.selection.active !== options.selection.anchor) {
+            anchorTarget = ast.findNodeAtPosition(options.selection.anchor);
+        }
         let result;
         result = mod.modFn(
             {
@@ -203,6 +207,7 @@ class CodeModService {
             },
             {
                 target,
+                anchorTarget,
                 selection: options.selection
             }
         );

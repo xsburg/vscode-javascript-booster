@@ -49,3 +49,10 @@ async function foo() {
     let foo = 'bar';
     await bar('test'); /*# { activePos: 23 } #*/
 }
+
+/*$ { fixture: 'should-not-trigger-in-complex-declaration', expected: false } $*/
+
+async function foo() {
+    await bar('test'); /*# { anchorPos: 5 } #*/
+    let a = await bar('test'), b = 2; /*# { activePos: 23 } #*/
+}
