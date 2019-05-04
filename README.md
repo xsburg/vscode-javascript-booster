@@ -79,6 +79,10 @@ You can easily load and run your own code actions. -->
 
 Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its variety of code refactorings. The extension uses [Babylon](https://github.com/babel/babel/tree/master/packages/babylon) to parse the code and then manipulates the abstract syntax tree using [jscodeshift](https://github.com/facebook/jscodeshift).
 
+## Contribution
+
+PRs are always welcome. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for tips on how to build and debug.
+
 ## Release Notes
 
 ### 0.11.0
