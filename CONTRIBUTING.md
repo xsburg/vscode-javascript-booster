@@ -1,19 +1,5 @@
 # Contributing to VSCode Javascript Booster
 
-## Pre-flight checklist
-
-All releases are made using release branches, e.g. `release/0.11.0`.
-
--   Update README.md:
-    -   Add new changelog entry
-    -   Add new code actions into the list
-    -   Check if other changes are needed
--   Place all the resources (gifs, etc) into the `resources` dir.
--   Copy the README.md => client/README.md (pure copy and replace).
--   Copy the new changelog entry into client/CHANGELOG.md
--   Initiate new release by running the command (in the root dir): `npm version [patch|minor|major]`
--   Merge the release branch into master, delete it and push
-
 ## Debugging the extension
 
 -   Compile the language server using `npm run compile` in the server/ directory.
@@ -31,6 +17,31 @@ Extension (client):
 
 -   run `npm test` inside the `client` directory to run the extension integration tests.
 -   launch `Extension tests (client)` to debug the tests.
+
+## Packaging extension for testing locally
+
+`vsce` (Visual Studio Code Extensions) CLI has to be installed in order to build the extension locally (`npm i -g vsce`).
+
+The following set of comppands builds the extension package:
+
+-   in the root dir: `npm run compile`
+-   in the client dir: `vsce package`
+
+After the build, run VSCode, go to the extensions tab and choose 'Install from VSIX...'. If the extension is already installed, it will be overwritten.
+
+## Pre-flight checklist
+
+All releases are made using release branches, e.g. `release/0.11.0`.
+
+-   Update README.md:
+    -   Add new changelog entry
+    -   Add new code actions into the list
+    -   Check if other changes are needed
+-   Place all the resources (gifs, etc) into the `resources` dir.
+-   Copy the README.md => client/README.md (pure copy and replace).
+-   Copy the new changelog entry into client/CHANGELOG.md
+-   Initiate new release by running the command (in the root dir): `npm version [patch|minor|major]`
+-   Merge the release branch into master, delete it and push
 
 ## Useful links
 
