@@ -6,7 +6,7 @@
     "license": "MIT",
     "engines": {
         "node": ">=8.0.0",
-        "npm": ">=5.6.0"
+        "npm": ">=6.0.0"
     },
     "repository": {
         "type": "git",
@@ -23,8 +23,12 @@
         "compile:server": "cd server && npm run compile && cd ..",
         "watch:server": "cd server && npm run watch",
         "test": "cd server && npm test -- --coverage && cd ../client && npm test && cd ..",
+        "generate:docs": "node ./build/generate-docs.js",
         "preversion": "npm test",
         "version": "cd client && npm version $npm_package_version && git add -A",
         "postversion": "git push && git push --tags"
+    },
+    "devDependencies": {
+        "fs-extra": "^8.1.0"
     }
 }

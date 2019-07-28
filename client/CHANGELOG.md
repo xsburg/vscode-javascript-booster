@@ -1,8 +1,10 @@
 # Change Log
 
-All notable changes to the "vscode-javascript-booster" extension will be documented in this file.
+All notable changes to the "vscode-javascript-booster" extension are documented in this file.
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
+
+<!-- CHANGELOG STARTS HERE -->
 
 ### 0.11.0
 
@@ -24,63 +26,20 @@ All notable changes to the "vscode-javascript-booster" extension will be documen
 -   `Split string under cursor` now puts selection before the second string when executed.
 -   `Split string under cursor` no longed triggers outside string quotes.
 -   `Remove redundant else` now supports the case when `if` branch ends with return statement:
-    ```javascript
-    if (condition) {
-        foo();
-        return;
-    } else {
-        bar();
-    }
-    // ==>
-    if (condition) {
-        foo();
-        return;
-    }
-    bar();
-    ```
+
+    ![](resources/remove-redundant-else_return-in-if.gif)
+
 -   `Replace with ternary` can now replace conditional return statements:
-    ```javascript
-    if (cond) {
-        return a;
-    } else {
-        return b;
-    }
-    // ==>
-    return cond ? a : b;
-    ```
+
+    ![](resources/replace-if-else-with-ternary_return.gif)
+
 -   Added new action: `Simplify if-else`.
 
-    ```javascript
-    // Removes unused conditional branches, e.g.:
-    if (false) {
-        foo();
-    } else {
-        bar();
-    }
-    // ==>
-    bar();
-
-    // Simplifies unnecessary if-else statements, e.g.:
-    if (cond) {
-        return true;
-    } else {
-        return false;
-    }
-    // ==>
-    return !!cond;
-    ```
+    ![](resources/simplify-if-else.gif)
 
 -   Added new action: `Simplify ?:`.
 
-    ```javascript
-    let foo = true ? 1 : 0;
-    let foo = cond ? true : false;
-    let bar = a ? a : b;
-    // ==>
-    let foo = 1;
-    let foo = !!cond;
-    let bar = a || b;
-    ```
+    ![](resources/simplify-ternary.gif)
 
 ### 0.9.0
 
