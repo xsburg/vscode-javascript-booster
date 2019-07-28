@@ -38,8 +38,7 @@ All releases are made using release branches, e.g. `release/0.11.0`.
     -   Add new code actions into the list
     -   Check if other changes are needed
 -   Place all the resources (gifs, etc) into the `resources` dir.
--   Copy the README.md => client/README.md (pure copy and replace).
--   Copy the new changelog entry into client/CHANGELOG.md
+-   Run `npm run generate:docs` to update extension's readme and changelog files.
 -   Initiate new release by running the command (in the root dir): `npm version [patch|minor|major]`
 -   Merge the release branch into master, delete it and push
 
