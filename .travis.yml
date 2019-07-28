@@ -1,47 +1,45 @@
 language: node_js
 node_js:
-  - "8"
+    - '10'
 os:
-  - osx
+    - osx
 env:
-  global:
-    secure: BSMZjdDm0OP51fh2zGmI++Iqdz75ECjp0IY8/tsv2GxDm7RwGRtIV/09xzv55zb47CdoAcrfo538j++p9g4SUYOMRX7cygV5ynKmbxEROp04jZSjC5CWT8FTMe50hmPUTn+Pndk9FJBBPPTpMJKHBM+D7kwiB6l40E8MrdCGOyy0p0+fPY0kZjLZgFZup8vgbaiuy2dITOX5KKau/GN47t8M8BQlRARdjQOZNib5Xvlp/tnP7OcaaPs+Wb6sScfhZKVsmW2x5MVtY2yt/a4t4k/RXm5YHgi3RivN3+gl4IJ25tL8F5/bafe+GZJX6mgRoZtP1uPxhV2fFE6txu5bJXNTF4Z9L3xgPrAHaGTR/73D8g/wN+UmthJORdtC26Z4240pT5y4+xG4NjAToa0lTlKTH1N3asaQhoSeARTrHQaDcaP5SZ/RgIodI7EWSuBC9sY5uaT0lIsDZ4J4L95VSg45b8xG7Z5DA15lFzJmYGbCw2SLC2dYpIbMvtuK48dzdhKAma20K/mpH/ONTF6Ry4PJdzfpVK7JHWdlIms9Z39eODBcorOYR7GsQZV3Y92JabpVgYJhZJ+RiecHCknJeyoLrhycTfEHB6FDdpF9AVE51nkeAYCThWKzxP/NTlXJAdEYqpB/azAEJOLdtb0/ioY5XkvCVpHQvLUTb8fatw0=
+    global:
+        secure: BSMZjdDm0OP51fh2zGmI++Iqdz75ECjp0IY8/tsv2GxDm7RwGRtIV/09xzv55zb47CdoAcrfo538j++p9g4SUYOMRX7cygV5ynKmbxEROp04jZSjC5CWT8FTMe50hmPUTn+Pndk9FJBBPPTpMJKHBM+D7kwiB6l40E8MrdCGOyy0p0+fPY0kZjLZgFZup8vgbaiuy2dITOX5KKau/GN47t8M8BQlRARdjQOZNib5Xvlp/tnP7OcaaPs+Wb6sScfhZKVsmW2x5MVtY2yt/a4t4k/RXm5YHgi3RivN3+gl4IJ25tL8F5/bafe+GZJX6mgRoZtP1uPxhV2fFE6txu5bJXNTF4Z9L3xgPrAHaGTR/73D8g/wN+UmthJORdtC26Z4240pT5y4+xG4NjAToa0lTlKTH1N3asaQhoSeARTrHQaDcaP5SZ/RgIodI7EWSuBC9sY5uaT0lIsDZ4J4L95VSg45b8xG7Z5DA15lFzJmYGbCw2SLC2dYpIbMvtuK48dzdhKAma20K/mpH/ONTF6Ry4PJdzfpVK7JHWdlIms9Z39eODBcorOYR7GsQZV3Y92JabpVgYJhZJ+RiecHCknJeyoLrhycTfEHB6FDdpF9AVE51nkeAYCThWKzxP/NTlXJAdEYqpB/azAEJOLdtb0/ioY5XkvCVpHQvLUTb8fatw0=
 sudo: false
 before_install:
-  - npm install -g npm@6.0.x
-  - if [ $TRAVIS_OS_NAME == "linux" ]; then export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
-    sh -e /etc/init.d/xvfb start; sleep 3; fi
+    - npm install -g npm@6.7.x
+    - if [ $TRAVIS_OS_NAME == "linux" ]; then export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
+      sh -e /etc/init.d/xvfb start; sleep 3; fi
 install:
-  - npm install
+    - npm install
 script:
-  - npm run compile
-  - npm test
+    - npm run compile
+    - npm test
 after_script:
-  - node ./server/node_modules/coveralls/bin/coveralls.js -v < ./server/coverage/lcov.info
+    - node ./server/node_modules/coveralls/bin/coveralls.js -v < ./server/coverage/lcov.info
 before_deploy:
-  - cd client
-  - npm install -g vsce
-  - vsce package
+    - cd client
+    - npm install -g vsce
+    - vsce package
 deploy:
-  - provider: script
-    script: vsce publish -p $VS_TOKEN
-    skip_cleanup: true
-    on:
-      repo: xsburg/vscode-javascript-booster
-      tags: true
-      branch: master
-      condition: "$TRAVIS_OS_NAME = osx"
-  - provider: releases
-    api_key:
-      secure: gs6iJkqvW4psjgFNaLIzp6QF8ceCUsSkQpeAlnbWUmlkUvCZjF2PN0vOf7sXD+VgMfSV6jS3lho0jcQZCp8ZFf/G1A25WMYThmHLzZGUGNXhXIMlJ5qPqbtbmvtnIRCuW9ZqzqNH/WB1XXArn1/qlJ5WPsU3EZpJb0ZZjmYHZAxJrQ+6Uo6+ZnNBv0/1KNiK03Bjf5/bokrkJbRKC0dsFdefcadCnQyNS/jkyxKzRo9zH8FGP3d2zSSDaehXbI4BlS4yhlwJ75Bz9AHLaElgCIoBtstsy8gJQr8IPA8D+m/f/fGTrIc4kcxfddDzKv31I0W7hEVOqB7ps6T3p6iww1XudYaki/LbGV+d3Bspe5r8RaCqz1iYFLuUCmEgqv+hAmcsd1mbtExfyR3T6QzwQYfzY/B+eMD3kfi/RfHYTxIWJril1a7AxwhJcHnnB2KYZxF5NIJRJTPIZ3vecmFjrOWdXPVtb29lpHICH2TWlKczfZQaTxNNmd6h6qYaq0QTAQhsSZWR8tJ7626bxM+N6MY59lDBU7g5K6AcGDddOWU5UB3TcPFLC9vFg+feY9jt6lIZCjzn6UiZ/y9OdKWu8j6+9PhphbEiE+IbZuUxqx1G2KRSJWahFn7F2nLlSSYexSIUX+CCum723msfwsN5MQbvfRnrlNz/6upbFyDaohk=
-    skip_cleanup: true
-    file_glob: true
-    file: "*.vsix"
-    on:
-      repo: xsburg/vscode-javascript-booster
-      tags: true
-      branch: master
-      condition: "$TRAVIS_OS_NAME = osx"
+    - provider: script
+      script: vsce publish -p $VS_TOKEN
+      skip_cleanup: true
+      on:
+          repo: xsburg/vscode-javascript-booster
+          tags: true
+          condition: '$TRAVIS_OS_NAME = osx'
+    - provider: releases
+      api_key:
+          secure: gs6iJkqvW4psjgFNaLIzp6QF8ceCUsSkQpeAlnbWUmlkUvCZjF2PN0vOf7sXD+VgMfSV6jS3lho0jcQZCp8ZFf/G1A25WMYThmHLzZGUGNXhXIMlJ5qPqbtbmvtnIRCuW9ZqzqNH/WB1XXArn1/qlJ5WPsU3EZpJb0ZZjmYHZAxJrQ+6Uo6+ZnNBv0/1KNiK03Bjf5/bokrkJbRKC0dsFdefcadCnQyNS/jkyxKzRo9zH8FGP3d2zSSDaehXbI4BlS4yhlwJ75Bz9AHLaElgCIoBtstsy8gJQr8IPA8D+m/f/fGTrIc4kcxfddDzKv31I0W7hEVOqB7ps6T3p6iww1XudYaki/LbGV+d3Bspe5r8RaCqz1iYFLuUCmEgqv+hAmcsd1mbtExfyR3T6QzwQYfzY/B+eMD3kfi/RfHYTxIWJril1a7AxwhJcHnnB2KYZxF5NIJRJTPIZ3vecmFjrOWdXPVtb29lpHICH2TWlKczfZQaTxNNmd6h6qYaq0QTAQhsSZWR8tJ7626bxM+N6MY59lDBU7g5K6AcGDddOWU5UB3TcPFLC9vFg+feY9jt6lIZCjzn6UiZ/y9OdKWu8j6+9PhphbEiE+IbZuUxqx1G2KRSJWahFn7F2nLlSSYexSIUX+CCum723msfwsN5MQbvfRnrlNz/6upbFyDaohk=
+      skip_cleanup: true
+      file_glob: true
+      file: '*.vsix'
+      on:
+          repo: xsburg/vscode-javascript-booster
+          tags: true
+          condition: '$TRAVIS_OS_NAME = osx'
 notifications:
-  email:
-    on_success: change
+    email:
+        on_success: change

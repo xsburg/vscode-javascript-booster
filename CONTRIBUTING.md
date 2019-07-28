@@ -4,7 +4,7 @@
 
 -   Compile the language server using `npm run compile` in the server/ directory.
 -   Launch `Launch client (client)`. You can debug the extension code now.
--   If needed, launch `Attach to Server (server)` in parallel. Now you can debug both language server and the extension.
+-   If needed, launch `Attach to Server (server)` in parallel. Now you can debug both the language server and the extension.
 
 ## Running tests (dev mode)
 
@@ -22,7 +22,7 @@ Extension (client):
 
 `vsce` (Visual Studio Code Extensions) CLI has to be installed in order to build the extension locally (`npm i -g vsce`).
 
-The following set of comppands builds the extension package:
+The following set of commands build the extension package:
 
 -   in the root dir: `npm run compile`
 -   in the client dir: `vsce package`
