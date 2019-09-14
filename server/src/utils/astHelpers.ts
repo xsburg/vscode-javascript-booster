@@ -109,3 +109,15 @@ export function getNextStatementInBlock(j: JsCodeShift, p: NodePath<Statement>):
     }
     return null;
 }
+
+export function getParentBlockStatament(j: JsCodeShift, p: NodePath<Statement>): Statement | null {
+    if (!p.parent || !j.BlockStatement.check(p.parent.node)) {
+        return null;
+    }
+    const blockBody = p.parent.node.body;
+    const index = blockBody.indexOf(p.node);
+    if (index !== -1 && index + 1 < blockBody.length) {
+        return blockBody[index + 1];
+    }
+    return null;
+}

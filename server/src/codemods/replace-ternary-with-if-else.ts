@@ -1,20 +1,11 @@
 import {
     AssignmentExpression,
     AstNode,
-    BinaryExpression,
-    BlockStatement,
-    Expression,
+    ConditionalExpression,
     ExpressionStatement,
-    FunctionDeclaration,
     Identifier,
-    IfStatement,
-    Node,
     NodePath,
-    Printable,
     ReturnStatement,
-    Statement,
-    TemplateElement,
-    UnaryExpression,
     VariableDeclaration,
     VariableDeclarator
 } from 'ast-types';
@@ -22,105 +13,133 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 import { getNextStatementInBlock, getSingleStatement } from '../utils/astHelpers';
 
-function getFragmentMeta(j: JsCodeShift, target: Collection<AstNode>) {
-    const path = target.thisOrClosest(j.IfStatement).firstPath();
+enum TransformType {
+    None,
+    /**
+     * 1 ? 1 : 0;
+     */
+    TernaryStatement,
+    /**
+     * foo = 1 ? 1 : 0;
+     */
+    AssignmentStatement,
+    /**
+     * let foo = 1 ? 1 : 0;
+     */
+    VariableDeclaration
+}
 
-    if (!path) {
-        return null;
+function getTransformType(j: JsCodeShift, target: Collection<AstNode>) {
+    const path = target.firstPath();
+
+    if (!path || !j.ConditionalExpression.check(path.node) || !path.parent) {
+        return TransformType.None;
     }
 
-    const conStatement = getSingleStatement(j, path.node.consequent);
-    const altStatement = getSingleStatement(j, path.node.alternate);
-    if (!conStatement) {
-        return null;
+    const parentNode = path.parent.node;
+
+    if (j.ExpressionStatement.check(parentNode)) {
+        return TransformType.TernaryStatement;
     }
 
-    let isAssignmentToOneVar = false;
-    const conIsReturn = j.ReturnStatement.check(conStatement) && conStatement.argument;
-    const conIsExprStatement = j.ExpressionStatement.check(conStatement);
-    let altIsReturn;
-    let altIsExprStatement;
-
-    if (altStatement) {
-        // 1. AssignmentExpression in both branches
-        const conName =
-            j.ExpressionStatement.check(conStatement) &&
-            j.AssignmentExpression.check(conStatement.expression) &&
-            j.Identifier.check(conStatement.expression.left) &&
-            conStatement.expression.left.name;
-        const altName =
-            j.ExpressionStatement.check(altStatement) &&
-            j.AssignmentExpression.check(altStatement.expression) &&
-            j.Identifier.check(altStatement.expression.left) &&
-            altStatement.expression.left.name;
-        isAssignmentToOneVar = Boolean(conName && altName && conName === altName);
-        // 2.1 if () { return a; } else { return b; }
-        altIsReturn = j.ReturnStatement.check(altStatement) && altStatement.argument;
-        // 3. if () { foo(); } else { bar; }
-        altIsExprStatement = j.ExpressionStatement.check(altStatement);
-    } else {
-        // 2.2 if() { return a; } return b;
-        const nextStatement = getNextStatementInBlock(j, path);
-        altIsReturn = j.ReturnStatement.check(nextStatement) && nextStatement.argument;
+    if (
+        j.AssignmentExpression.check(parentNode) &&
+        j.ExpressionStatement.check(path.parent.parent && path.parent.parent.node)
+    ) {
+        return TransformType.AssignmentStatement;
     }
 
-    const isIfElseReturn = Boolean(conIsReturn && altIsReturn);
-    const isExprStatementPair =
-        Boolean(conIsExprStatement && altIsExprStatement) && !isAssignmentToOneVar;
-    return {
-        isAssignmentToOneVar,
-        isIfElseReturn,
-        isExprStatementPair
-    };
+    if (
+        j.VariableDeclarator.check(parentNode) &&
+        j.VariableDeclaration.check(path.parent.parent && path.parent.parent.node)
+    ) {
+        return TransformType.VariableDeclaration;
+    }
+
+    return TransformType.None;
 }
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
     const ast = fileInfo.ast;
     const target = options.target;
-    const path = target.thisOrClosest(j.IfStatement).firstPath()!;
+    const path = target.firstPath()!;
+    const node = path.node as ConditionalExpression;
 
-    const conStatement = getSingleStatement(j, path.node.consequent)!;
-    const altStatement = getSingleStatement(j, path.node.alternate!);
-    const nextStatement = getNextStatementInBlock(j, path);
-    const meta = getFragmentMeta(j, target)!;
-
-    let result;
-    if (meta.isIfElseReturn) {
-        // if-return-else
-        const conExpr = (conStatement as ReturnStatement).argument!;
-        let altExpr;
-        if (altStatement) {
-            altExpr = (altStatement as ReturnStatement).argument!;
-        } else {
-            altExpr = (nextStatement as ReturnStatement).argument!;
-            path.parentPath.value.splice(path.parentPath.value.indexOf(nextStatement), 1);
+    const transformType = getTransformType(j, target);
+    switch (transformType) {
+        case TransformType.TernaryStatement:
+            // Simple case: a?b:c expression => if (a) {b} else {c}
+            path.parent.replace(
+                j.ifStatement(
+                    node.test,
+                    j.blockStatement([j.expressionStatement(node.consequent)]),
+                    j.blockStatement([j.expressionStatement(node.alternate)])
+                )
+            );
+            break;
+        case TransformType.AssignmentStatement: {
+            // Assignment: x = a?b:c => if (a) {x = b} else {x = c}
+            const assignmentExpr = path.parent.node as AssignmentExpression;
+            path.parent.parent.replace(
+                j.ifStatement(
+                    node.test,
+                    j.blockStatement([
+                        j.expressionStatement(
+                            j.assignmentExpression('=', assignmentExpr.left, node.consequent)
+                        )
+                    ]),
+                    j.blockStatement([
+                        j.expressionStatement(
+                            j.assignmentExpression('=', assignmentExpr.left, node.alternate)
+                        )
+                    ])
+                )
+            );
+            break;
         }
+        case TransformType.VariableDeclaration: {
+            // Variable declaration: let x = a?b:c; => let x; if (a) {x = b} else {x = c}
+            // Tricky case 1: convert const to let
+            // Tricky case 2: multiple declarations. Split the declarations.
+            const varDeclarator = path.parent as NodePath<VariableDeclarator>;
+            const varDeclaration = path.parent.parent as NodePath<VariableDeclaration>;
+            const newIfStatement = j.ifStatement(
+                node.test,
+                j.blockStatement([
+                    j.expressionStatement(
+                        j.assignmentExpression('=', varDeclarator.node.id, node.consequent)
+                    )
+                ]),
+                j.blockStatement([
+                    j.expressionStatement(
+                        j.assignmentExpression('=', varDeclarator.node.id, node.alternate)
+                    )
+                ])
+            );
+            varDeclarator.node.init = null;
+            const declaratorIndex = varDeclaration.node.declarations.indexOf(varDeclarator.node);
+            let newDeclaration;
+            if (declaratorIndex < varDeclaration.node.declarations.length - 1) {
+                // tricky case 2
+                const newDeclarators = varDeclaration.node.declarations.splice(declaratorIndex + 1);
+                newDeclaration = j.variableDeclaration(varDeclaration.node.kind, newDeclarators);
+            }
 
-        result = j.returnStatement(j.conditionalExpression(path.node.test, conExpr, altExpr));
-    } else if (meta.isAssignmentToOneVar) {
-        // if-else assignment
-        const conExpr = (conStatement as ExpressionStatement).expression as AssignmentExpression;
-        const altExpr = (altStatement as ExpressionStatement).expression as AssignmentExpression;
+            if (varDeclaration.node.kind === 'const') {
+                // Tricky case 1
+                varDeclaration.node.kind = 'let';
+            }
 
-        const name = (conExpr.left as Identifier).name;
-
-        result = j.expressionStatement(
-            j.assignmentExpression(
-                '=',
-                j.identifier(name),
-                j.conditionalExpression(path.node.test, conExpr.right, altExpr.right)
-            )
-        );
-    } else {
-        // is-else expression statement
-        const conExpr = (conStatement as ExpressionStatement).expression;
-        const altExpr = (altStatement as ExpressionStatement).expression;
-
-        result = j.expressionStatement(j.conditionalExpression(path.node.test, conExpr, altExpr));
+            if (newDeclaration) {
+                varDeclaration.insertAfter(newDeclaration);
+            }
+            varDeclaration.insertAfter(newIfStatement);
+            break;
+        }
+        default:
+            throw new Error(`Transform type "${transformType}" is not supported.`);
     }
-
-    path.replace(result);
 
     const resultText = ast.toSource();
     return resultText;
@@ -130,15 +149,12 @@ codeMod.canRun = (fileInfo, api, options) => {
     const j = api.jscodeshift;
     const target = options.target;
 
-    const meta = getFragmentMeta(j, target);
-    return Boolean(
-        meta && (meta.isAssignmentToOneVar || meta.isIfElseReturn || meta.isExprStatementPair)
-    );
+    return getTransformType(j, target) !== TransformType.None;
 };
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Replace with ?:';
+codeMod.title = 'Replace ?: with if-else';
 
 codeMod.description = '';
 
