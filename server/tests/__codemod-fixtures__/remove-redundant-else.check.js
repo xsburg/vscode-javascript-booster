@@ -9,11 +9,13 @@ if (a) {  /*# { pos: 2 } #*/
 
 /*$ { fixture: 'should-trigger-at-else', expected: true } $*/
 
-const a = 1;
+{
+    const a = 1;
 
-if (a) {
-    let b = 2;
-} else {  /*# { pos: 3 } #*/
+    if (a) {
+        let b = 2;
+    } else {  /*# { pos: 7 } #*/
+    }
 }
 
 /*$ { fixture: 'should-trigger-when-if-returns', expected: true } $*/
@@ -29,18 +31,32 @@ function test() {
 
 /*$ { fixture: 'should-not-trigger-else-not-empty', expected: false } $*/
 
-const a = 1;
+{
+    const a = 1;
 
-if (a) { /*# { pos: 1 } #*/
-    let b = 2;
-} else {
-    let c = 3;
+    if (a) { /*# { pos: 5 } #*/
+        let b = 2;
+    } else {
+        let c = 3;
+    }
 }
 
 /*$ { fixture: 'should-not-trigger-no-else', expected: false } $*/
 
-const a = 1;
+{
+    const a = 1;
 
-if (a) { /*# { pos: 1 } #*/
-    let b = 2;
+    if (a) { /*# { pos: 5 } #*/
+        let b = 2;
+    }
+}
+
+/*$ { fixture: 'should-not-trigger-no-else-return', expected: false } $*/
+
+function test2() {
+    const a = 1;
+
+    if (a) { /*# { pos: 5 } #*/
+        return 5;
+    }
 }

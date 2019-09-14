@@ -41,7 +41,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const node = target.firstNode();
 
-    if (!j.IfStatement.check(node)) {
+    if (!j.IfStatement.check(node) || !node.alternate) {
         return false;
     }
 
