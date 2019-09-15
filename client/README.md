@@ -1,4 +1,4 @@
-# VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster) [![Coverage Status](https://img.shields.io/coveralls/github/xsburg/vscode-javascript-booster.svg)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master) [![GitHub release](https://img.shields.io/github/release/xsburg/vscode-javascript-booster.svg)](https://github.com/xsburg/vscode-javascript-booster)
+# VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster) [![Coverage Status](https://img.shields.io/coveralls/github/xsburg/vscode-javascript-booster.svg)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master) [![GitHub release](https://img.shields.io/github/release/xsburg/vscode-javascript-booster.svg)](https://github.com/xsburg/vscode-javascript-booster) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/xsburg)
 
 Make your life easier, use code actions to do repetitive tasks for you! They can help a lot, just follow the light bulb 💡!
 
@@ -81,7 +81,9 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 ## Contribution
 
-PRs are always welcome. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for tips on how to build and debug.
+PRs are always welcome. Please refer to the [Contribution Guide](CONTRIBUTING.md) for tips on how to work with this project. The guide includes basic development workflows like running tests and debugging as well as useful links for creating new code actions.
+
+If you like this project and find it useful, you can buy me a beer through paypal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/xsburg). The beer will be greatly appreciated and help me continue the development. 🧐
 
 ## Release Notes
 

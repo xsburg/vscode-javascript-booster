@@ -17,8 +17,9 @@
     },
     "scripts": {
         "installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
-        "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-        "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p .",
+        "compile:dev": "npm run installServer && tsc -p .",
+        "compile:prod": "npm run installServer && tsc -p .",
+        "compile:watch": "npm run installServer && tsc -w -p .",
         "test": "jest",
         "generate-ast-typings": "node ./typings/generate-ast-typings"
     },
