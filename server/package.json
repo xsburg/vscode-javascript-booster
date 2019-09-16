@@ -16,7 +16,7 @@
         "url": "https://github.com/xsburg/vscode-javascript-booster/issues"
     },
     "scripts": {
-        "installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
+        "installServer": "installServerIntoExtension ../client/dist ./package.json ./tsconfig.json",
         "compile:dev": "npm run installServer && tsc -p .",
         "compile:prod": "npm run installServer && tsc -p .",
         "compile:watch": "npm run installServer && tsc -w -p .",
@@ -24,28 +24,28 @@
         "generate-ast-typings": "node ./typings/generate-ast-typings"
     },
     "dependencies": {
-        "@babel/parser": "7.4.3",
-        "fs-extra": "7.0.1",
+        "@babel/parser": "7.6.0",
+        "fs-extra": "8.1.0",
         "ast-types": "0.12.3",
         "recast": "0.17.5",
         "jscodeshift": "xsburg/jscodeshift",
-        "lodash": "4.17.11",
-        "vscode-languageserver": "4.1.2",
-        "vscode-uri": "1.0.6"
+        "lodash": "4.17.15",
+        "vscode-languageserver": "5.2.1",
+        "vscode-uri": "2.0.3"
     },
     "devDependencies": {
-        "@types/fs-extra": "5.0.5",
-        "@types/jest": "22.2.3",
+        "@types/fs-extra": "8.0.0",
+        "@types/jest": "24.0.18",
         "@types/lodash": "4.14.123",
         "@types/node": "11.13.0",
         "coveralls": "3.0.3",
         "cpx": "1.5.0",
-        "jest": "22.4.3",
-        "prettier": "1.16.4",
-        "react": "16.8.6",
-        "rimraf": "2.6.3",
+        "jest": "24.9.0",
+        "prettier": "1.18.2",
+        "react": "16.9.0",
+        "rimraf": "3.0.0",
         "ts-jest": "22.4.5",
-        "tslint": "5.15.0",
+        "tslint": "5.20.0",
         "tslint-config-prettier": "1.18.0",
         "tslint-react": "4.0.0",
         "typescript": "3.4.1"

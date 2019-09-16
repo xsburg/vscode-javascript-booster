@@ -31,9 +31,9 @@
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "clean": "rimraf out && rimraf dist",
-        "compile:dev": "npm run clean && webpack --mode none && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
-        "compile:prod": "npm run clean && webpack --mode production && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
-        "compile:watch": "npm run clean && webpack --mode none --watch",
+        "compile:dev": "webpack --mode none && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
+        "compile:prod": "webpack --mode production && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
+        "compile:watch": "webpack --mode none --watch",
         "test": "CODE_TESTS_PATH=${PWD}/out/tests node ./node_modules/vscode/bin/test"
     },
     "main": "./dist/extension",
@@ -171,32 +171,32 @@
         ]
     },
     "devDependencies": {
-        "@types/fs-extra": "5.0.5",
+        "@types/fs-extra": "8.0.0",
         "@types/glob": "7.1.1",
-        "@types/lodash": "4.14.123",
-        "@types/mocha": "5.2.6",
-        "@types/node": "11.13.0",
+        "@types/lodash": "4.14.138",
+        "@types/mocha": "5.2.7",
+        "@types/node": "12.7.5",
         "coveralls": "3.0.3",
         "cpx": "1.5.0",
         "decache": "4.5.1",
-        "glob": "7.1.3",
+        "glob": "7.1.4",
         "istanbul": "0.4.5",
-        "prettier": "1.16.4",
-        "react": "16.8.6",
+        "prettier": "1.18.2",
+        "react": "16.9.0",
         "remap-istanbul": "0.13.0",
-        "rimraf": "2.6.3",
+        "rimraf": "3.0.0",
         "ts-loader": "^6.1.0",
-        "tslint": "5.15.0",
+        "tslint": "5.20.0",
         "tslint-config-prettier": "1.18.0",
         "tslint-react": "4.0.0",
         "typescript": "3.4.1",
-        "vscode": "1.1.33",
+        "vscode": "1.1.36",
         "webpack": "^4.40.2",
         "webpack-cli": "^3.3.8"
     },
     "dependencies": {
-        "fs-extra": "7.0.1",
-        "lodash": "4.17.11",
-        "vscode-languageclient": "4.1.3"
+        "fs-extra": "8.1.0",
+        "lodash": "4.17.15",
+        "vscode-languageclient": "5.2.1"
     }
 }

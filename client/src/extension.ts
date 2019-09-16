@@ -9,7 +9,7 @@ import langService from './services/langService';
 import { extendSelectionCommand, shrinkSelectionCommand } from './smartSelectionCommands';
 
 export async function activate(context: ExtensionContext) {
-    langService.initialize();
+    langService.initialize(context);
     context.subscriptions.push(langService.start());
     await langService.ready();
 

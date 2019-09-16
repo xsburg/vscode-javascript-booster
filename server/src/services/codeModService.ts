@@ -1,8 +1,6 @@
-import { File, Program } from 'ast-types';
 import * as fs from 'fs-extra';
-import * as os from 'os';
 import * as path from 'path';
-import Uri from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../codeModTypes';
 import { configIds, extensionId } from '../const';
 import { Position } from '../utils/Position';
@@ -40,8 +38,8 @@ class CodeModService {
         const wsFolders = await connectionService.connection().workspace.getWorkspaceFolders();
         if (wsFolders) {
             const codemodDir = connectionService.getSettings().codemodDir;
-            for (let folder of wsFolders) {
-                const folderUri = Uri.parse(folder.uri);
+            for (let folder of wsFolders!) {
+                const folderUri = URI.parse(folder.uri);
                 if (folderUri.scheme !== 'file') {
                     continue;
                 }

@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "outDir": "../client/server",
+        "outDir": "../client/dist/server",
         "lib": ["es2015", "es2017"],
         "sourceMap": true,
         "strict": true,

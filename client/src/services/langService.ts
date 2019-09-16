@@ -71,14 +71,13 @@ export const shrinkSelectionRequestType = new RequestType<
 class LangService {
     private _languageClient!: LanguageClient;
 
-    public initialize() {
+    public initialize(context: vscode.ExtensionContext) {
         if (this._languageClient) {
             // Already initialized
             return;
         }
 
-        const base = path.join(__dirname, '..', '..', '..');
-        let serverModule = path.normalize(path.join(base, 'server', 'src', 'server.js'));
+        let serverModule = context.asAbsolutePath(path.join('dist', 'server', 'src', 'server.js'));
         let serverOptions: ServerOptions = {
             run: {
                 module: serverModule,
