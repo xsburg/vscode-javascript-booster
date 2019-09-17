@@ -15,7 +15,7 @@
         "url": "https://github.com/xsburg/vscode-javascript-booster/issues"
     },
     "engines": {
-        "vscode": "^1.24.0",
+        "vscode": "^1.30.0",
         "node": ">=8.0.0",
         "npm": ">=5.6.0"
     },
@@ -31,9 +31,10 @@
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "clean": "rimraf out && rimraf dist",
-        "compile:dev": "webpack --mode none && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
-        "compile:prod": "webpack --mode production && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
+        "compile:dev": "webpack --mode none && cpx ./tests/__simple-workspace__/**/* ./dist/tests/__simple-workspace__",
+        "compile:prod": "webpack --mode production && cpx ./tests/__simple-workspace__/**/* ./dist/tests/__simple-workspace__",
         "compile:watch": "webpack --mode none --watch",
+        "compile:test": "tsc -p ./ && cpx ./tests/__simple-workspace__/**/* ./out/tests/__simple-workspace__",
         "test": "CODE_TESTS_PATH=${PWD}/out/tests node ./node_modules/vscode/bin/test"
     },
     "main": "./dist/extension",
@@ -197,6 +198,6 @@
     "dependencies": {
         "fs-extra": "8.1.0",
         "lodash": "4.17.15",
-        "vscode-languageclient": "5.2.1"
+        "vscode-languageclient": "5.3.0-next.9"
     }
 }

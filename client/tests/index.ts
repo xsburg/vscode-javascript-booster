@@ -12,7 +12,7 @@
 
 import { join } from 'path';
 import * as testRunner from 'vscode/lib/testrunner';
-import { setupTestCoverage } from './utils/testCoverage';
+// import { setupTestCoverage } from './utils/testCoverage';
 
 // You can directly control Mocha options by uncommenting the following lines
 // See https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options for more info
@@ -22,6 +22,6 @@ testRunner.configure({
     timeout: 15000
 });
 
-setupTestCoverage(join(__dirname, '../src'));
+// setupTestCoverage(join(__dirname, '../src'));
 
 module.exports = testRunner;

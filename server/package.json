@@ -17,7 +17,7 @@
     },
     "scripts": {
         "installServer": "installServerIntoExtension ../client/dist ./package.json ./tsconfig.json",
-        "compile:dev": "npm run installServer && tsc -p .",
+        "compile:dev": "webpack --mode none",
         "compile:prod": "npm run installServer && tsc -p .",
         "compile:watch": "npm run installServer && tsc -w -p .",
         "test": "jest",
@@ -30,25 +30,28 @@
         "recast": "0.17.5",
         "jscodeshift": "xsburg/jscodeshift",
         "lodash": "4.17.15",
-        "vscode-languageserver": "5.2.1",
+        "vscode-languageserver": "5.3.0-next.10",
         "vscode-uri": "2.0.3"
     },
     "devDependencies": {
         "@types/fs-extra": "8.0.0",
         "@types/jest": "24.0.18",
-        "@types/lodash": "4.14.123",
-        "@types/node": "11.13.0",
-        "coveralls": "3.0.3",
+        "@types/lodash": "4.14.138",
+        "@types/node": "12.7.5",
+        "coveralls": "3.0.6",
         "cpx": "1.5.0",
         "jest": "24.9.0",
         "prettier": "1.18.2",
         "react": "16.9.0",
         "rimraf": "3.0.0",
         "ts-jest": "22.4.5",
+        "ts-loader": "^6.1.0",
         "tslint": "5.20.0",
         "tslint-config-prettier": "1.18.0",
         "tslint-react": "4.0.0",
-        "typescript": "3.4.1"
+        "typescript": "3.4.1",
+        "webpack": "^4.40.2",
+        "webpack-cli": "^3.3.9"
     },
     "jest": {
         "testEnvironment": "node",

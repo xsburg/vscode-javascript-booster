@@ -77,7 +77,7 @@ class LangService {
             return;
         }
 
-        let serverModule = context.asAbsolutePath(path.join('dist', 'server', 'src', 'server.js'));
+        let serverModule = context.asAbsolutePath(path.join('dist', 'server', 'server.js'));
         let serverOptions: ServerOptions = {
             run: {
                 module: serverModule,

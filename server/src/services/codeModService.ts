@@ -4,36 +4,63 @@ import { URI } from 'vscode-uri';
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../codeModTypes';
 import { configIds, extensionId } from '../const';
 import { Position } from '../utils/Position';
+import { requireDynamically } from '../utils/requireDynamically';
 import astService, { LanguageId, Selection } from './astService';
 import connectionService from './connectionService';
 import logService from './logService';
 
-const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
+function parseCodeMod(id: string, modFn: CodeModExports): CodeModDefinition {
+    return {
+        id,
+        name: modFn.title || id,
+        description: modFn.description || '',
+        detail: modFn.detail,
+        canRun: modFn.canRun || (() => true),
+        scope: (modFn.scope as CodeModScope) || CodeModScope.Global,
+        modFn
+    };
+}
 
-class CodeModService {
-    private _codeModsCache: CodeModDefinition[] | null = null;
-
-    public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
-        // local code mods
-        const files = await fs.readdir(embeddedCodeModDir);
+export function requireFiles() {
+    debugger;
+    let result: CodeModDefinition[];
+    if (typeof __webpack_require__ === 'function') {
+        let context = (__webpack_require__ as any).context('../codemods');
+        result = context.keys().map((k: any) => parseCodeMod(k, context(k)));
+    } else {
+        const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
+        const files = fs.readdirSync(embeddedCodeModDir);
         const fileNames = files.map(name => path.join(embeddedCodeModDir, name));
-        const codeMods = (await Promise.all(
-            fileNames.map(async fileName => {
+        result = fileNames
+            .map(fileName => {
                 if (!fileName.match(/(\.ts|\.js)$/)) {
                     return {
                         isFile: false,
                         fileName
                     };
                 }
-                const stat = await fs.lstat(fileName);
+                const stat = fs.lstatSync(fileName);
                 return {
                     isFile: stat.isFile(),
                     fileName
                 };
             })
-        ))
             .filter(x => x.isFile)
-            .map(x => this._parseCodeModFile(x.fileName));
+            .map(x => {
+                const exp = requireDynamically(x.fileName);
+                const id = path.basename(x.fileName, path.extname(x.fileName));
+                return parseCodeMod(id, exp);
+            });
+    }
+    return result;
+}
+const embeddedCodeMods = requireFiles();
+
+class CodeModService {
+    private _codeModsCache: CodeModDefinition[] | null = null;
+
+    public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
+        let codeMods = [...embeddedCodeMods];
         // user-workspace code mods
         const wsFolders = await connectionService.connection().workspace.getWorkspaceFolders();
         if (wsFolders) {
@@ -53,7 +80,16 @@ class CodeModService {
                 for (let n of names) {
                     const fn = path.join(dirName, n);
                     if ((await fs.stat(fn)).isFile) {
-                        codeMods.push(this._parseCodeModFile(fn));
+                        let modFn: CodeModExports | null = null;
+                        try {
+                            modFn = requireDynamically(fn);
+                        } catch (e) {
+                            logService.outputError(`Failed to parse codemod '${fn}': ${e.message}`);
+                        }
+                        if (modFn) {
+                            const id = path.basename(fn, path.extname(fn));
+                            codeMods.push(parseCodeMod(id, modFn));
+                        }
                     }
                 }
             }
@@ -66,7 +102,7 @@ class CodeModService {
     }
 
     public loadOneEmbeddedCodeMod(modId: string): void {
-        if (this._codeModsCache && this._codeModsCache.some(m => m.id === modId)) {
+        /* if (this._codeModsCache && this._codeModsCache.some(m => m.id === modId)) {
             return;
         }
         const fileName = path.join(embeddedCodeModDir, modId);
@@ -77,7 +113,7 @@ class CodeModService {
         if (!this._codeModsCache) {
             this._codeModsCache = [];
         }
-        this._codeModsCache.push(mod);
+        this._codeModsCache.push(mod); */
     }
 
     public async getGlobalMods(options: {
@@ -225,26 +261,6 @@ class CodeModService {
                 selection: result.selection
             };
         }
-    }
-
-    private _parseCodeModFile(fileName: string): CodeModDefinition | null {
-        let modFn: CodeModExports;
-        try {
-            modFn = require(fileName);
-        } catch (e) {
-            logService.outputError(`Failed to parse codemod '${fileName}': ${e.message}`);
-            return null;
-        }
-        const name = path.basename(fileName, path.extname(fileName));
-        return {
-            id: name,
-            name: modFn.title || name,
-            description: modFn.description || '',
-            detail: modFn.detail,
-            canRun: modFn.canRun || (() => true),
-            scope: (modFn.scope as CodeModScope) || CodeModScope.Global,
-            modFn
-        };
     }
 
     private async _getAllCodeMods(): Promise<CodeModDefinition[]> {

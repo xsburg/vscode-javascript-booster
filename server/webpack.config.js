@@ -7,22 +7,17 @@ const path = require('path');
 /**@type {import('webpack').Configuration}*/
 const config = {
     target: 'node', // vscode extensions run in a Node.js-context
-
     entry: {
-        extension: './src/extension.ts'
-        //tests: './tests/index.ts'
+        server: './src/server.ts'
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, '../client/dist/server'),
         filename: '[name].js',
         libraryTarget: 'commonjs2',
         devtoolModuleFilenameTemplate: '../[resource-path]'
     },
     devtool: 'source-map',
     externals: {
-        'remap-istanbul': 'commonjs remap-istanbul',
-        istanbul: 'commonjs istanbul',
-        mocha: 'commonjs mocha',
         vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     },
     resolve: {

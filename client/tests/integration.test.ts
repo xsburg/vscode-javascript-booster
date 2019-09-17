@@ -30,7 +30,7 @@ async function openFileInEditor(filePath: string) {
     const editor = await vscode.window.showTextDocument(textDocument);
     // Opening the document triggers this extension to start.
     // Wait until the language server has started.
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     await langService.ready();
     return { fileUri, textDocument, editor };
 }

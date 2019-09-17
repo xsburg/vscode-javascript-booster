@@ -11,7 +11,7 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "out": true,
+        "out": false,
         "server": true,
         ".history/**": true,
         ".vscode-test/**": true
