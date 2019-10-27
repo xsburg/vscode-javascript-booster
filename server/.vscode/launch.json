@@ -16,7 +16,8 @@
             "protocol": "inspector",
             "port": 6014,
             "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/../client/server/**/*.js"]
+            "trace": "verbose",
+            "outFiles": ["${workspaceRoot}/../client/dist/server/**/*.js"]
         },
         {
             "type": "node",

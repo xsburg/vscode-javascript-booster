@@ -58,7 +58,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                     if (isPositionWithinNode(pos, p.node as Printable)) {
                         targets.push(p);
                         this.traverse(p);
-                        return;
+                        return undefined;
                     } else {
                         return false;
                     }
@@ -89,7 +89,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                     if (n.start <= start && end <= n.end) {
                         targets.push(p);
                         this.traverse(p);
-                        return;
+                        return undefined;
                     } else {
                         return false;
                     }
