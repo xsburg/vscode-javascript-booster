@@ -16,10 +16,8 @@
         "url": "https://github.com/xsburg/vscode-javascript-booster/issues"
     },
     "scripts": {
-        "installServer": "installServerIntoExtension ../client/dist ./package.json ./tsconfig.json",
         "compile:dev": "webpack --mode none",
-        "compile:prod": "npm run installServer && tsc -p .",
-        "compile:watch": "npm run installServer && tsc -w -p .",
+        "compile:prod": "webpack --mode production",
         "test": "jest",
         "generate-ast-typings": "node ./typings/generate-ast-typings"
     },

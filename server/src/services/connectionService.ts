@@ -35,7 +35,7 @@ interface JavaScriptBoosterSettings {
 }
 
 class ConnectionService {
-    private _connection!: IConnection;
+    private _connection: IConnection | null = null;
     private _documents!: TextDocuments;
     private _settings!: JavaScriptBoosterSettings;
 

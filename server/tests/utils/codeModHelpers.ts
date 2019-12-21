@@ -64,7 +64,6 @@ async function runInlineTransformTest(
 ) {
     input = normalizeLineEndings(input);
     const expectedOutput = normalizeLineEndings(output.source);
-    codeModService.loadOneEmbeddedCodeMod(modId);
 
     const runOptions = {
         languageId,
@@ -116,8 +115,6 @@ async function runInlineCanRunTest(
     expected: boolean,
     options: { fileName?: string; anchor?: IPosition; active: IPosition }
 ) {
-    codeModService.loadOneEmbeddedCodeMod(modId);
-
     const runOptions = {
         languageId,
         fileName: (options && options.fileName) || '/Users/example/example.ts',
@@ -350,9 +347,7 @@ function posToString(pos: { anchor: IPosition; active: IPosition }) {
     if (pos.active.column === pos.anchor.column && pos.active.line === pos.anchor.line) {
         return `pos ${pos.active.line}:${pos.active.column}`;
     } else {
-        return `pos ${pos.anchor.line}:${pos.anchor.column}->${pos.active.line}:${
-            pos.active.column
-        }`;
+        return `pos ${pos.anchor.line}:${pos.anchor.column}->${pos.active.line}:${pos.active.column}`;
     }
 }
 

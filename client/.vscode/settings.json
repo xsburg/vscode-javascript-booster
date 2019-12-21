@@ -3,6 +3,7 @@
         "**/node_modules": true,
         "**/bower_components": true,
         "out": true,
+        "dist": true,
         "server": true
     },
     "files.exclude": {
@@ -11,7 +12,7 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "out": false,
+        "dist": false,
         "server": true,
         ".history/**": true,
         ".vscode-test/**": true

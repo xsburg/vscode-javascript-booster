@@ -1,33 +1,51 @@
 # Contributing to VSCode Javascript Booster
 
+Before you start, it's useful to understand that the extension consists of two major components: the extension itself and the so-called language server. All UI interactions with VS Code are conducted inside the extension part, while all the code-analyzing logic is hidden inside the language server - a separate process to handle resource-heavy operations.
+
+Following this architecture, below are the main scenarious that you might come across while working on this project.
+
+-   Debugging the extension (which is: launching VS Code and this extension in debug mode)
+-   Debugging the language server
+-   Running integration tests (to check that all the pieces work together)
+-   Running unit tests of the language server (to build new features: code actions etc.)
+-   Building a Release Candidate bundle (for purpose of long-term local testing)
+
 ## Debugging the extension
 
--   Compile the language server using `npm run compile` in the server/ directory.
--   Launch `Launch client (client)`. You can debug the extension code now.
--   If needed, launch `Attach to Server (server)` in parallel. Now you can debug both the language server and the extension.
+-   Compile the language server: go to the `server` directory and run `npm run compile`.
+-   Start the configuration `Launch client (client)`.
 
-## Running tests (dev mode)
+## Debugging the language server
 
-Language server:
+-   Start extension in debug mode using the previous step.
+-   Start the additional configuration `Attach to Server (server)` in parallel to `Launch client (client)`.
 
--   run `npm test -- --watch` inside the `server` directory to run the language server tests.
--   launch `Server Tests (server)` to debug the tests.
+## Running integration tests
 
-Extension (client):
+-   Compile the language server: go to the `server` directory and run `npm run compile`.
+-   Start the configuration `Extension tests (client)`.
 
--   run `npm test` inside the `client` directory to run the extension integration tests.
--   launch `Extension tests (client)` to debug the tests.
+## Running unit tests of the language server
 
-## Packaging extension for testing locally
+Running the unit tests in watch mode:
+
+-   Go to the `server` directory and run `npm test -- --watch`.
+
+Debugging the unit tests:
+
+-   Start the configuration `Server Tests (server)`.
+
+## Building a Release Candidate bundle
 
 `vsce` (Visual Studio Code Extensions) CLI has to be installed in order to build the extension locally (`npm i -g vsce`).
 
-The following set of commands build the extension package:
+The following commands build the extension package:
 
--   in the root dir: `npm run compile`
--   in the client dir: `vsce package`
+-   in the root repository dir: `npm run package`
 
-After the build, run VSCode, go to the extensions tab and choose 'Install from VSIX...'. If the extension is already installed, it will be overwritten.
+The extension bundle (\*.vsix) will be created in the `client` directory.
+
+After that, you can load the bundle by going to the extensions tab in VS Code and choosing 'Install from VSIX...'. If the extension has already been installed from the Marketplace, it will be overwritten.
 
 ## Pre-flight checklist
 
@@ -38,7 +56,7 @@ All releases are made using release branches, e.g. `release/0.11.0`.
     -   Add new code actions into the list
     -   Check if other changes are needed
 -   Place all the resources (gifs, etc) into the `resources` dir.
--   Run `npm run generate:docs` to update extension's readme and changelog files.
+-   Run `npm run utils:generate:docs` to update extension's readme and changelog files.
 -   Initiate new release by running the command (in the root dir): `npm version [patch|minor|major]`
 -   Merge the release branch into master, delete it and push
 
