@@ -5,15 +5,18 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "compile:watch",
-            "problemMatcher": "$tsc-watch",
-            "isBackground": true,
+            "script": "compile:dev",
+            "problemMatcher": "$tsc",
             "presentation": {
                 "reveal": "never"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
+            }
+        },
+        {
+            "type": "npm",
+            "script": "compile:test",
+            "problemMatcher": "$tsc",
+            "presentation": {
+                "reveal": "never"
             }
         }
     ]

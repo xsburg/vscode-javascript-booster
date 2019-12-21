@@ -10,7 +10,6 @@ const config = {
 
     entry: {
         extension: './src/extension.ts'
-        //tests: './tests/index.ts'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),

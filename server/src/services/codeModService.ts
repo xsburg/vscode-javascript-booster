@@ -22,10 +22,9 @@ function parseCodeMod(id: string, modFn: CodeModExports): CodeModDefinition {
 }
 
 export function requireFiles() {
-    debugger;
     let result: CodeModDefinition[];
     if (typeof __webpack_require__ === 'function') {
-        let context = (require as any).context('../codemods');
+        let context = (require as any).context('../codemods', true, /\.ts$/);
         result = context.keys().map((k: any) => parseCodeMod(k, context(k)));
     } else {
         const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');

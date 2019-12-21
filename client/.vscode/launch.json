@@ -7,10 +7,10 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+            "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/dist/**/*.js"],
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "preLaunchTask": "npm: compile:dev"
         },
         {
@@ -18,13 +18,16 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "env": {
+                "TEST_WORKSPACES_DIR": "${workspaceFolder}/dist/test-workspaces"
+            },
             "args": [
-                "--extensionDevelopmentPath=${workspaceRoot}/out",
-                "--extensionTestsPath=${workspaceRoot}/out/tests"
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionTestsPath=${workspaceFolder}/tests/runtime"
             ],
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/out/**/*.js"],
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "preLaunchTask": "npm: compile:test"
         }
     ]

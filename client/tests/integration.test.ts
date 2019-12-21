@@ -6,7 +6,11 @@ import { executeCodeActionCommand } from '../src/executeCodeActionCommand';
 import langService from '../src/services/langService';
 
 function getWorkspaceFilePath(workspaceName: string, relativeFilePath: string) {
-    return path.join(__dirname, `__${workspaceName}__`, relativeFilePath);
+    const testWorkspacesDir = process.env.TEST_WORKSPACES_DIR;
+    if (!testWorkspacesDir) {
+        throw new Error('TEST_WORSPACES_DIR variable is not set.');
+    }
+    return path.join(testWorkspacesDir, `__${workspaceName}__`, relativeFilePath);
 }
 
 function createDiagnosticsMock(): vscode.CodeActionContext {
