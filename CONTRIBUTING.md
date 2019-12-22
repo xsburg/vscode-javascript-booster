@@ -41,7 +41,8 @@ Debugging the unit tests:
 
 The following commands build the extension package:
 
--   in the root repository dir: `npm run package`
+-   Bump the version in `client/package.json` (don't forget to revert the change later)
+-   In the root repository dir, run `npm run package`
 
 The extension bundle (\*.vsix) will be created in the `client` directory.
 
