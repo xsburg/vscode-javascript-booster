@@ -1,7 +1,7 @@
 {
     "name": "vscode-javascript-booster",
     "description": "Boost your productivity with advanced JavaScript refactorings and commands",
-    "version": "0.12.1",
+    "version": "0.12.2",
     "author": "Stepan Burguchev <me@sburg.net>",
     "license": "MIT",
     "engines": {
