@@ -6,6 +6,15 @@ All notable changes to the "vscode-javascript-booster" extension are documented 
 
 <!-- CHANGELOG STARTS HERE -->
 
+### 0.12.0
+
+-   Add new refactoring: `Replace ?: with if-else` (#19):
+
+![Replace ?: with if-else](resources/replace-ternary-with-if-else.gif)
+
+-   Fixed 'Remove redundant else' refactoring not to appear when there is not else statement (#21).
+-   The project now uses Webpack internally to minimize the extension size and improve performance (#22).
+
 ### 0.11.0
 
 -   Add new range-based code action: `Call await statements in parallel with Promise.All()` (#7):

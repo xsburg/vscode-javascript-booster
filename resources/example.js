@@ -52,3 +52,13 @@ function simplifyIfElse() {
         return false;
     }
 }
+
+function replaceTernaryWithIfElse() {
+    let foo;
+
+    if (importantValue > MAX_VALUE) {
+        foo = getThis();
+    } else {
+        foo = getOtherThing();
+    }
+}

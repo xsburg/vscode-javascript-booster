@@ -52,7 +52,7 @@ After that, you can load the bundle by going to the extensions tab in VS Code an
 
 All releases are made using release branches, e.g. `release/0.11.0`.
 
--   Update README.md:
+-   Update README.md in the root directory:
     -   Add new changelog entry
     -   Add new code actions into the list
     -   Check if other changes are needed
