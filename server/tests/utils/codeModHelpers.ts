@@ -1,15 +1,3 @@
-/**
- * Developer: Stepan Burguchev
- * Date: 11/16/2017
- * Copyright: 2015-present ApprovalMax
- *       All Rights Reserved
- *
- * THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF ApprovalMax
- *       The copyright notice above does not evidence any
- *       actual or intended publication of such source code.
- */
-
-import * as assert from 'assert';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as os from 'os';
