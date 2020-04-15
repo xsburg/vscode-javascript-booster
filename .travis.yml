@@ -31,7 +31,7 @@ deploy:
           condition: '$TRAVIS_OS_NAME = osx'
     - provider: releases
       api_key:
-          secure: gs6iJkqvW4psjgFNaLIzp6QF8ceCUsSkQpeAlnbWUmlkUvCZjF2PN0vOf7sXD+VgMfSV6jS3lho0jcQZCp8ZFf/G1A25WMYThmHLzZGUGNXhXIMlJ5qPqbtbmvtnIRCuW9ZqzqNH/WB1XXArn1/qlJ5WPsU3EZpJb0ZZjmYHZAxJrQ+6Uo6+ZnNBv0/1KNiK03Bjf5/bokrkJbRKC0dsFdefcadCnQyNS/jkyxKzRo9zH8FGP3d2zSSDaehXbI4BlS4yhlwJ75Bz9AHLaElgCIoBtstsy8gJQr8IPA8D+m/f/fGTrIc4kcxfddDzKv31I0W7hEVOqB7ps6T3p6iww1XudYaki/LbGV+d3Bspe5r8RaCqz1iYFLuUCmEgqv+hAmcsd1mbtExfyR3T6QzwQYfzY/B+eMD3kfi/RfHYTxIWJril1a7AxwhJcHnnB2KYZxF5NIJRJTPIZ3vecmFjrOWdXPVtb29lpHICH2TWlKczfZQaTxNNmd6h6qYaq0QTAQhsSZWR8tJ7626bxM+N6MY59lDBU7g5K6AcGDddOWU5UB3TcPFLC9vFg+feY9jt6lIZCjzn6UiZ/y9OdKWu8j6+9PhphbEiE+IbZuUxqx1G2KRSJWahFn7F2nLlSSYexSIUX+CCum723msfwsN5MQbvfRnrlNz/6upbFyDaohk=
+          secure: onSI3tk+3s1iwE/8ylDgMuU1B8k4Kep/QKcWvxX5+i0dW/2FioybgaVAjVDxKPMrkj9Z65bgOccHArL8gInf1zjjU3hi97/WHYXReqUfW6cCw1CElhRQo7cq+2o4D5T0vkDzd1gT4e5nRMI2+jSjoUP7pvxg9/LwXvl7h7Ay//3PCGWYz77cNjYVb3n5uho5ckBe0Trg8LzHvYb64BFa44D3pfYUBEUeWeS8nFJDARHgpDH8JIWtACSZaY6hkl4fSJMpaXpJ0SxPpe1qAJRgac3h5o38sutQK5PgZ3fLPxAbuut+T2TwMpURCBbgF/djoElVxQEHkRf9Ux7FSS0kL/0MCRNxJsiZ2EOUG36MIBSYEr0mR2Xe/jJngpktC0x8MQEJcaJcy/RZ5r2PXDTWonPYToacp7Pem/5zsEhEAbCeMCRxy1/xwNj0ghfXULCSIOwK0PWBZiBxoOKwaYA5Ty1RnSFYFV185OHIbQSpjjN7nHJRWYWt9IXVI81TmJu/ZIL9jBI+SiwRE/m/L9xg8d2lLX/3JcGHKoVaWNjclOo5t/Qegy41VUiSrs8kCmnOuKIU9bcLXD01ubItoApXl3K3lh8MUNs7FCjMwbtb2nNOETgCKumTihWw69bQ7csq+k9jJ9xgYNLt13RgJ9CGCrv8WqnGUg4c6DhPDnhsfPQ=
       skip_cleanup: true
       file_glob: true
       file: 'client/*.vsix'
