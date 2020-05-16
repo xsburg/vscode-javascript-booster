@@ -4,19 +4,22 @@ import {
     InitializeResult,
     IPCMessageReader,
     IPCMessageWriter,
-    TextDocuments
+    TextDocuments,
+    TextDocumentSyncKind,
 } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
+
 import { codeActionsRequestHandler, codeActionsRequestType } from '../codeActionsRequest';
 import { commandIds } from '../const';
 import {
     executeTransformRequestHandler,
-    executeTransformRequestType
+    executeTransformRequestType,
 } from '../executeTransformRequest';
 import {
     extendSelectionRequestHandler,
     extendSelectionRequestType,
     shrinkSelectionRequestHandler,
-    shrinkSelectionRequestType
+    shrinkSelectionRequestType,
 } from '../smartSelectionRequest';
 import codeModService from './codeModService';
 
@@ -36,7 +39,7 @@ interface JavaScriptBoosterSettings {
 
 class ConnectionService {
     private _connection: IConnection | null = null;
-    private _documents!: TextDocuments;
+    private _documents!: TextDocuments<TextDocument>;
     private _settings!: JavaScriptBoosterSettings;
 
     public listen() {
@@ -45,23 +48,23 @@ class ConnectionService {
             new IPCMessageWriter(process)
         );
 
-        this._documents = new TextDocuments();
+        this._documents = new TextDocuments(TextDocument);
         this._documents.listen(this._connection);
 
         this._connection.onInitialize(
             (params): InitializeResult => {
                 return {
                     capabilities: {
-                        textDocumentSync: this._documents.syncKind,
+                        textDocumentSync: TextDocumentSyncKind.Incremental,
                         executeCommandProvider: {
-                            commands: [commandIds.reloadCodeMods]
-                        }
-                    }
+                            commands: [commandIds.reloadCodeMods],
+                        },
+                    },
                 };
             }
         );
 
-        this._connection.onDidChangeConfiguration(change => {
+        this._connection.onDidChangeConfiguration((change) => {
             this._settings = change.settings.javascriptBooster as JavaScriptBoosterSettings;
             codeModService.reloadAllCodeMods();
         });
@@ -71,7 +74,7 @@ class ConnectionService {
         this._connection.onRequest(extendSelectionRequestType, extendSelectionRequestHandler);
         this._connection.onRequest(shrinkSelectionRequestType, shrinkSelectionRequestHandler);
 
-        this._connection.onExecuteCommand(async params => {
+        this._connection.onExecuteCommand(async (params) => {
             switch (params.command) {
                 case commandIds.reloadCodeMods:
                     codeModService.reloadAllCodeMods();

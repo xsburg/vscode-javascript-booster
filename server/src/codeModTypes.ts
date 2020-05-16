@@ -1,5 +1,6 @@
 import { File } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+
 import { Selection } from './services/astService';
 import { Position } from './utils/Position';
 
@@ -40,7 +41,7 @@ export interface CodeModExports extends CodeModTransform {
 
 export enum CodeModScope {
     Global = 'global',
-    Cursor = 'cursor'
+    Cursor = 'cursor',
 }
 
 export interface CodeModDefinition {

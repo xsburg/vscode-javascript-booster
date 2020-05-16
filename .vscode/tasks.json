@@ -18,6 +18,18 @@
             "presentation": {
                 "reveal": "never"
             }
+        },
+        {
+            "type": "npm",
+            "script": "compile:dev",
+            "problemMatcher": "$tsc",
+            "presentation": {
+                "reveal": "never"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

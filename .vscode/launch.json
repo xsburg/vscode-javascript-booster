@@ -1,5 +1,77 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 {
     "version": "0.1.0",
-    "configurations": []
+    "configurations": [
+        {
+            "name": "Client: Launch",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": ["--extensionDevelopmentPath=${workspaceFolder}/client"],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": ["${workspaceFolder}/client/dist/**/*.js"],
+            "preLaunchTask": "npm: compile:dev"
+        },
+        {
+            "name": "Client: Integration Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "env": {
+                "TEST_WORKSPACES_DIR": "${workspaceFolder}/client/dist/test-workspaces"
+            },
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/client",
+                "--extensionTestsPath=${workspaceFolder}/client/tests/runtime"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": ["${workspaceFolder}/client/dist/**/*.js"],
+            "preLaunchTask": "npm: compile:test"
+        },
+        {
+            "name": "Attach to Server",
+            "type": "node",
+            "request": "attach",
+            "address": "localhost",
+            "protocol": "inspector",
+            "port": 6014,
+            "sourceMaps": true,
+            "trace": "verbose",
+            "outFiles": ["${workspaceRoot}/client/dist/server/**/*.js"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Server: Tests",
+            "program": "${workspaceFolder}/server/node_modules/jest/bin/jest.js",
+            "cwd": "${workspaceFolder}/server",
+            "args": ["--runInBand"],
+            "runtimeArgs": ["--nolazy"],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Server: Tests [Selected]",
+            "program": "${workspaceFolder}/server/node_modules/jest/bin/jest.js",
+            "cwd": "${workspaceFolder}/server",
+            "args": ["--runInBand", "-t=${selectedText}"],
+            "runtimeArgs": ["--nolazy"],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Generate ast-types typings",
+            "program": "${workspaceFolder}/server/typings/generate-ast-typings.js"
+        }
+    ]
 }

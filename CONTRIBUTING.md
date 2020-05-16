@@ -12,18 +12,16 @@ Following this architecture, below are the main scenarious that you might come a
 
 ## Debugging the extension
 
--   Compile the language server: go to the `server` directory and run `npm run compile`.
--   Start the configuration `Launch client (client)`.
+-   Start the configuration `Client: Launch`. The configuration will first build both client and server and then run the extension in debug mode.
 
 ## Debugging the language server
 
 -   Start extension in debug mode using the previous step.
--   Start the additional configuration `Attach to Server (server)` in parallel to `Launch client (client)`.
+-   Start the additional configuration `Attach to Server` in parallel to `Client: Launch`.
 
 ## Running integration tests
 
--   Compile the language server: go to the `server` directory and run `npm run compile`.
--   Start the configuration `Extension tests (client)`.
+-   Start the configuration `Client: Integration Tests`. The configuration will first build both client and server and then run the integration tests (uses debug build).
 
 ## Running unit tests of the language server
 
@@ -33,13 +31,13 @@ Running the unit tests in watch mode:
 
 Debugging the unit tests:
 
--   Start the configuration `Server Tests (server)`.
+-   Start the configuration `Server: Tests`.
 
 ## Building a Release Candidate bundle
 
 `vsce` (Visual Studio Code Extensions) CLI has to be installed in order to build the extension locally (`npm i -g vsce`).
 
-The following commands build the extension package:
+In order to build the extension package:
 
 -   Bump the version in `client/package.json` (don't forget to revert the change later)
 -   In the root repository dir, run `npm run package`

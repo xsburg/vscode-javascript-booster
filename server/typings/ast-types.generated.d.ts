@@ -2650,6 +2650,11 @@ declare module 'ast-types' {
             right: Identifier | TSQualifiedName
         ): TSQualifiedName;
 
+        tsTypeReference(
+            typeName: Identifier | TSQualifiedName,
+            typeParameters: TSTypeParameterInstantiation | null
+        );
+
         tsTypeParameterInstantiation(params: Array<TSType>): TSTypeParameterInstantiation;
 
         tsTypeParameterDeclaration(params: Array<TSTypeParameter>): TSTypeParameterDeclaration;
@@ -2760,7 +2765,7 @@ declare module 'ast-types' {
 
         tsEnumDeclaration(id: Identifier, members: Array<TSEnumMember>): TSEnumDeclaration;
 
-        tsTypeAliasDeclaration(id: Identifier): TSTypeAliasDeclaration;
+        tsTypeAliasDeclaration(id: Identifier, typeAnnotation: TSType): TSTypeAliasDeclaration;
 
         tsModuleBlock(body: Array<Statement>): TSModuleBlock;
 
