@@ -5,7 +5,7 @@ import {
     assertSmartSelectionBulk,
     extractSelections,
     normalizeNewLines,
-    removeSelectionMarkers
+    removeSelectionMarkers,
 } from './utils/smartSelectionHelpers';
 
 describe(`Smart selection`, () => {
@@ -272,7 +272,7 @@ describe(`Smart selection`, () => {
             'const company = |selectors.company.getCompanyById|(state, d.companyId); /*# { action: `-` } #*/',
             'const company = selectors.company.|getCompanyById|(state, d.companyId); /*# { action: `-` } #*/',
             'const company = selectors.company.getCo|mpany|ById(state, d.companyId); /*# { action: `-` } #*/',
-            'const company = selectors.company.getCompany|ById(state, d.companyId);'
+            'const company = selectors.company.getCompany|ById(state, d.companyId);',
         ]);
     });
 
@@ -318,7 +318,7 @@ describe(`Smart selection`, () => {
             `
                 const company1 = selectors.company.getCompanyById|1|(state, d.companyId);
                 const company2 = selectors.company.getCompanyById|2|(state, d.companyId);
-            `
+            `,
         ]);
     });
 });

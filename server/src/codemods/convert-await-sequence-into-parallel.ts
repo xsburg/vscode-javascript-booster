@@ -8,7 +8,7 @@ import {
     Pattern,
     Statement,
     VariableDeclaration,
-    VariableDeclarator
+    VariableDeclarator,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -17,8 +17,8 @@ function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
     return j.match<ExpressionStatement>(s, {
         type: 'ExpressionStatement',
         expression: {
-            type: 'AwaitExpression'
-        } as AssignmentExpression
+            type: 'AwaitExpression',
+        } as AssignmentExpression,
     });
 }
 
@@ -28,9 +28,9 @@ function isAssignmentStatement(j: JsCodeShift, s: Collection<Statement>) {
         expression: {
             type: 'AssignmentExpression',
             right: {
-                type: 'AwaitExpression'
-            }
-        } as AssignmentExpression
+                type: 'AwaitExpression',
+            },
+        } as AssignmentExpression,
     });
 }
 
@@ -42,10 +42,10 @@ function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
                 {
                     type: 'VariableDeclarator',
                     init: {
-                        type: 'AwaitExpression'
-                    }
-                } as VariableDeclarator
-            ]
+                        type: 'AwaitExpression',
+                    },
+                } as VariableDeclarator,
+            ],
         }) && (s.firstNode() as VariableDeclaration).declarations.length === 1
     );
 }
@@ -77,27 +77,27 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         targetVar: Pattern | null;
         awaitArgument: Expression;
     }> = [];
-    statements.forEach(s => {
+    statements.forEach((s) => {
         const node = s.firstNode();
         if (isExpressionStatement(j, s)) {
             dataList.push({
                 targetVar: null,
                 awaitArgument: ((node as ExpressionStatement).expression as AwaitExpression)
-                    .argument!
+                    .argument!,
             });
         } else if (isVariableDeclaration(j, s)) {
             needsVarDeclaration = true;
             const declarator = (node as VariableDeclaration).declarations[0] as VariableDeclarator;
             dataList.push({
                 targetVar: declarator.id,
-                awaitArgument: (declarator.init as AwaitExpression).argument!
+                awaitArgument: (declarator.init as AwaitExpression).argument!,
             });
         } else if (isAssignmentStatement(j, s)) {
             needsAssignment = true;
             const assignmentExpr = (node as ExpressionStatement).expression as AssignmentExpression;
             dataList.push({
                 targetVar: assignmentExpr.left,
-                awaitArgument: (assignmentExpr.right as AwaitExpression).argument!
+                awaitArgument: (assignmentExpr.right as AwaitExpression).argument!,
             });
         } else {
             throw new Error('Not supported');
@@ -105,7 +105,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     });
 
     // Trailing nulls are truncated, e.g.: [,,result,,] => [,,result]
-    let varList = dataList.map(x => x.targetVar);
+    let varList = dataList.map((x) => x.targetVar);
     while (varList.length > 0 && !varList[varList.length - 1]) {
         varList.pop();
     }
@@ -113,7 +113,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     // Generating new code
     const awaitExpr = j.awaitExpression(
         j.callExpression(j.memberExpression(j.identifier('Promise'), j.identifier('all')), [
-            j.arrayExpression(dataList.map(x => x.awaitArgument))
+            j.arrayExpression(dataList.map((x) => x.awaitArgument)),
         ])
     );
 

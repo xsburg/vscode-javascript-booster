@@ -6,7 +6,7 @@ import {
     Identifier,
     Node,
     ReturnStatement,
-    Statement
+    Statement,
 } from 'ast-types';
 import { JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -53,7 +53,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
             }
         }
 
-        statements.reverse().forEach(st => path.insertAfter(st));
+        statements.reverse().forEach((st) => path.insertAfter(st));
         path.prune();
     } else {
         // Case 2. if-return-bool-else-return-bool

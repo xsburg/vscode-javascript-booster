@@ -52,11 +52,11 @@ export function applySelectionMarkers(code: string, selections: Selection[]) {
             return a.active - b.active;
         })
         .forEach((sel, i) => {
-            [sel.anchor, sel.active].forEach(point => {
+            [sel.anchor, sel.active].forEach((point) => {
                 let a = points[point];
                 if (!a) {
                     a = points[point] = {
-                        indexes: []
+                        indexes: [],
                     };
                 }
                 if (!a.indexes.includes(i)) {
@@ -67,13 +67,13 @@ export function applySelectionMarkers(code: string, selections: Selection[]) {
 
     Object.keys(points)
         .sort((a, b) => Number(b) - Number(a))
-        .forEach(key => {
+        .forEach((key) => {
             const offset = Number(key);
             const point = points[offset];
             code = [
                 code.substring(0, offset),
-                ...point.indexes.map(i => (selections.length === 1 ? '|' : `|${i + 1}|`)),
-                code.substring(offset)
+                ...point.indexes.map((i) => (selections.length === 1 ? '|' : `|${i + 1}|`)),
+                code.substring(offset),
             ].join('');
         });
 
@@ -90,7 +90,7 @@ function extractAction(text: string) {
     if (!match || !match[0]) {
         return {
             text,
-            action: true
+            action: true,
         };
     }
     // tslint:disable-next-line:no-eval
@@ -100,7 +100,7 @@ function extractAction(text: string) {
 
     return {
         text: cleanSource,
-        action: action !== '-'
+        action: action !== '-',
     };
 }
 
@@ -125,7 +125,7 @@ export function assertSmartSelection(
     const ast = astService.getAstTree({
         languageId,
         fileName: 'example.jsx',
-        source: cleanInputFixture
+        source: cleanInputFixture,
     });
     if (!ast) {
         throw new Error('SyntaxError in input fixture.');
@@ -138,7 +138,7 @@ export function assertSmartSelection(
             source: cleanInputFixture,
             fileName: 'example.js',
             ast,
-            selections: inputSelections
+            selections: inputSelections,
         });
     } else {
         actualSelections = smartSelectionService.shrinkSelection({
@@ -146,7 +146,7 @@ export function assertSmartSelection(
             source: cleanInputFixture,
             fileName: 'example.js',
             ast,
-            selections: inputSelections
+            selections: inputSelections,
         });
     }
 

@@ -5,7 +5,7 @@ import {
     JSXElement,
     JSXOpeningElement,
     Printable,
-    UnaryExpression
+    UnaryExpression,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';

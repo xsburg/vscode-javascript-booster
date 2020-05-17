@@ -12,7 +12,7 @@ import {
     TemplateElement,
     UnaryExpression,
     VariableDeclaration,
-    VariableDeclarator
+    VariableDeclarator,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -27,7 +27,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
 
     // Go through scope statements and find assignments
     // Then check if assigned vars exist in target declaration and update them
-    blockStatementPath.node.body.forEach(d => {
+    blockStatementPath.node.body.forEach((d) => {
         if (
             j.ExpressionStatement.check(d) &&
             j.AssignmentExpression.check(d.expression) &&
@@ -35,7 +35,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         ) {
             const name = d.expression.left.name;
             const matchedDeclarator = declarationNode.declarations.find(
-                dtor =>
+                (dtor) =>
                     (j.Identifier.check(dtor) && dtor.name === name) ||
                     (j.VariableDeclarator.check(dtor) &&
                         !dtor.init &&
@@ -52,7 +52,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
             );
             // Update assignment expression into declaration
             const newDeclaration = j.variableDeclaration(declarationNode.kind, [
-                j.variableDeclarator(j.identifier(name), d.expression.right)
+                j.variableDeclarator(j.identifier(name), d.expression.right),
             ]);
             blockStatementPath.node.body.splice(
                 blockStatementPath.node.body.indexOf(d),
@@ -80,7 +80,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     }
 
     const candidateIdentifiers: Identifier[] = [];
-    path.node.declarations.forEach(d => {
+    path.node.declarations.forEach((d) => {
         if (j.Identifier.check(d)) {
             candidateIdentifiers.push(d);
         }
@@ -94,9 +94,9 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    const names = candidateIdentifiers.map(i => i.name);
+    const names = candidateIdentifiers.map((i) => i.name);
     const hasAssignmentsInScope = (path.parent.node as BlockStatement).body.some(
-        d =>
+        (d) =>
             j.ExpressionStatement.check(d) &&
             j.AssignmentExpression.check(d.expression) &&
             j.Identifier.check(d.expression.left) &&

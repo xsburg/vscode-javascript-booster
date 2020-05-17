@@ -5,8 +5,8 @@ import * as _ from 'lodash';
 import { CodeModExports } from '../codeModTypes';
 import { assertNever } from '../utils/helpers';
 
-function getEnumDeclaration(path: NodePath<AstNode>, j: JsCodeShift) {
-    let enumDeclaration: TSEnumDeclaration;
+function getEnumDeclaration(path: NodePath<AstNode> | null, j: JsCodeShift) {
+    let enumDeclaration: TSEnumDeclaration | null = null;
     if (path) {
         if (j.TSEnumDeclaration.check(path.node)) {
             enumDeclaration = path.node;
@@ -61,7 +61,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
     const path = target.firstPath();
 
-    const enumDeclaration = getEnumDeclaration(path, j);
+    const enumDeclaration = getEnumDeclaration(path, j)!;
     const valueCase = inferValueCase(enumDeclaration);
 
     for (let member of enumDeclaration.members) {

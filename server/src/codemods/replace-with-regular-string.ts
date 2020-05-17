@@ -60,7 +60,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const path = target.thisOrClosest(j.TemplateLiteral).firstPath();
 
-    return Boolean(path) && !j.TaggedTemplateExpression.check(path.parent.node);
+    return Boolean(path) && !j.TaggedTemplateExpression.check(path!.parent.node);
 };
 
 codeMod.scope = 'cursor';

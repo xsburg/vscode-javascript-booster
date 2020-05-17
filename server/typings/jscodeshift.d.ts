@@ -8,7 +8,7 @@ declare module 'jscodeshift' {
         Type,
         NamedType,
         AstNode,
-        TypeName
+        TypeName,
     } from 'ast-types';
     import { PrinterOptions, Parser, ParserOptions } from 'recast';
 

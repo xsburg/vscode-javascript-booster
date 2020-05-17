@@ -10,7 +10,7 @@ import {
     StringLiteral,
     TemplateElement,
     UnaryExpression,
-    VariableDeclaration
+    VariableDeclaration,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';

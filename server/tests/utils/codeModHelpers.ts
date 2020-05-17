@@ -17,7 +17,7 @@ function toOffsetFromStart(input: string, posOneBased: IPosition): number {
     let offset = 0;
     const lines = input.split('\n');
     const prevLines = lines.slice(0, pos.line);
-    offset += prevLines.map(l => l.length + os.EOL.length).reduce((s, a) => s + a, 0);
+    offset += prevLines.map((l) => l.length + os.EOL.length).reduce((s, a) => s + a, 0);
     offset += pos.character;
     return offset;
 }
@@ -25,7 +25,7 @@ function toOffsetFromStart(input: string, posOneBased: IPosition): number {
 function getSelection(options: { input: string; anchor?: IPosition; active: IPosition }) {
     return {
         anchor: toOffsetFromStart(options.input, options.anchor || options.active),
-        active: toOffsetFromStart(options.input, options.active)
+        active: toOffsetFromStart(options.input, options.active),
     };
 }
 
@@ -61,9 +61,9 @@ async function runInlineTransformTest(
         selection: getSelection({
             input,
             anchor: options.anchor,
-            active: options.active
+            active: options.active,
         }),
-        include: [modId]
+        include: [modId],
     };
 
     const canRun = (await codeModService.getRunnableCodeMods(runOptions)).length === 1;
@@ -110,9 +110,9 @@ async function runInlineCanRunTest(
         selection: getSelection({
             input,
             anchor: options.anchor,
-            active: options.active
+            active: options.active,
         }),
-        include: [modId]
+        include: [modId],
     };
 
     const actualCanRun = (await codeModService.getRunnableCodeMods(runOptions)).length === 1;
@@ -127,23 +127,23 @@ function getLanguageIdByFileName(fileName: string): LanguageId {
     }> = [
         {
             extensions: '.js,.es,.es6',
-            parser: 'javascript'
+            parser: 'javascript',
         },
         {
             extensions: '.jsx',
-            parser: 'javascriptreact'
+            parser: 'javascriptreact',
         },
         {
             extensions: '.ts',
-            parser: 'typescript'
+            parser: 'typescript',
         },
         {
             extensions: '.tsx',
-            parser: 'typescriptreact'
-        }
+            parser: 'typescriptreact',
+        },
     ];
     const fileExt = path.extname(fileName);
-    const def = extensionMap.find(x => x.extensions.split(',').indexOf(fileExt) !== -1);
+    const def = extensionMap.find((x) => x.extensions.split(',').indexOf(fileExt) !== -1);
     if (!def) {
         throw new Error(`Failed to match file extension of file '${fileName}' to languageId.`);
     }
@@ -159,7 +159,7 @@ function getLanguageIdByFileName(fileName: string): LanguageId {
 function extractPosition(
     modId: string,
     source: string
-): ({ source: string; pos: { anchor: IPosition; active: IPosition } }) | null {
+): { source: string; pos: { anchor: IPosition; active: IPosition } } | null {
     function extractPosInternal(posKey: string) {
         const re = /\/\*#\s*([^#]+?)\s*#\*\//g;
         let match: RegExpExecArray | null;
@@ -176,13 +176,13 @@ function extractPosition(
                     throw new Error(`Invalid 'pos' definition in positional comment:\n"${source}"`);
                 }
                 const column: number = pos1;
-                let line: number = source.split('\n').findIndex(l => l.includes(match![0])) + 1;
+                let line: number = source.split('\n').findIndex((l) => l.includes(match![0])) + 1;
                 if (posDef.nextLine) {
                     line++;
                 }
                 return {
                     line,
-                    column
+                    column,
                 };
             }
         }
@@ -199,7 +199,7 @@ function extractPosition(
             activePos = pos;
             anchorPos = {
                 line: pos.line,
-                column: pos.column
+                column: pos.column,
             };
         }
     }
@@ -216,8 +216,8 @@ function extractPosition(
         source: cleanSource,
         pos: {
             anchor: anchorPos,
-            active: activePos
-        }
+            active: activePos,
+        },
     };
 }
 
@@ -258,7 +258,7 @@ function extractFixtures(
             skip: fixtureDef.skip,
             validateOutPos: fixtureDef.validateOutPos,
             inputStart: re.lastIndex,
-            inputEnd: input.length
+            inputEnd: input.length,
         };
     }
     if (activeFixture) {
@@ -274,7 +274,7 @@ function extractFixtures(
             anchor: IPosition;
             active: IPosition;
         };
-    }> = fixtures.map(fx => {
+    }> = fixtures.map((fx) => {
         const inputFragment = input.substring(fx.inputStart, fx.inputEnd);
         let source = inputFragment.trim();
         let posInfo = extractPosition(modId, source);
@@ -283,8 +283,9 @@ function extractFixtures(
         }
         if (!posInfo && (hasPosition || fx.validateOutPos)) {
             throw new Error(
-                `[${modId}][${fx.name ||
-                    ''}] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
+                `[${modId}][${
+                    fx.name || ''
+                }] Position is not provided, use '/*# { position: columnNumber[, nextLine: true] } #*/'`
             );
         }
 
@@ -298,8 +299,8 @@ function extractFixtures(
                 ? posInfo.pos
                 : {
                       anchor: new Position(1, 1),
-                      active: new Position(1, 1)
-                  }
+                      active: new Position(1, 1),
+                  },
         };
     });
     if (fullFixtures.length === 0) {
@@ -324,8 +325,8 @@ function extractFixtures(
                 ? posInfo.pos
                 : {
                       anchor: new Position(1, 1),
-                      active: new Position(1, 1)
-                  }
+                      active: new Position(1, 1),
+                  },
         });
     }
     return fullFixtures;
@@ -348,8 +349,8 @@ function defineTransformTests(
     const fixDir = path.join(dirName, '__codemod-fixtures__');
     const fixtureSuffix = fixtureId ? `.${fixtureId}` : '';
     const files = fs.readdirSync(fixDir);
-    const inputFile = files.find(file => file.startsWith(`${modId}${fixtureSuffix}.input.`));
-    const outputFile = files.find(file => file.startsWith(`${modId}${fixtureSuffix}.output.`));
+    const inputFile = files.find((file) => file.startsWith(`${modId}${fixtureSuffix}.input.`));
+    const outputFile = files.find((file) => file.startsWith(`${modId}${fixtureSuffix}.output.`));
     if (!inputFile || !outputFile) {
         throw new Error(
             `Failed to find input or output fixture. modId: '${modId}', fixtureId: ${fixtureId}.`
@@ -362,11 +363,11 @@ function defineTransformTests(
     const outputFixtures = extractFixtures(modId, output, fixtureId, false);
 
     describe(`${modId} transform`, () => {
-        inputFixtures.forEach(fx => {
+        inputFixtures.forEach((fx) => {
             const testName = fx.name
                 ? `"${modId}:${fx.name}" transforms correctly (${posToString(fx.pos)})`
                 : `"${modId}" transforms correctly (${posToString(fx.pos)})`;
-            const outputFx = outputFixtures.find(x => x.name === fx.name);
+            const outputFx = outputFixtures.find((x) => x.name === fx.name);
             if (!outputFx) {
                 throw new Error(`Failed to find output data for fixture ${fx.name}, mod ${modId}.`);
             }
@@ -381,14 +382,14 @@ function defineTransformTests(
                         selection: outputFx.validateOutPos
                             ? {
                                   active: outputFx.pos.active,
-                                  anchor: outputFx.pos.anchor
+                                  anchor: outputFx.pos.anchor,
                               }
-                            : undefined
+                            : undefined,
                     },
                     {
                         fileName: options.fileName,
                         active: fx.pos.active,
-                        anchor: fx.pos.anchor
+                        anchor: fx.pos.anchor,
                     }
                 );
             });
@@ -405,7 +406,7 @@ function defineCanRunTests(
     const fixDir = path.join(dirName, '__codemod-fixtures__');
     const fixtureSuffix = fixtureId ? `.${fixtureId}` : '';
     const files = fs.readdirSync(fixDir);
-    const inputFile = files.find(file => file.startsWith(`${modId}${fixtureSuffix}.check.`));
+    const inputFile = files.find((file) => file.startsWith(`${modId}${fixtureSuffix}.check.`));
     if (!inputFile) {
         throw new Error(
             `Failed to find the input fixture for canRun() test. modId: '${modId}', fixtureId: ${fixtureId}.`
@@ -415,7 +416,7 @@ function defineCanRunTests(
     const inputFixtures = extractFixtures(modId, input, fixtureId, true);
 
     describe(`${modId} can run`, () => {
-        inputFixtures.forEach(fx => {
+        inputFixtures.forEach((fx) => {
             if (typeof fx.raw.expected !== 'boolean') {
                 throw new Error(
                     `Invalid type of 'expected' property in fixture ${fx.name}, mod ${modId}.`
@@ -437,7 +438,7 @@ function defineCanRunTests(
                     {
                         fileName: options.fileName,
                         active: fx.pos.active,
-                        anchor: fx.pos.anchor
+                        anchor: fx.pos.anchor,
                     }
                 );
             });
@@ -448,9 +449,9 @@ function defineCanRunTests(
 export function defineCodeModTests(dirName: string) {
     const fixDir = path.join(dirName, '__codemod-fixtures__');
     const files = fs.readdirSync(fixDir);
-    const modIds = _.uniq(files.map(f => f.substring(0, f.indexOf('.'))));
+    const modIds = _.uniq(files.map((f) => f.substring(0, f.indexOf('.'))));
 
-    modIds.forEach(modId => {
+    modIds.forEach((modId) => {
         defineCanRunTests(dirName, modId);
         defineTransformTests(dirName, modId);
     });

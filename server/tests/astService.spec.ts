@@ -21,7 +21,7 @@ describe('astService', () => {
                     export class AppComponent {
                         title = 'Tour of Heroes';
                     }
-                `
+                `,
         });
 
         expect(actual).toBeTruthy();

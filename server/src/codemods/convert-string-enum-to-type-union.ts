@@ -3,8 +3,8 @@ import { JsCodeShift } from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
 
-function getEnumDeclaration(path: NodePath<AstNode>, j: JsCodeShift) {
-    let enumDeclaration: NodePath<TSEnumDeclaration>;
+function getEnumDeclaration(path: NodePath<AstNode> | null, j: JsCodeShift) {
+    let enumDeclaration: NodePath<TSEnumDeclaration> | null = null;
     if (path) {
         if (j.TSEnumDeclaration.check(path.node)) {
             enumDeclaration = path as NodePath<TSEnumDeclaration>;

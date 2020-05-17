@@ -15,7 +15,7 @@ import logService from './logService';
 // tslint:disable-next-line:variable-name
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
-CollectionPrototype.toSource = function (options: PrinterOptions) {
+CollectionPrototype.toSource = function (options: Partial<PrinterOptions>) {
     const settings = connectionService.getSettings();
     const userFormattingOptions = settings ? settings.formattingOptions : {};
     return toSource.call(this, {

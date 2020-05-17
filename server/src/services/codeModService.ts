@@ -1,8 +1,10 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
+
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../codeModTypes';
 import { configIds, extensionId } from '../const';
+import { noop } from '../utils/helpers';
 import { Position } from '../utils/Position';
 import { requireDynamically } from '../utils/requireDynamically';
 import astService, { LanguageId, Selection } from './astService';
@@ -17,13 +19,14 @@ function parseCodeMod(id: string, modFn: CodeModExports): CodeModDefinition {
         detail: modFn.detail,
         canRun: modFn.canRun || (() => true),
         scope: (modFn.scope as CodeModScope) || CodeModScope.Global,
-        modFn
+        modFn,
     };
 }
 
 function loadEmbeddedCodeMods() {
     // The logic is different for Webpack and Node environment. In production Webpack is used.
     let result: CodeModDefinition[];
+    // eslint-disable-next-line @typescript-eslint/camelcase
     if (typeof __webpack_require__ === 'function') {
         let context = (require as any).context('../codemods', true, /\.ts$/);
         result = context.keys().map((k: any) => parseCodeMod(k, context(k)));
@@ -31,23 +34,23 @@ function loadEmbeddedCodeMods() {
         // Different loading code when running from Node (Jest)
         const embeddedCodeModDir = path.join(__dirname, '..', 'codemods');
         const files = fs.readdirSync(embeddedCodeModDir);
-        const fileNames = files.map(name => path.join(embeddedCodeModDir, name));
+        const fileNames = files.map((name) => path.join(embeddedCodeModDir, name));
         result = fileNames
-            .map(fileName => {
+            .map((fileName) => {
                 if (!fileName.match(/(\.ts|\.js)$/)) {
                     return {
                         isFile: false,
-                        fileName
+                        fileName,
                     };
                 }
                 const stat = fs.lstatSync(fileName);
                 return {
                     isFile: stat.isFile(),
-                    fileName
+                    fileName,
                 };
             })
-            .filter(x => x.isFile)
-            .map(x => {
+            .filter((x) => x.isFile)
+            .map((x) => {
                 const exp = requireDynamically(x.fileName);
                 const id = path.basename(x.fileName, path.extname(x.fileName));
                 return parseCodeMod(id, exp);
@@ -83,7 +86,7 @@ class CodeModService {
                     const names = await fs.readdir(dirName);
                     for (let n of names) {
                         const fn = path.join(dirName, n);
-                        if ((await fs.stat(fn)).isFile) {
+                        if ((await fs.stat(fn)).isFile()) {
                             let modFn: CodeModExports | null = null;
                             try {
                                 modFn = requireDynamically(fn);
@@ -101,7 +104,7 @@ class CodeModService {
                 }
             }
         }
-        const validCodeMods = codeMods.filter(c => c) as CodeModDefinition[];
+        const validCodeMods = codeMods.filter((c) => c) as CodeModDefinition[];
         validCodeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
         this._codeModsCache = validCodeMods;
         logService.output(`${validCodeMods.length} code actions loaded.`);
@@ -116,7 +119,7 @@ class CodeModService {
     }) {
         try {
             const mods = await this.getRunnableCodeMods(options);
-            return mods.filter(mod => mod.scope === CodeModScope.Global);
+            return mods.filter((mod) => mod.scope === CodeModScope.Global);
         } catch (e) {
             logService.outputError(
                 `Error while executing [getGlobalMods].getRunnableCodeMods(): ${e.toString()}`
@@ -133,7 +136,7 @@ class CodeModService {
     }) {
         try {
             const mods = await this.getRunnableCodeMods(options);
-            return mods.filter(mod => mod.scope === CodeModScope.Cursor);
+            return mods.filter((mod) => mod.scope === CodeModScope.Cursor);
         } catch (e) {
             logService.outputError(
                 `Error while executing [getCodeActionMods].getRunnableCodeMods(): ${e.toString()}`
@@ -152,8 +155,8 @@ class CodeModService {
     }): Promise<CodeModDefinition[]> {
         let mods = await this._getAllCodeMods();
         if (options.include) {
-            mods = options.include!.map(id => {
-                const mod = mods.find(m => m.id === id);
+            mods = options.include!.map((id) => {
+                const mod = mods.find((m) => m.id === id);
                 if (!mod) {
                     throw new Error(`Mod ${id} not loaded.`);
                 }
@@ -161,7 +164,7 @@ class CodeModService {
             });
         }
         if (options.exclude) {
-            mods = mods.filter(m => !options.exclude!.includes(m.id));
+            mods = mods.filter((m) => !options.exclude!.includes(m.id));
         }
 
         const jscodeshift = astService.getCodeShift(options.languageId);
@@ -175,22 +178,21 @@ class CodeModService {
         if (options.selection.active !== options.selection.anchor) {
             anchorTarget = ast.findNodeAtPosition(options.selection.anchor);
         }
-        const stats = () => {};
-        return mods.filter(m => {
+        return mods.filter((m) => {
             const r = m.canRun(
                 {
                     path: options.fileName,
                     source: options.source,
-                    ast
+                    ast,
                 },
                 {
                     jscodeshift,
-                    stats
+                    stats: noop,
                 },
                 {
                     target,
                     anchorTarget,
-                    selection: options.selection
+                    selection: options.selection,
                 }
             );
             return r;
@@ -225,32 +227,32 @@ class CodeModService {
             {
                 path: options.fileName,
                 source: options.source,
-                ast
+                ast,
             },
             {
                 jscodeshift,
-                stats: () => {}
+                stats: noop,
             },
             {
                 target,
                 anchorTarget,
-                selection: options.selection
+                selection: options.selection,
             }
         );
         astService.invalidateAstTree(options.fileName);
         if (!result) {
             return {
-                source: options.source
+                source: options.source,
             };
         }
         if (typeof result === 'string') {
             return {
-                source: result
+                source: result,
             };
         } else {
             return {
                 source: result.source,
-                selection: result.selection
+                selection: result.selection,
             };
         }
     }
@@ -264,7 +266,7 @@ class CodeModService {
     }
 
     private _getCodeMod(modId: string): CodeModDefinition {
-        const mod = this._codeModsCache && this._codeModsCache.find(m => m.id === modId);
+        const mod = this._codeModsCache && this._codeModsCache.find((m) => m.id === modId);
         if (!mod) {
             throw new Error(`The requested mod ${modId} is missing in cache.`);
         }

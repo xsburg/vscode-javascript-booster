@@ -62,7 +62,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                     } else {
                         return false;
                     }
-                }
+                },
             });
 
             const last = targets[targets.length - 1];
@@ -93,7 +93,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                     } else {
                         return false;
                     }
-                }
+                },
             });
 
             const last = targets[targets.length - 1];
@@ -105,7 +105,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
             type: NamedType<TNode>,
             filter?: any
         ): Collection {
-            return this.map(path => {
+            return this.map((path) => {
                 let target = path as NodePath<any>;
                 while (
                     target &&
@@ -118,7 +118,7 @@ export function registerCollectionExtensions(j: JsCodeShift) {
         },
 
         furthest<TNode>(this: Collection<TNode>, type: NamedType<TNode>, filter?: any): Collection {
-            return this.map(path => {
+            return this.map((path) => {
                 let furthestPath = null;
                 let target = path.parent;
                 while (target) {
@@ -129,6 +129,6 @@ export function registerCollectionExtensions(j: JsCodeShift) {
                 }
                 return furthestPath;
             });
-        }
+        },
     });
 }

@@ -10,7 +10,7 @@ import {
     TemplateElement,
     UnaryExpression,
     VariableDeclaration,
-    VariableDeclarator
+    VariableDeclarator,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -27,14 +27,14 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     }
 
     const assignments: ExpressionStatement[] = [];
-    path.node.declarations.forEach(d => {
+    path.node.declarations.forEach((d) => {
         if (j.VariableDeclarator.check(d) && d.init) {
             assignments.push(j.expressionStatement(j.assignmentExpression('=', d.id, d.init)));
             d.init = null;
         }
     });
 
-    assignments.reverse().forEach(a => {
+    assignments.reverse().forEach((a) => {
         path.insertAfter(a);
     });
 
@@ -66,7 +66,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     return Boolean(
         path &&
             !j.ExportNamedDeclaration.check(path.parent.node) &&
-            path.node.declarations.some(d => Boolean(j.VariableDeclarator.check(d) && d.init))
+            path.node.declarations.some((d) => Boolean(j.VariableDeclarator.check(d) && d.init))
     );
 };
 

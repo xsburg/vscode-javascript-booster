@@ -24,10 +24,10 @@ export const extendSelectionRequestHandler: RequestHandler<
     ExtendSelectionParams,
     ExtendSelectionResult,
     void
-> = async params => {
+> = async (params) => {
     const { textDocumentUri, selections } = params;
     let result: ExtendSelectionResult = {
-        selections: null
+        selections: null,
     };
 
     const document = connectionService.getDocument(textDocumentUri);
@@ -39,7 +39,7 @@ export const extendSelectionRequestHandler: RequestHandler<
     const ast = astService.getAstTree({
         languageId: document.languageId as LanguageId,
         fileName: document.uri,
-        source
+        source,
     });
     if (!ast) {
         return result;
@@ -51,14 +51,14 @@ export const extendSelectionRequestHandler: RequestHandler<
             source,
             fileName: document.uri,
             ast,
-            selections: selections.map(sel => ({
+            selections: selections.map((sel) => ({
                 anchor: astService.offsetAt(source, sel.anchor),
-                active: astService.offsetAt(source, sel.active)
-            }))
+                active: astService.offsetAt(source, sel.active),
+            })),
         })
-        .map(sel => ({
+        .map((sel) => ({
             anchor: astService.positionAt(source, sel.anchor),
-            active: astService.positionAt(source, sel.active)
+            active: astService.positionAt(source, sel.active),
         }));
 
     return result;
@@ -84,10 +84,10 @@ export const shrinkSelectionRequestHandler: RequestHandler<
     ShrinkSelectionParams,
     ShrinkSelectionResult,
     void
-> = async params => {
+> = async (params) => {
     const { textDocumentUri, selections } = params;
     let result: ExtendSelectionResult = {
-        selections: null
+        selections: null,
     };
 
     const document = connectionService.getDocument(textDocumentUri);
@@ -99,7 +99,7 @@ export const shrinkSelectionRequestHandler: RequestHandler<
     const ast = astService.getAstTree({
         languageId: document.languageId as LanguageId,
         fileName: document.uri,
-        source
+        source,
     });
     if (!ast) {
         return result;
@@ -111,14 +111,14 @@ export const shrinkSelectionRequestHandler: RequestHandler<
             source,
             fileName: document.uri,
             ast,
-            selections: selections.map(sel => ({
+            selections: selections.map((sel) => ({
                 anchor: astService.offsetAt(source, sel.anchor),
-                active: astService.offsetAt(source, sel.active)
-            }))
+                active: astService.offsetAt(source, sel.active),
+            })),
         })
-        .map(sel => ({
+        .map((sel) => ({
             anchor: astService.positionAt(source, sel.anchor),
-            active: astService.positionAt(source, sel.active)
+            active: astService.positionAt(source, sel.active),
         }));
 
     return result;

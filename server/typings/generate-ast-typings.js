@@ -11,7 +11,7 @@ function loadTypes() {
         require('ast-types/def/flow'),
         require('ast-types/def/esprima'),
         require('ast-types/def/babel'),
-        require('ast-types/def/typescript')
+        require('ast-types/def/typescript'),
     ];
 
     let used = [];
@@ -100,7 +100,7 @@ function buildValidFieldName(name) {
         'volatile',
         'while',
         'with',
-        'yield'
+        'yield',
     ];
     if (keywords.includes(name)) {
         return `\$${name}`;
@@ -110,8 +110,8 @@ function buildValidFieldName(name) {
 
 function generateBuildersInterface(types, typeDefs) {
     const builders = Object.values(typeDefs)
-        .filter(def => def.buildable)
-        .map(def => {
+        .filter((def) => def.buildable)
+        .map((def) => {
             const builderName = types.getBuilderName(def.typeName);
 
             let optional = false;
@@ -128,7 +128,7 @@ function generateBuildersInterface(types, typeDefs) {
                 return `${buildValidFieldName(param)}${optional ? '?' : ''}: ${typeStr}`;
             }
 
-            const params = def.buildParams.map(function(param, i) {
+            const params = def.buildParams.map(function (param, i) {
                 return add(param, i);
             });
 
@@ -156,9 +156,9 @@ function getTypeFromField(field) {
 
 function generateNamedTypes(types, typeDefs) {
     const interfaces = Object.values(typeDefs)
-        .map(def => {
+        .map((def) => {
             const typeName = def.typeName;
-            const fields = Object.values(def.ownFields).map(function(field, i) {
+            const fields = Object.values(def.ownFields).map(function (field, i) {
                 /* if (field.name === 'type') {
                     typeStr = `'${typeName}'`;
                 } */
@@ -183,14 +183,14 @@ function generateNamedTypes(types, typeDefs) {
 
 function generateTypeNameUnion(types, typeDefs) {
     return `    export type TypeName = ${Object.keys(typeDefs)
-        .map(tn => `'${tn}'`)
+        .map((tn) => `'${tn}'`)
         .join('\n        | ')};\n`;
 }
 
 function generateTypeUnion(types, typeDefs) {
     const options = Object.values(typeDefs)
-        .filter(def => def.buildable)
-        .map(def => def.typeName)
+        .filter((def) => def.buildable)
+        .map((def) => def.typeName)
         .join('\n        | ');
 
     return `    export type AstNode = ${options};\n`;
@@ -198,7 +198,7 @@ function generateTypeUnion(types, typeDefs) {
 
 function generateNamedTypesObject(types, typeDefs) {
     const fields = Object.keys(typeDefs)
-        .map(tn => `        ${tn}: NamedType<${tn}>;`)
+        .map((tn) => `        ${tn}: NamedType<${tn}>;`)
         .join('\n');
     return `    export interface NamedTypes {\n${fields}\n    }`;
 }
@@ -212,7 +212,7 @@ function generateFooter() {
 
 const types = loadTypes();
 const typeDefs = {};
-Object.keys(types.namedTypes).forEach(typeName => {
+Object.keys(types.namedTypes).forEach((typeName) => {
     typeDefs[typeName] = types.Type.def(typeName);
 });
 
@@ -222,7 +222,7 @@ const result = [
     generateTypeUnion(types, typeDefs),
     generateBuildersInterface(types, typeDefs),
     generateNamedTypesObject(types, typeDefs),
-    generateFooter()
+    generateFooter(),
 ];
 
 const data = `declare module 'ast-types' {\n${result.join('\n')}\n}\n`;

@@ -22,7 +22,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
     const $variableDeclaration = target.thisOrClosest(j.VariableDeclaration);
 
-    const varDecl = $variableDeclaration.firstNode();
+    const varDecl = $variableDeclaration.firstNode()!;
     const fnName = ((varDecl.declarations[0] as VariableDeclarator).id as Identifier).name;
     const arrowExpr = (varDecl.declarations[0] as VariableDeclarator)
         .init as ArrowFunctionExpression;

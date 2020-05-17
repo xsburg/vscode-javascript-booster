@@ -37,11 +37,11 @@ export const executeTransformRequestHandler: RequestHandler<
     ExecuteTransformParams,
     ExecuteTransformResult,
     void
-> = async params => {
+> = async (params) => {
     const { selection, codeModId, textDocumentIdentifier } = params;
     let result: ExecuteTransformResult = {
         edit: null,
-        selection: null
+        selection: null,
     };
 
     const document = connectionService.getDocument(textDocumentIdentifier.uri);
@@ -52,7 +52,7 @@ export const executeTransformRequestHandler: RequestHandler<
     const source = document.getText();
     const offsetSelection = {
         anchor: astService.offsetAt(source, selection.anchor),
-        active: astService.offsetAt(source, selection.active)
+        active: astService.offsetAt(source, selection.active),
     };
 
     let transformResult: {
@@ -64,7 +64,7 @@ export const executeTransformRequestHandler: RequestHandler<
             languageId: document.languageId as LanguageId,
             fileName: document.uri,
             source,
-            selection: offsetSelection
+            selection: offsetSelection,
         });
     } catch (e) {
         logService.outputError(`Error while executing ${codeModId}.transform(): ${e.toString()}`);
@@ -80,14 +80,14 @@ export const executeTransformRequestHandler: RequestHandler<
     result.edit = {
         range: {
             start: document.positionAt(range.start),
-            end: document.positionAt(range.end)
+            end: document.positionAt(range.end),
         },
-        newText
+        newText,
     };
     if (transformResult.selection) {
         result.selection = {
             active: astService.positionAt(transformResult.source, transformResult.selection.active),
-            anchor: astService.positionAt(transformResult.source, transformResult.selection.anchor)
+            anchor: astService.positionAt(transformResult.source, transformResult.selection.anchor),
         };
     }
     return result;

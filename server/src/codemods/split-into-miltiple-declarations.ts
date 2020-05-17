@@ -8,7 +8,7 @@ import {
     Printable,
     TemplateElement,
     UnaryExpression,
-    VariableDeclaration
+    VariableDeclaration,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -22,9 +22,9 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const node = path.node;
 
     const declarations = node.declarations
-        .map(d => j.variableDeclaration(node.kind, [d]))
+        .map((d) => j.variableDeclaration(node.kind, [d]))
         .reverse();
-    declarations.forEach(d => {
+    declarations.forEach((d) => {
         path.insertAfter(d);
     });
     path.prune();

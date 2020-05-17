@@ -7,7 +7,7 @@ import {
     NodePath,
     ReturnStatement,
     VariableDeclaration,
-    VariableDeclarator
+    VariableDeclarator,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -26,7 +26,7 @@ enum TransformType {
     /**
      * let foo = 1 ? 1 : 0;
      */
-    VariableDeclaration
+    VariableDeclaration,
 }
 
 function getTransformType(j: JsCodeShift, target: Collection<AstNode>) {
@@ -87,12 +87,12 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
                     j.blockStatement([
                         j.expressionStatement(
                             j.assignmentExpression('=', assignmentExpr.left, node.consequent)
-                        )
+                        ),
                     ]),
                     j.blockStatement([
                         j.expressionStatement(
                             j.assignmentExpression('=', assignmentExpr.left, node.alternate)
-                        )
+                        ),
                     ])
                 )
             );
@@ -109,12 +109,12 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
                 j.blockStatement([
                     j.expressionStatement(
                         j.assignmentExpression('=', varDeclarator.node.id, node.consequent)
-                    )
+                    ),
                 ]),
                 j.blockStatement([
                     j.expressionStatement(
                         j.assignmentExpression('=', varDeclarator.node.id, node.alternate)
-                    )
+                    ),
                 ])
             );
             varDeclarator.node.init = null;

@@ -7,7 +7,7 @@ export function extractSelectionAnchor(source: string) {
         source,
         selection: {
             anchor: selectionPos,
-            active: selectionPos
-        }
+            active: selectionPos,
+        },
     };
 }

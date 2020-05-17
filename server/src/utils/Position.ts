@@ -6,7 +6,7 @@ export interface IPosition {
 export class Position implements IPosition {
     public static fromZeroBased({
         line,
-        character
+        character,
     }: {
         line: number;
         character: number;

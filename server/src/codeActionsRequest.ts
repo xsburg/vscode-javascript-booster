@@ -29,7 +29,7 @@ export const codeActionsRequestHandler: RequestHandler<
     CodeActionsParams,
     CodeActionsResult,
     void
-> = async params => {
+> = async (params) => {
     let result: CodeActionsResult;
 
     const document = connectionService.getDocument(params.textDocumentUri);
@@ -40,20 +40,20 @@ export const codeActionsRequestHandler: RequestHandler<
         source,
         selection: {
             anchor: astService.offsetAt(source, params.selection.anchor),
-            active: astService.offsetAt(source, params.selection.active)
-        }
+            active: astService.offsetAt(source, params.selection.active),
+        },
     });
 
     result = {
         textDocument: {
             uri: document.uri,
-            version: document.version
+            version: document.version,
         },
-        codeMods: codeMods.map(mod => ({
+        codeMods: codeMods.map((mod) => ({
             id: mod.id,
             title: mod.name,
-            tooltip: mod.detail || mod.description
-        }))
+            tooltip: mod.detail || mod.description,
+        })),
     };
     return result;
 };

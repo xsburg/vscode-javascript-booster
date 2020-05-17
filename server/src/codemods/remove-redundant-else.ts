@@ -3,7 +3,7 @@ import {
     FunctionDeclaration,
     IfStatement,
     Printable,
-    UnaryExpression
+    UnaryExpression,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -26,7 +26,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         alternateStatements
             .slice(0)
             .reverse()
-            .forEach(st => path.insertAfter(st));
+            .forEach((st) => path.insertAfter(st));
     }
 
     path.node.alternate = null;

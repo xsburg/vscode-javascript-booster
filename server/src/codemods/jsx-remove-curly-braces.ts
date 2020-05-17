@@ -10,7 +10,7 @@ import {
     Printable,
     StringLiteral,
     TemplateElement,
-    UnaryExpression
+    UnaryExpression,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -21,7 +21,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
 
     const $jsxExprContainer = target.thisOrClosest(j.JSXExpressionContainer, {
-        expression: { type: 'StringLiteral' }
+        expression: { type: 'StringLiteral' },
     });
     const stringLiteral = $jsxExprContainer.firstPath<JSXExpressionContainer>()!.node
         .expression as StringLiteral;
@@ -37,7 +37,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
     const $jsxExprContainer = target.thisOrClosest(j.JSXExpressionContainer, {
-        expression: { type: 'StringLiteral' }
+        expression: { type: 'StringLiteral' },
     });
 
     if ($jsxExprContainer.length === 0) {

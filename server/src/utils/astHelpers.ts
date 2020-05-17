@@ -5,7 +5,7 @@ import {
     NodePath,
     Statement,
     StringLiteral,
-    UnaryExpression
+    UnaryExpression,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 
@@ -26,7 +26,7 @@ export function negateExpression(j: JsCodeShift, expr: Expression) {
         '!=': '==',
         '==': '!=',
         '!==': '===',
-        '===': '!=='
+        '===': '!==',
     };
     if (j.BinaryExpression.check(expr) && operatorMap[expr.operator]) {
         expr.operator = operatorMap[expr.operator];

@@ -16,7 +16,7 @@ import {
     TemplateElement,
     UnaryExpression,
     VariableDeclaration,
-    VariableDeclarator
+    VariableDeclarator,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -70,7 +70,7 @@ function getFragmentMeta(j: JsCodeShift, target: Collection<AstNode>) {
     return {
         isAssignmentToOneVar,
         isIfElseReturn,
-        isExprStatementPair
+        isExprStatementPair,
     };
 }
 

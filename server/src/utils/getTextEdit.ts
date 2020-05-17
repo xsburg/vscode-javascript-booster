@@ -1,4 +1,4 @@
-export default function(before: string, after: string) {
+export default function (before: string, after: string) {
     let startPosBefore = 0;
     let startPosAfter = 0;
     while (startPosBefore < before.length && startPosAfter < after.length) {
@@ -41,8 +41,8 @@ export default function(before: string, after: string) {
     return {
         range: {
             start: startPosBefore,
-            end: endPosBefore
+            end: endPosBefore,
         },
-        newText
+        newText,
     };
 }

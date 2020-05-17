@@ -5,7 +5,7 @@ import {
     NodePath,
     Printable,
     StringLiteral,
-    TypeName
+    TypeName,
 } from 'ast-types';
 import { JsCodeShift } from 'jscodeshift';
 import astService, { AstRoot, LanguageId, Selection } from './astService';
@@ -27,7 +27,7 @@ function fromSelection(selection: Selection) {
     }
     return {
         start,
-        end
+        end,
     };
 }
 
@@ -35,12 +35,12 @@ function toSelection(result: { start: number; end: number }, previousSelection: 
     if (previousSelection.anchor > previousSelection.active) {
         return {
             anchor: result.end,
-            active: result.start
+            active: result.start,
         };
     } else {
         return {
             anchor: result.start,
-            active: result.end
+            active: result.end,
         };
     }
 }
@@ -59,7 +59,7 @@ function wrapBrackets(
     }
     return {
         start,
-        end
+        end,
     };
 }
 
@@ -81,7 +81,7 @@ class SmartSelectionService {
         source,
         fileName,
         ast,
-        selections
+        selections,
     }: {
         languageId: LanguageId;
         source: string;
@@ -92,7 +92,7 @@ class SmartSelectionService {
         const j = astService.getCodeShift(languageId);
 
         let changed = false;
-        const newSelections = selections.map(sel => {
+        const newSelections = selections.map((sel) => {
             const result = this._extendOneSelection(j, source, ast, sel);
             if (!result) {
                 return sel;
@@ -114,7 +114,7 @@ class SmartSelectionService {
         fileName,
         source,
         ast,
-        selections
+        selections,
     }: {
         languageId: LanguageId;
         fileName: string;
@@ -140,7 +140,7 @@ class SmartSelectionService {
         const { start, end } = fromSelection(selection);
         let result = {
             start,
-            end
+            end,
         };
         let targetNode = target.firstNode<Node>()!;
         let targetPath = target.firstPath<Node>()!;
@@ -326,11 +326,11 @@ class SmartSelectionService {
             // 2. New active selection? Start from scratch.
             // 3. Cache has active selections which are now gone? Remove them.
             const storedActiveSelections = cache.selectionStack[cache.selectionStack.length - 1];
-            const allSelectionsPresentInCache = activeSelections.every(sel => {
-                return storedActiveSelections.some(val => equalSelections(sel, val));
+            const allSelectionsPresentInCache = activeSelections.every((sel) => {
+                return storedActiveSelections.some((val) => equalSelections(sel, val));
             });
-            const cacheHasRemovedSelections = storedActiveSelections.some(sel => {
-                return !activeSelections.some(val => equalSelections(sel, val));
+            const cacheHasRemovedSelections = storedActiveSelections.some((sel) => {
+                return !activeSelections.some((val) => equalSelections(sel, val));
             });
             invalidCache = !allSelectionsPresentInCache || cacheHasRemovedSelections;
         }
@@ -339,7 +339,7 @@ class SmartSelectionService {
             // Invalid cache, start from scratch
             cache = {
                 source,
-                selectionStack: [activeSelections]
+                selectionStack: [activeSelections],
             };
             this._selectionCache.set(fileName, cache);
         }
@@ -356,7 +356,7 @@ class SmartSelectionService {
         function collapseSelection(sel: Selection) {
             return {
                 active: sel.active,
-                anchor: sel.active
+                anchor: sel.active,
             };
         }
 
@@ -371,8 +371,8 @@ class SmartSelectionService {
         // 2. Can't find selection => collapse active selection
         const storedActiveSelections = cache.selectionStack.pop()!;
         const storedPrevSelections = cache.selectionStack[cache.selectionStack.length - 1];
-        const newSelections = activeSelections.map(sel => {
-            const index = storedActiveSelections.findIndex(val => equalSelections(sel, val));
+        const newSelections = activeSelections.map((sel) => {
+            const index = storedActiveSelections.findIndex((val) => equalSelections(sel, val));
             if (index !== -1) {
                 return storedPrevSelections[index];
             } else {

@@ -4,8 +4,8 @@ import { JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 import * as astHelpers from '../utils/astHelpers';
 
-function getEnumDeclaration(path: NodePath<AstNode>, j: JsCodeShift) {
-    let enumDeclaration: NodePath<TSEnumDeclaration>;
+function getEnumDeclaration(path: NodePath<AstNode> | null, j: JsCodeShift) {
+    let enumDeclaration: NodePath<TSEnumDeclaration> | null = null;
     if (path) {
         if (j.TSEnumDeclaration.check(path.node)) {
             enumDeclaration = path as NodePath<TSEnumDeclaration>;
@@ -38,7 +38,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     if (!isStringExpr) {
         return false;
     }
-    const node = path.node as StringLiteral;
+    const node = path!.node as StringLiteral;
     return node.value.trim().length !== node.value.length;
 };
 

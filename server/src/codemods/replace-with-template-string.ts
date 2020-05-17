@@ -7,7 +7,7 @@ import {
     Node,
     Printable,
     TemplateElement,
-    UnaryExpression
+    UnaryExpression,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
@@ -39,7 +39,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
                     j.templateElement(
                         {
                             cooked: node.value,
-                            raw: node.value
+                            raw: node.value,
                         },
                         false
                     )
@@ -52,7 +52,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         if (
             j.match<BinaryExpression>(node, {
                 type: 'BinaryExpression',
-                operator: '+'
+                operator: '+',
             } as any)
         ) {
             const parenthesized = (node as any).extra && (node as any).extra.parenthesized;
@@ -69,7 +69,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
                 j.templateElement(
                     {
                         cooked: '',
-                        raw: ''
+                        raw: '',
                     },
                     false
                 )
