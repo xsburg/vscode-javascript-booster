@@ -1,4 +1,5 @@
 import { commands, Position, Selection, window, workspace } from 'vscode';
+
 import { configIds, extensionId, isSupportedLanguage } from './const';
 import langService from './services/langService';
 
@@ -35,7 +36,7 @@ export async function extendSelectionCommand() {
     }
 
     window.activeTextEditor!.selections = newSelections.map(
-        sel =>
+        (sel) =>
             new Selection(
                 new Position(sel.anchor.line, sel.anchor.character),
                 new Position(sel.active.line, sel.active.character)
@@ -65,7 +66,7 @@ export async function shrinkSelectionCommand() {
     }
 
     window.activeTextEditor!.selections = newSelections.map(
-        sel =>
+        (sel) =>
             new Selection(
                 new Position(sel.anchor.line, sel.anchor.character),
                 new Position(sel.active.line, sel.active.character)

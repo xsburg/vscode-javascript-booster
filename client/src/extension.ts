@@ -1,6 +1,7 @@
 'use strict';
 
 import { commands, ExtensionContext, languages } from 'vscode';
+
 import { CodeModCodeActionProvider } from './CodeModCodeActionProvider';
 import { commandIds, supportedLanguages } from './const';
 import { executeCodeActionCommand } from './executeCodeActionCommand';

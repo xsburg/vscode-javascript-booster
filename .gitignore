@@ -1,8 +1,7 @@
-dist
-out
 node_modules
-.vscode-test/
 *.vsix
 \.history/
+client/.vscode-test
 client/server
+client/dist
 server/coverage

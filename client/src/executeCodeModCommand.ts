@@ -1,5 +1,6 @@
 import { Position, Range, Selection, window } from 'vscode';
 import { VersionedTextDocumentIdentifier } from 'vscode-languageclient';
+
 import langService from './services/langService';
 
 export async function executeCodeModCommand() {
@@ -9,7 +10,7 @@ export async function executeCodeModCommand() {
     const document = window.activeTextEditor.document;
     const documentRef = {
         uri: document.uri.toString(),
-        version: document.version
+        version: document.version,
     };
     const selection = window.activeTextEditor.selection;
 

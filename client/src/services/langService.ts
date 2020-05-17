@@ -6,8 +6,9 @@ import {
     RequestType,
     ServerOptions,
     TransportKind,
-    VersionedTextDocumentIdentifier
+    VersionedTextDocumentIdentifier,
 } from 'vscode-languageclient';
+
 import { extensionId, supportedLanguages } from '../const';
 
 export const codeActionsRequestType = new RequestType<
@@ -82,20 +83,20 @@ class LangService {
             run: {
                 module: serverModule,
                 transport: TransportKind.ipc,
-                options: { cwd: process.cwd() }
+                options: { cwd: process.cwd() },
             },
             debug: {
                 module: serverModule,
                 transport: TransportKind.ipc,
-                options: { execArgv: ['--nolazy', '--inspect=6014'], cwd: process.cwd() }
-            }
+                options: { execArgv: ['--nolazy', '--inspect=6014'], cwd: process.cwd() },
+            },
         };
 
         let clientOptions: LanguageClientOptions = {
-            documentSelector: supportedLanguages.map(language => ({ language })),
+            documentSelector: supportedLanguages.map((language) => ({ language })),
             synchronize: {
-                configurationSection: extensionId
-            }
+                configurationSection: extensionId,
+            },
         };
 
         this._languageClient = new LanguageClient(
@@ -117,7 +118,7 @@ class LangService {
     public async requestCodeActions(textDocumentUri: string, selection: vscode.Selection) {
         const result = await this._languageClient.sendRequest(codeActionsRequestType, {
             textDocumentUri,
-            selection
+            selection,
         });
         return result;
     }
@@ -130,7 +131,7 @@ class LangService {
         const result = await this._languageClient.sendRequest(executeTransformRequestType, {
             codeModId,
             textDocumentIdentifier,
-            selection
+            selection,
         });
         if (result.selection) {
             result.selection = this._rebuildSelection(result.selection);
@@ -141,23 +142,23 @@ class LangService {
     public async extendSelection(textDocumentUri: string, selections: vscode.Selection[]) {
         const result = await this._languageClient.sendRequest(extendSelectionRequestType, {
             textDocumentUri,
-            selections
+            selections,
         });
         if (!result.selections) {
             return null;
         }
-        return result.selections.map(sel => this._rebuildSelection(sel));
+        return result.selections.map((sel) => this._rebuildSelection(sel));
     }
 
     public async shrinkSelection(textDocumentUri: string, selections: vscode.Selection[]) {
         const result = await this._languageClient.sendRequest(shrinkSelectionRequestType, {
             textDocumentUri,
-            selections
+            selections,
         });
         if (!result.selections) {
             return null;
         }
-        return result.selections.map(sel => this._rebuildSelection(sel));
+        return result.selections.map((sel) => this._rebuildSelection(sel));
     }
 
     private _rebuildSelection(sel: vscode.Selection) {

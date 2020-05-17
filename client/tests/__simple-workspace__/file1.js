@@ -1,7 +1,7 @@
 function test() {
     const a = () => {
         dispatch({
-            type: 'FOO'
+            type: 'FOO',
         });
     };
 }

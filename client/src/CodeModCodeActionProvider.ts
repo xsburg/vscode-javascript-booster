@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 import { commandIds, isSupportedLanguage } from './const';
 import langService from './services/langService';
 import { isSelection } from './utils/isSelection';
@@ -22,12 +23,12 @@ export class CodeModCodeActionProvider implements vscode.CodeActionProvider {
         const result = await langService.requestCodeActions(document.uri.toString(), selection);
 
         return result.codeMods.map(
-            mod =>
+            (mod) =>
                 ({
                     title: mod.title,
                     tooltip: mod.tooltip,
                     command: commandIds._executeCodeAction,
-                    arguments: [mod.id, result.textDocument, selection]
+                    arguments: [mod.id, result.textDocument, selection],
                 } as vscode.Command)
         );
     }

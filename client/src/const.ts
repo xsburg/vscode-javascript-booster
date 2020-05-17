@@ -6,7 +6,7 @@ export const supportedLanguages: LanguageId[] = [
     'javascript',
     'javascriptreact',
     'typescript',
-    'typescriptreact'
+    'typescriptreact',
 ];
 
 export function isSupportedLanguage(languageId: string): boolean {
@@ -18,10 +18,10 @@ export const commandIds = {
     executeCodeMod: `${extensionId}.executeCodeMod`,
     extendSelection: `${extensionId}.extendSelection`,
     shrinkSelection: `${extensionId}.shrinkSelection`,
-    reloadCodeMods: `${extensionId}.reloadCodeMods`
+    reloadCodeMods: `${extensionId}.reloadCodeMods`,
 };
 
 export const configIds = {
     smartExtendFallbackCommand: 'smartExtendFallbackCommand',
-    smartShrinkFallbackCommand: 'smartShrinkFallbackCommand'
+    smartShrinkFallbackCommand: 'smartShrinkFallbackCommand',
 };

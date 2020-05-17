@@ -1,5 +1,6 @@
 import { Position, Range, Selection, TextDocument, window } from 'vscode';
 import { VersionedTextDocumentIdentifier } from 'vscode-languageclient';
+
 import langService from './services/langService';
 
 export async function executeCodeActionCommand(
@@ -16,7 +17,7 @@ export async function executeCodeActionCommand(
         return;
     }
 
-    await window.activeTextEditor!.edit(edit => {
+    await window.activeTextEditor!.edit((edit) => {
         edit.replace(
             new Range(
                 new Position(result.edit!.range.start.line, result.edit!.range.start.character),

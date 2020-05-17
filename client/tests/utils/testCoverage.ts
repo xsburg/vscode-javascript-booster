@@ -46,7 +46,7 @@ function reportCoverage(
     writeFileSync(coverageFile, JSON.stringify(coverage), 'utf8');
 
     const remappedCollector = remapIstanbul.remap(coverage, {
-        warn: () => {}
+        warn: () => {},
     });
 
     const reporter = new Reporter(undefined, coverageDir);
@@ -70,7 +70,7 @@ export function setupTestCoverage(sourceRoot: string) {
         decache(fullPath);
     }
 
-    const matchFunction: MatcherFunction = file => fileMap[file];
+    const matchFunction: MatcherFunction = (file) => fileMap[file];
     matchFunction.files = Object.keys(fileMap);
 
     const hookOpts = { verbose: false, extensions: ['.js'] };

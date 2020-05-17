@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
+
 import { CodeModCodeActionProvider } from '../src/CodeModCodeActionProvider';
 import { executeCodeActionCommand } from '../src/executeCodeActionCommand';
 import langService from '../src/services/langService';
@@ -34,7 +35,7 @@ async function openFileInEditor(filePath: string) {
     const editor = await vscode.window.showTextDocument(textDocument);
     // Opening the document triggers this extension to start.
     // Wait until the language server has started.
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await langService.ready();
     return { fileUri, textDocument, editor };
 }

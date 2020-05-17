@@ -19,7 +19,7 @@ import * as testRunner from 'vscode/lib/testrunner';
 testRunner.configure({
     ui: 'tdd',
     useColors: true,
-    timeout: 15000
+    timeout: 15000,
 });
 
 // setupTestCoverage(join(__dirname, '../src'));

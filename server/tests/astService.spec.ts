@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as vscode from 'vscode-languageserver-types';
+
 import astService from '../src/services/astService';
 
 describe('astService', () => {

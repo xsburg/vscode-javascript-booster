@@ -1,1 +1,3 @@
 server/tests/__codemod-fixtures__/*
+server/coverage
+client/dist

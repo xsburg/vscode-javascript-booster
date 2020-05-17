@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as _ from 'lodash';
 import * as os from 'os';
+
 import astService, { LanguageId, Selection } from '../../src/services/astService';
 import smartSelectionService from '../../src/services/smartSelectionService';
 
