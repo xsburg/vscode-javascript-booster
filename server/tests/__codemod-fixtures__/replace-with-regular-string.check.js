@@ -7,6 +7,12 @@ const a = `foo`; /*# { pos: 14 } #*/
 const a = 'foo';
 const b = `${foo}bar`; /*# { pos: 16 } #*/
 
-/*$ { fixture: 'should-not-trigger-otherwise', expected: false } $*/
+/*$ { fixture: 'should-not-trigger-on-tagged-template-strings', expected: false } $*/
+
+const a = styled.div`
+    background: #fff; /*# { pos: 17 } #*/
+`;
+
+/*$ { fixture: 'should-not-trigger-anywhere-else', expected: false } $*/
 
 const a = 'foo'; /*# { pos: 7 } #*/

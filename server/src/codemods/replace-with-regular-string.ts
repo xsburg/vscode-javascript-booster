@@ -8,9 +8,10 @@ import {
     Printable,
     TemplateElement,
     TemplateLiteral,
-    UnaryExpression
+    UnaryExpression,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
+
 import { CodeModExports } from '../codeModTypes';
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
@@ -59,7 +60,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const path = target.thisOrClosest(j.TemplateLiteral).firstPath();
 
-    return Boolean(path);
+    return Boolean(path) && !j.TaggedTemplateExpression.check(path.parent.node);
 };
 
 codeMod.scope = 'cursor';
