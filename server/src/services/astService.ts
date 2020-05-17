@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import * as os from 'os';
 import { PrinterOptions } from 'recast';
 import * as vscode from 'vscode-languageserver-types';
+
 import { registerCollectionExtensions } from '../utils/collectionExtensions';
 import connectionService from './connectionService';
 import logService from './logService';
@@ -14,13 +15,14 @@ import logService from './logService';
 // tslint:disable-next-line:variable-name
 const CollectionPrototype = jscodeshift.withParser('babylon')('').constructor.prototype;
 const toSource = CollectionPrototype.toSource;
-CollectionPrototype.toSource = function(options: PrinterOptions) {
+CollectionPrototype.toSource = function (options: PrinterOptions) {
     const settings = connectionService.getSettings();
     const userFormattingOptions = settings ? settings.formattingOptions : {};
     return toSource.call(this, {
         quote: 'single',
+        tabWidth: 4,
         ...userFormattingOptions,
-        ...options
+        ...options,
     });
 };
 
@@ -38,14 +40,14 @@ const supportedLanguages: LanguageId[] = [
     'javascript',
     'javascriptreact',
     'typescript',
-    'typescriptreact'
+    'typescriptreact',
 ];
 
 const codeshifts: { [languageId in LanguageId]: jscodeshift.JsCodeShift } = {
     javascript: jscodeshift.withParser('babylon'),
     javascriptreact: jscodeshift.withParser('babylon'),
     typescript: jscodeshift.withParser('ts'),
-    typescriptreact: jscodeshift.withParser('tsx')
+    typescriptreact: jscodeshift.withParser('tsx'),
 };
 
 export type AstRoot = jscodeshift.Collection<File>;
@@ -82,13 +84,10 @@ class AstService {
      */
     public offsetAt(text: string, pos: vscode.Position) {
         let offset = 0;
-        const lines = text
-            .split('\r')
-            .join('')
-            .split('\n');
+        const lines = text.split('\r').join('').split('\n');
         const prevLines = lines.slice(0, pos.line);
         const eolLength = os.EOL.length;
-        offset += prevLines.map(l => l.length + eolLength).reduce((s, a) => s + a, 0);
+        offset += prevLines.map((l) => l.length + eolLength).reduce((s, a) => s + a, 0);
         offset += pos.character;
         return offset;
     }
@@ -111,14 +110,14 @@ class AstService {
             if (activeOffset + line.length >= offset) {
                 return {
                     line: i,
-                    character: offset - activeOffset
+                    character: offset - activeOffset,
                 };
             }
             activeOffset += line.length + os.EOL.length;
         }
         return {
             line: 0,
-            character: 0
+            character: 0,
         };
     }
 
@@ -148,15 +147,13 @@ class AstService {
                 );
             } else {
                 this._addDelayedLogEntry(
-                    `Unknown error in file ${options.fileName}. \nError from Babylon Parser: ${
-                        e.message
-                    }.`
+                    `Unknown error in file ${options.fileName}. \nError from Babylon Parser: ${e.message}.`
                 );
             }
         }
         this._astCache.set(options.fileName, {
             source: options.source,
-            ast
+            ast,
         });
         return ast;
     }
