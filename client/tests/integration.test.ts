@@ -56,9 +56,12 @@ suite(`Integration tests`, () => {
             createCancellationTokenMock()
         );
 
-        assert.equal(codeActions.length, 1);
-        assert.equal(codeActions[0].title, 'Convert to shorthand arrow function');
-        assert.equal(codeActions[0].arguments!.length, 3);
+        const convertToArrowAction = codeActions.find(
+            (ca) => ca.title === 'Convert to shorthand arrow function'
+        );
+        assert.equal(codeActions.length >= 1, true);
+        assert.equal(Boolean(convertToArrowAction), true);
+        assert.equal(convertToArrowAction!.arguments!.length, 3);
     });
 
     test('runCodeModCommand should update text in editor', async () => {
@@ -76,9 +79,12 @@ suite(`Integration tests`, () => {
             createCancellationTokenMock()
         );
 
-        assert.equal(codeActions[0].arguments!.length, executeCodeActionCommand.length);
+        const convertToArrowAction = codeActions.find(
+            (ca) => ca.title === 'Convert to shorthand arrow function'
+        )!;
+        assert.equal(convertToArrowAction.arguments!.length, executeCodeActionCommand.length);
 
-        await (executeCodeActionCommand as any)(...codeActions[0].arguments!);
+        await (executeCodeActionCommand as any)(...convertToArrowAction.arguments!);
 
         const actualText = textDocument.getText();
         assert.equal(
@@ -86,7 +92,7 @@ suite(`Integration tests`, () => {
             `
 function test() {
     const a = () => dispatch({
-        type: 'FOO'
+        type: 'FOO',
     });
 }
             `.trim()
