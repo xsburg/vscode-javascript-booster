@@ -46,7 +46,6 @@ codeMod.canRun = (fileInfo, api, options) => {
     const target = options.target;
     const path = target.firstPath();
 
-    // convert-arrow-fn-to-regular-fn:should-trigger-on-var-declaration
     if (!path) {
         return false;
     }

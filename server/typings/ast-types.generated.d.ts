@@ -2653,7 +2653,7 @@ declare module 'ast-types' {
         tsTypeReference(
             typeName: Identifier | TSQualifiedName,
             typeParameters: TSTypeParameterInstantiation | null
-        );
+        ): TSTypeReference;
 
         tsTypeParameterInstantiation(params: Array<TSType>): TSTypeParameterInstantiation;
 
