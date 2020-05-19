@@ -16,5 +16,6 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
-    }
+    },
+    "npm.packageManager": "yarn"
 }

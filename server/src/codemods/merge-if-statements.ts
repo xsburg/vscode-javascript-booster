@@ -94,7 +94,7 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Simplify into one if-statement';
+codeMod.title = 'Merge into one if-statement';
 
 codeMod.description = '';
 

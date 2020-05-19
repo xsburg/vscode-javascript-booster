@@ -27,7 +27,7 @@ Following this architecture, below are the main scenarious that you might come a
 
 Running the unit tests in watch mode:
 
--   Go to the `server` directory and run `npm test -- --watch`.
+-   Go to the `server` directory and run `yarn test --watch`.
 
 Debugging the unit tests:
 
@@ -35,12 +35,12 @@ Debugging the unit tests:
 
 ## Building a Release Candidate bundle
 
-`vsce` (Visual Studio Code Extensions) CLI has to be installed in order to build the extension locally (`npm i -g vsce`).
+`vsce` (Visual Studio Code Extensions) CLI has to be installed in order to build the extension locally (`yarn global add vsce`).
 
 In order to build the extension package:
 
 -   Bump the version in `client/package.json` (don't forget to revert the change later)
--   In the root repository dir, run `npm run package`
+-   In the root repository dir, run `yarn run package`
 
 The extension bundle (\*.vsix) will be created in the `client` directory.
 
@@ -55,8 +55,8 @@ All releases are made using release branches, e.g. `release/0.11.0`.
     -   Add new code actions into the list
     -   Check if other changes are needed
 -   Place all the resources (gifs, etc) into the `resources` dir.
--   Run `npm run utils:generate:docs` to update extension's readme and changelog files.
--   Initiate new release by running the command (in the root dir): `npm version [patch|minor|major]`
+-   Run `yarn run utils:generate:docs` to update extension's readme and changelog files.
+-   Initiate new release by running the command (in the root dir): `yarn version [patch|minor|major]`
 -   Merge the release branch into master, delete it and push
 
 ## Useful links

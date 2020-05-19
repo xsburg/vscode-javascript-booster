@@ -1056,6 +1056,7 @@ declare module 'ast-types' {
         declaration: Declaration | null;
         specifiers: Array<ExportSpecifier>;
         source: Literal | null;
+        exportKind: 'type' | 'value' | null;
     }
 
     export interface ExportNamespaceSpecifier extends Specifier {

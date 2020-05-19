@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-    - '10'
+    - '12'
 os:
     - osx
 env:
@@ -8,22 +8,21 @@ env:
         secure: qOagTTe/0JSg4iR21jYyhx023fWvT0BNdVKs9CHoxfql/V6uoOU6gbMdilW1VmmAMKfzPnr2vWLDwEAqTMG7Qe/ZPkkpI769ykPKmGgYU9pFX/n78UOw5wCCqjQozUgXgkWQjIPxshQN4A3xgrMQaZG1s/3kbRJbCLqzs6Enex+hoc1Is7T4yCmCdkqQDK39wzrzsEOvxYVBCuJd1dcq9/pZG+TjtTOrcJLGxPpzQ6ntdc0tuPiQUkbprIyP82XrKc44QdH/Gxvi703Kkde/RawyvRjas5WcS1mmzigW4QgxFrqDBjwKMA4YW6CHi5X7iaJUDx/g9YXh5pJauX5vjrRNKXM2ixqC6ka4tOcLXWWVE+5sJx7pr2KWZgkxsOjSfeGAYKOQ5H1piYLX054vj2awbSa3KpP91whv4bWUtXsqVquU26/u3pu5SyhfJQADm92lmszFs9rhwiqaZb5iyphtgSCRFWv6q3Pgs1vdl34yQx58Ce9R1yZxF0aUjLCE+697zRPv7I5m0hLvxG83djL07Lj0eoyUUymwWkNLlS/56K5zr9S7MYuJEWwT4Pzc7Nr9VN+IYODn6EV99hmvEoJhcKu7wHKIsIquaCvCKQ8531Eoc+Ii7KCOQ/FArnU18h87o8LGKcr4FAdw1+RFkOqL0OVJ4zb5YmXKQhoL1yk=
 sudo: false
 before_install:
-    - npm install -g npm@6.7.x
     - if [ $TRAVIS_OS_NAME == "linux" ]; then export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
       sh -e /etc/init.d/xvfb start; sleep 3; fi
 install:
-    - npm install
+    - yarn install
 script:
-    - npm run compile:dev
-    - npm test
+    - yarn run compile:dev
+    - yarn test
 after_script:
     - node ./server/node_modules/coveralls/bin/coveralls.js -v < ./server/coverage/lcov.info
 before_deploy:
-    - npm install -g vsce
-    - npm run package
+    - yarn global add vsce
+    - yarn run package
 deploy:
     - provider: script
-      script: npm run publish -- -p $VS_TOKEN
+      script: yarn run publish -- -p $VS_TOKEN
       skip_cleanup: true
       on:
           repo: xsburg/vscode-javascript-booster

@@ -30,11 +30,11 @@
     ],
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "clean": "rimraf out && rimraf dist",
+        "clean": "rimraf dist",
         "compile:dev": "webpack --mode none",
         "compile:test": "webpack --mode none && cpx ./tests/__simple-workspace__/**/* ./dist/test-workspaces/__simple-workspace__",
         "compile:prod": "webpack --mode production",
-        "test": "npm run compile:test && TEST_WORKSPACES_DIR=${PWD}/dist/test-workspaces CODE_TESTS_PATH=${PWD}/tests/runtime CODE_EXTENSIONS_PATH=${PWD} node ./node_modules/vscode/bin/test"
+        "test": "yarn run compile:test && TEST_WORKSPACES_DIR=${PWD}/dist/test-workspaces CODE_TESTS_PATH=${PWD}/tests/runtime CODE_EXTENSIONS_PATH=${PWD} node ./node_modules/vscode/bin/test"
     },
     "main": "./dist/extension",
     "activationEvents": [
