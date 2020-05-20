@@ -1,18 +1,4 @@
-import {
-    ArrowFunctionExpression,
-    AstNode,
-    BlockStatement,
-    Expression,
-    ExpressionStatement,
-    FunctionDeclaration,
-    Identifier,
-    IfStatement,
-    Printable,
-    ReturnStatement,
-    UnaryExpression,
-    VariableDeclarator,
-} from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+import { ArrowFunctionExpression, ASTNode, Identifier, VariableDeclarator } from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
 
@@ -50,7 +36,7 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    let checkTarget: AstNode | undefined;
+    let checkTarget: ASTNode | undefined;
     if (j.Identifier.check(path.node) && j.VariableDeclarator.check(path.parent.node)) {
         checkTarget = path.parent.parent?.node;
     } else if (j.ArrowFunctionExpression.check(path.node)) {

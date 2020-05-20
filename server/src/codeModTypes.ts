@@ -1,15 +1,14 @@
-import { File } from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+import { $Collection, File, JSCodeshift } from 'jscodeshift';
 
 import { Selection } from './services/astService';
 import { Position } from './utils/Position';
 
 type CodeModTransform = (
-    fileInfo: { path: string; source: string; ast: Collection<File> },
-    api: { jscodeshift: JsCodeShift; stats(value: string): void },
+    fileInfo: { path: string; source: string; ast: $Collection<File> },
+    api: { jscodeshift: JSCodeshift; stats(value: string): void },
     options: {
-        target: Collection;
-        anchorTarget: Collection;
+        target: $Collection;
+        anchorTarget: $Collection;
         selection: Selection;
     }
 ) =>
@@ -22,11 +21,11 @@ type CodeModTransform = (
       };
 
 type CanRunFunction = (
-    fileInfo: { path: string; source: string; ast: Collection<File> },
-    api: { jscodeshift: JsCodeShift; stats(value: string): void },
+    fileInfo: { path: string; source: string; ast: $Collection<File> },
+    api: { jscodeshift: JSCodeshift; stats(value: string): void },
     options: {
-        target: Collection;
-        anchorTarget: Collection;
+        target: $Collection;
+        anchorTarget: $Collection;
         selection: Selection;
     }
 ) => boolean;

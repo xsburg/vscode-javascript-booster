@@ -1,18 +1,15 @@
 import {
+    $Collection,
     AssignmentExpression,
-    AstNode,
+    ASTNode,
+    ASTPath,
     ConditionalExpression,
-    ExpressionStatement,
-    Identifier,
-    NodePath,
-    ReturnStatement,
+    JSCodeshift,
     VariableDeclaration,
     VariableDeclarator,
-} from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+} from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
-import { getNextStatementInBlock, getSingleStatement } from '../utils/astHelpers';
 
 enum TransformType {
     None,
@@ -30,7 +27,7 @@ enum TransformType {
     VariableDeclaration,
 }
 
-function getTransformType(j: JsCodeShift, target: Collection<AstNode>) {
+function getTransformType(j: JSCodeshift, target: $Collection<ASTNode>) {
     const path = target.firstPath();
 
     if (!path || !j.ConditionalExpression.check(path.node) || !path.parent) {
@@ -65,6 +62,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const ast = fileInfo.ast;
     const target = options.target;
     const path = target.firstPath()!;
+    target.replaceWith;
     const node = path.node as ConditionalExpression;
 
     const transformType = getTransformType(j, target);
@@ -103,8 +101,8 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
             // Variable declaration: let x = a?b:c; => let x; if (a) {x = b} else {x = c}
             // Tricky case 1: convert const to let
             // Tricky case 2: multiple declarations. Split the declarations.
-            const varDeclarator = path.parent as NodePath<VariableDeclarator>;
-            const varDeclaration = path.parent.parent as NodePath<VariableDeclaration>;
+            const varDeclarator = path.parent as ASTPath<VariableDeclarator>;
+            const varDeclaration = path.parent.parent as ASTPath<VariableDeclaration>;
             const newIfStatement = j.ifStatement(
                 node.test,
                 j.blockStatement([

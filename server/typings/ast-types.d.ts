@@ -1,4 +1,4 @@
-declare module 'ast-types' {
+declare module 'ast-types123' {
     export interface NodeBase {}
 
     export class Path {

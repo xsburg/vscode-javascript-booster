@@ -1,4 +1,4 @@
-declare module 'recast' {
+declare module 'recast123' {
     export type ParserOptions = any;
 
     export interface PrinterOptions {

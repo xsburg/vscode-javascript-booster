@@ -1,12 +1,5 @@
-import {
-    ArrowFunctionExpression,
-    Expression,
-    FunctionDeclaration,
-    IfStatement,
-    Printable,
-    UnaryExpression,
-} from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+import { ExpressionKind } from 'ast-types/gen/kinds';
+import { ArrowFunctionExpression } from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
 
@@ -16,7 +9,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
     const node = target.firstNode<ArrowFunctionExpression>()!;
 
-    const expr = node.body;
+    const expr = node.body as ExpressionKind;
     node.body = j.blockStatement([j.returnStatement(expr)]);
 
     const resultText = ast.toSource();

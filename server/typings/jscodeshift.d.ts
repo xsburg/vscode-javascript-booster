@@ -1,4 +1,4 @@
-declare module 'jscodeshift' {
+declare module 'jscodeshift123' {
     import {
         NodePath,
         Node,
@@ -9,7 +9,7 @@ declare module 'jscodeshift' {
         NamedType,
         AstNode,
         TypeName,
-    } from 'ast-types';
+    } from 'ast-types123';
     import { PrinterOptions, Parser, ParserOptions } from 'recast';
 
     interface CollectionBase<TNode> {

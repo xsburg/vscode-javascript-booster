@@ -1,20 +1,22 @@
+import { StatementKind } from 'ast-types/gen/kinds';
 import {
+    $Collection,
     AssignmentExpression,
-    AstNode,
+    ASTNode,
     AwaitExpression,
     BlockStatement,
     Expression,
     ExpressionStatement,
+    JSCodeshift,
     Pattern,
     Statement,
     VariableDeclaration,
     VariableDeclarator,
-} from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+} from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
 
-function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
+function isExpressionStatement(j: JSCodeshift, s: $Collection<Statement>) {
     return j.match<ExpressionStatement>(s, {
         type: 'ExpressionStatement',
         expression: {
@@ -23,8 +25,8 @@ function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
     });
 }
 
-function isAssignmentStatement(j: JsCodeShift, s: Collection<Statement>) {
-    return j.match<ExpressionStatement>(s, {
+function isAssignmentStatement(j: JSCodeshift, s: $Collection<StatementKind>) {
+    return j.match(s, {
         type: 'ExpressionStatement',
         expression: {
             type: 'AssignmentExpression',
@@ -35,7 +37,7 @@ function isAssignmentStatement(j: JsCodeShift, s: Collection<Statement>) {
     });
 }
 
-function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
+function isVariableDeclaration(j: JSCodeshift, s: $Collection<Statement>) {
     return (
         j.match<VariableDeclaration>(s, {
             type: 'VariableDeclaration',
@@ -135,9 +137,9 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
 }) as CodeModExports;
 
 function getContainingStatement(
-    j: JsCodeShift,
-    c: Collection<AstNode>
-): Collection<Statement> | null {
+    j: JSCodeshift,
+    c: $Collection<ASTNode>
+): $Collection<StatementKind> | null {
     const s = c.thisOrClosest(j.Statement);
     if (isExpressionStatement(j, s)) {
         // Example: 'await foo();'

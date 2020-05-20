@@ -1,19 +1,11 @@
-import {
-    ArrowFunctionExpression,
-    Expression,
-    FunctionDeclaration,
-    Identifier,
-    IfStatement,
-    Printable,
-    UnaryExpression,
-} from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+import { ArrowFunctionExpression, Identifier, SourceLocation } from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
 import { extractSelectionAnchor, SELECTION_ANCHOR } from '../utils/extractSelectionAnchor';
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
+    j.types;
     const ast = fileInfo.ast;
     const target = options.target;
     const node = target.thisOrClosest(j.ArrowFunctionExpression).firstNode()!;
