@@ -297,6 +297,15 @@ declare module 'ast-types' {
         arguments: Array<Expression | SpreadElement>;
     }
 
+    export interface OptionalCallExpression extends Expression {
+        type: string;
+        callee: Expression;
+        arguments: Array<Expression | SpreadElement | JSXNamespacedName>;
+        optional: boolean;
+        typeArguments: TypeParameterInstantiation | null;
+        typeParameters: TSTypeParameterInstantiation | null;
+    }
+
     export interface MemberExpression extends Expression {
         type: string;
         object: Expression;
