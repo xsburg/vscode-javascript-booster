@@ -12,9 +12,29 @@ const HelloWorld = React.memo(props => {
     return <div>Hello, world!</div>;
 });
 
+/*$ { fixture: 'should-transform-exported-fn' } $*/
+
+export const HelloWorld = React.memo<Props>(props => {
+    return <div>Hello, world!</div>;
+});
+
+/*$ { fixture: 'should-transform-exported-default-fn' } $*/
+
+const HelloWorld = React.memo<Props>(props => {
+    return <div>Hello, world!</div>;
+});
+
+export default HelloWorld;
+
 /*$ { fixture: 'should-transform-arrow-fn-expr' } $*/
 
 const HelloWorld = React.memo<Props>((props) => {
+    return <div>Hello, world!</div>;
+})
+
+/*$ { fixture: 'should-transform-exported-arrow-fn-expr' } $*/
+
+export const HelloWorld = React.memo<Props>((props) => {
     return <div>Hello, world!</div>;
 })
 

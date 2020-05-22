@@ -12,9 +12,27 @@ function HelloWorld(props: Props) { /*# { pos: 16 } #*/
     return <div>Hello, world!</div>;
 }
 
+/*$ { fixture: 'should-trigger-over-exported-fn', expected: true } $*/
+
+export function HelloWorld(props: Props) { /*# { pos: 22 } #*/
+    return <div>Hello, world!</div>;
+}
+
+/*$ { fixture: 'should-trigger-over-exported-default-fn', expected: true } $*/
+
+export default function HelloWorld(props: Props) { /*# { pos: 30 } #*/
+    return <div>Hello, world!</div>;
+}
+
 /*$ { fixture: 'should-trigger-over-arrow-fn-expr', expected: true } $*/
 
 const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos: 68 } #*/
+    return <div>Hello, world!</div>;
+}
+
+/*$ { fixture: 'should-trigger-over-exported-arrow-fn-expr', expected: true } $*/
+
+export const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos: 75 } #*/
     return <div>Hello, world!</div>;
 }
 

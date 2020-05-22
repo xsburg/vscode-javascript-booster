@@ -12,9 +12,27 @@ function HelloWorld(props) { /*# { pos: 4 } #*/
     return <div>Hello, world!</div>;
 }
 
+/*$ { fixture: 'should-transform-exported-fn' } $*/
+
+export function HelloWorld(props: Props) { /*# { pos: 22 } #*/
+    return <div>Hello, world!</div>;
+}
+
+/*$ { fixture: 'should-transform-exported-default-fn' } $*/
+
+export default function HelloWorld(props: Props) { /*# { pos: 30 } #*/
+    return <div>Hello, world!</div>;
+}
+
 /*$ { fixture: 'should-transform-arrow-fn-expr' } $*/
 
 const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos: 68 } #*/
+    return <div>Hello, world!</div>;
+}
+
+/*$ { fixture: 'should-transform-exported-arrow-fn-expr' } $*/
+
+export const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos: 75 } #*/
     return <div>Hello, world!</div>;
 }
 

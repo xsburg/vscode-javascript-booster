@@ -12,9 +12,29 @@ const HelloWorld = React.forwardRef((props, ref) => {
     return <div>Hello, world!</div>;
 });
 
+/*$ { fixture: 'should-transform-exported-fn' } $*/
+
+export const HelloWorld = React.forwardRef<any, Props>((props, ref) => {
+    return <div>Hello, world!</div>;
+});
+
+/*$ { fixture: 'should-transform-exported-default-fn' } $*/
+
+const HelloWorld = React.forwardRef<any, Props>((props, ref) => {
+    return <div>Hello, world!</div>;
+});
+
+export default HelloWorld;
+
 /*$ { fixture: 'should-transform-arrow-fn-expr' } $*/
 
 const HelloWorld = React.forwardRef<any, Props>((props, ref) => {
+    return <div>Hello, world!</div>;
+})
+
+/*$ { fixture: 'should-transform-exported-arrow-fn-expr' } $*/
+
+export const HelloWorld = React.forwardRef<any, Props>((props, ref) => {
     return <div>Hello, world!</div>;
 })
 

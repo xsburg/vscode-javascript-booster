@@ -61,7 +61,15 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
             ),
         ]);
         newNode.comments = oldFuncDecl.comments;
-        functionDeclaration.replace(newNode);
+        if (j.ExportDefaultDeclaration.check(functionDeclaration.parent.node)) {
+            // Special case: export default function() {} => 2 statements (var declaration, then export default)
+            functionDeclaration.parent.insertAfter(
+                j.exportDefaultDeclaration(j.identifier(oldFuncDecl.id.name))
+            );
+            functionDeclaration.parent.replace(newNode);
+        } else {
+            functionDeclaration.replace(newNode);
+        }
     } else if (variableDeclaration) {
         const variableDeclarator = variableDeclaration.node.declarations[0] as VariableDeclarator;
         // Replace const Foo = (props: Props) => {} WITH const Foo = React.forwardRef<any, Props>((props) => {});
