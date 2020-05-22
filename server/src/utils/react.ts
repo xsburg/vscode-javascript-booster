@@ -50,7 +50,7 @@ function isHook(node: AstNode) {
  * are valid component names for instance.
  */
 
-function isComponentName(node: AstNode) {
+export function isReactComponentName(node: AstNode): node is Identifier {
     if (node.type === 'Identifier') {
         return !/^[a-z]/.test((node as Identifier).name);
     } else {
@@ -177,7 +177,7 @@ function getFunctionName(path: NodePath<AstNode>) {
 export function isReactFunctionComponentOrHook(path: NodePath<AstNode>) {
     const functionName = getFunctionName(path);
     if (functionName) {
-        if (isComponentName(functionName) || isHook(functionName)) {
+        if (isReactComponentName(functionName) || isHook(functionName)) {
             return true;
         }
     }
@@ -220,6 +220,19 @@ export function isValidHookLocation(path: NodePath<AstNode>) {
         currentPath = currentPath.parent;
     }
     return insideReactFunctionComponentOrHook;
+}
+
+export function isReactFunctionComponent(path: NodePath<AstNode>) {
+    const functionName = getFunctionName(path);
+    if (functionName) {
+        if (isReactComponentName(functionName) || isHook(functionName)) {
+            return true;
+        }
+    }
+    if (isForwardRefCallback(path) || isMemoCallback(path)) {
+        return true;
+    }
+    return false;
 }
 
 export function isInsideReactFunctionComponentOrHook(path: NodePath<AstNode>) {
