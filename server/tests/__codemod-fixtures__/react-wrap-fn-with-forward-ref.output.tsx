@@ -50,6 +50,18 @@ const HelloWorld = React.forwardRef<any, Props>((
     return <div>Hello, world!</div>;
 })
 
+/*$ { fixture: 'should-transform-with-types-in-declarator-only' } $*/
+
+const HelloWorld = React.forwardRef<any, Props>((props) => {
+    return <div>Hello, world!</div>;
+})
+
+/*$ { fixture: 'should-transform-with-default-params' } $*/
+
+const HelloWorld = React.forwardRef<any, Props>((props = { foo: 'default-text' }) => {
+    return <div>Hello, world!</div>;
+})
+
 /*$ { fixture: 'should-transform-regular-fn-expr-type' } $*/
 
 const HelloWorld = React.forwardRef<any, Props>(function(props, ref) {
