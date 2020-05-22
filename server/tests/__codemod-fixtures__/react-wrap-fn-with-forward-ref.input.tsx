@@ -18,6 +18,12 @@ const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos
     return <div>Hello, world!</div>;
 }
 
+/*$ { fixture: 'should-transform-arrow-fn-expr-with-spread' } $*/
+
+const HelloWorld: React.FunctionComponent<Props> = ({ foo, bar }: Props) => { /*# { pos: 75 } #*/
+    return <div>Hello, world!</div>;
+}
+
 /*$ { fixture: 'should-transform-regular-fn-expr-type' } $*/
 
 const HelloWorld = function(props: Props) { /*# { pos: 25 } #*/

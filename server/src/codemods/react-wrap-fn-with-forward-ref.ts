@@ -1,21 +1,16 @@
 import {
     ArrowFunctionExpression,
-    AssignmentExpression,
     AstNode,
-    BlockStatement,
     FunctionDeclaration,
     FunctionExpression,
     NodePath,
-    StringLiteral,
-    TSEnumDeclaration,
     VariableDeclaration,
     VariableDeclarator,
 } from 'ast-types';
 import { JsCodeShift } from 'jscodeshift';
 
-import { codeActionsRequestHandler } from '../codeActionsRequest';
 import { CodeModExports } from '../codeModTypes';
-import { isReactComponentName, isValidHookLocation } from '../utils/react';
+import { isReactComponentName } from '../utils/react';
 
 function getVariableDeclaration(
     path: NodePath<AstNode>,
@@ -38,6 +33,12 @@ function getVariableDeclaration(
     } else if (j.VariableDeclaration.check(path.node)) {
         // co|nst Foo = () => {};
         checkTarget = path;
+    } else {
+        const typeAnnotation = j(path).thisOrClosest(j.TSTypeAnnotation).firstPath();
+        // annotation => identifier => declarator => declaration
+        if (typeAnnotation) {
+            checkTarget = typeAnnotation.parent?.parent?.parent;
+        }
     }
     if (!checkTarget) {
         return null;
@@ -85,15 +86,32 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     let variableDeclaration = getVariableDeclaration(path, j);
 
     function createUseCallbackWrapper(fnExpr: ArrowFunctionExpression | FunctionExpression) {
-        return j.callExpression(j.identifier('useCallback'), [fnExpr, j.arrayExpression([])]);
+        return j.memberExpression(
+            j.identifier('React'),
+            j.callExpression(j.identifier('forwardRef'), [fnExpr])
+        );
     }
 
     if (functionDeclaration) {
         const oldFuncExpr = functionDeclaration.node;
         // Replace function onClick() {} WITH const onClick = useCallback(() => {}, []);
-        const newFuncExpr = j.arrowFunctionExpression(oldFuncExpr.params, oldFuncExpr.body);
-        newFuncExpr.returnType = oldFuncExpr.returnType;
-        newFuncExpr.typeParameters = oldFuncExpr.typeParameters;
+        let oldPropsAnnotation;
+        // prepare new function props
+        let propsParam;
+        if (oldFuncExpr.params.length > 0) {
+            const firstParam = oldFuncExpr.params[0];
+            if (j.Identifier.check(firstParam) || j.ObjectPattern.check(firstParam)) {
+                oldPropsAnnotation = firstParam.typeAnnotation;
+                firstParam.typeAnnotation = null;
+                propsParam = firstParam;
+            }
+        }
+        if (!propsParam) {
+            propsParam = j.identifier('props');
+        }
+        const newParams = [propsParam, j.identifier('ref')];
+
+        const newFuncExpr = j.arrowFunctionExpression(newParams, oldFuncExpr.body);
         const newNode = j.variableDeclaration('const', [
             j.variableDeclarator(
                 j.identifier(oldFuncExpr.id.name),
