@@ -1,80 +1,14 @@
 import {
     ArrowFunctionExpression,
-    AstNode,
-    FunctionDeclaration,
     FunctionExpression,
-    NodePath,
-    VariableDeclaration,
+    Identifier,
+    TSType,
     VariableDeclarator,
 } from 'ast-types';
-import { JsCodeShift } from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
+import { getFunctionDeclaration, getVariableDeclaration } from '../utils/function';
 import { isReactComponentName } from '../utils/react';
-
-function getVariableDeclaration(
-    path: NodePath<AstNode>,
-    j: JsCodeShift
-): NodePath<VariableDeclaration> | null {
-    let checkTarget: NodePath<AstNode> | undefined;
-    if (j.Identifier.check(path.node) && j.VariableDeclarator.check(path.parent.node)) {
-        // const fo|o = () => {};
-        checkTarget = path.parent.parent;
-    } else if (
-        j.ArrowFunctionExpression.check(path.node) ||
-        j.FunctionExpression.check(path.node)
-    ) {
-        // const Foo = () =|> {};
-        // const Foo = functi|on() {};
-        checkTarget = path.parent.parent;
-    } else if (j.VariableDeclarator.check(path.node)) {
-        // const Foo |= () => {};
-        checkTarget = path.parent;
-    } else if (j.VariableDeclaration.check(path.node)) {
-        // co|nst Foo = () => {};
-        checkTarget = path;
-    } else {
-        const typeAnnotation = j(path).thisOrClosest(j.TSTypeAnnotation).firstPath();
-        // annotation => identifier => declarator => declaration
-        if (typeAnnotation) {
-            checkTarget = typeAnnotation.parent?.parent?.parent;
-        }
-    }
-    if (!checkTarget) {
-        return null;
-    }
-
-    const isDeclarationWithSingleDeclarator =
-        j.VariableDeclaration.check(checkTarget.node) && checkTarget.node.declarations.length === 1;
-    if (!isDeclarationWithSingleDeclarator) {
-        return null;
-    }
-
-    const declarator = (checkTarget.node as VariableDeclaration).declarations[0];
-    const preconditionsMet =
-        j.VariableDeclarator.check(declarator) &&
-        isReactComponentName(declarator.id) &&
-        (j.ArrowFunctionExpression.check(declarator.init) ||
-            j.FunctionExpression.check(declarator.init));
-    if (!preconditionsMet) {
-        return null;
-    }
-    return checkTarget as any;
-}
-
-function getFunctionDeclaration(
-    path: NodePath<AstNode>,
-    j: JsCodeShift
-): NodePath<FunctionDeclaration> | null {
-    if (isReactComponentName(path.node) && j.FunctionDeclaration.check(path.parent.node)) {
-        // function Fo|o() {};
-        return path.parent as any;
-    } else if (j.FunctionDeclaration.check(path.node) && isReactComponentName(path.node.id)) {
-        // funct|ion Foo() {};
-        return path as any;
-    }
-    return null;
-}
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -82,26 +16,33 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
     const path = target.firstPath()!;
 
-    let functionDeclaration = getFunctionDeclaration(path, j);
-    let variableDeclaration = getVariableDeclaration(path, j);
+    let functionDeclaration = getFunctionDeclaration(j, path);
+    let variableDeclaration = getVariableDeclaration(j, path);
 
-    function createUseCallbackWrapper(fnExpr: ArrowFunctionExpression | FunctionExpression) {
-        return j.memberExpression(
-            j.identifier('React'),
-            j.callExpression(j.identifier('forwardRef'), [fnExpr])
-        );
+    function createUseCallbackWrapper(
+        fnExpr: ArrowFunctionExpression | FunctionExpression,
+        propsType: TSType | null
+    ) {
+        const callExpr = j.callExpression(j.identifier('forwardRef'), [fnExpr]);
+        if (propsType) {
+            callExpr.typeParameters = j.tsTypeParameterInstantiation([j.tsAnyKeyword(), propsType]);
+        }
+        return j.memberExpression(j.identifier('React'), callExpr);
     }
 
     if (functionDeclaration) {
-        const oldFuncExpr = functionDeclaration.node;
-        // Replace function onClick() {} WITH const onClick = useCallback(() => {}, []);
-        let oldPropsAnnotation;
-        // prepare new function props
+        const oldFuncDecl = functionDeclaration.node;
+        // Replace function Foo(props: Props) {} WITH const onClick = React.forwardRef<any, Props>((props, ref) => {});
+
+        // 1. Extract propsType & propsParam
+        let propsType = null;
         let propsParam;
-        if (oldFuncExpr.params.length > 0) {
-            const firstParam = oldFuncExpr.params[0];
+        if (oldFuncDecl.params.length > 0) {
+            const firstParam = oldFuncDecl.params[0];
             if (j.Identifier.check(firstParam) || j.ObjectPattern.check(firstParam)) {
-                oldPropsAnnotation = firstParam.typeAnnotation;
+                propsType = firstParam.typeAnnotation
+                    ? firstParam.typeAnnotation.typeAnnotation
+                    : null;
                 firstParam.typeAnnotation = null;
                 propsParam = firstParam;
             }
@@ -109,24 +50,39 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         if (!propsParam) {
             propsParam = j.identifier('props');
         }
-        const newParams = [propsParam, j.identifier('ref')];
-
-        const newFuncExpr = j.arrowFunctionExpression(newParams, oldFuncExpr.body);
+        // 2. Build new statement
         const newNode = j.variableDeclaration('const', [
             j.variableDeclarator(
-                j.identifier(oldFuncExpr.id.name),
-                createUseCallbackWrapper(newFuncExpr)
+                j.identifier(oldFuncDecl.id.name),
+                createUseCallbackWrapper(
+                    j.arrowFunctionExpression([propsParam, j.identifier('ref')], oldFuncDecl.body),
+                    propsType
+                )
             ),
         ]);
-        newNode.comments = oldFuncExpr.comments;
+        newNode.comments = oldFuncDecl.comments;
         functionDeclaration.replace(newNode);
     } else if (variableDeclaration) {
         const variableDeclarator = variableDeclaration.node.declarations[0] as VariableDeclarator;
-        // Replace const onClick = () => {} WITH const onClick = useCallback(() => {}, []);
-        const functionExpr = variableDeclarator.init as
-            | ArrowFunctionExpression
-            | FunctionExpression;
-        variableDeclarator.init = createUseCallbackWrapper(functionExpr);
+        // Replace const Foo = (props: Props) => {} WITH const Foo = React.forwardRef<any, Props>((props) => {});
+        const fnExpr = variableDeclarator.init as ArrowFunctionExpression | FunctionExpression;
+        // 1. Update fn parameters
+        let propsType = null;
+        if (fnExpr.params.length === 1) {
+            const firstParam = fnExpr.params[0];
+            if (j.Identifier.check(firstParam) || j.ObjectPattern.check(firstParam)) {
+                propsType = firstParam.typeAnnotation
+                    ? firstParam.typeAnnotation.typeAnnotation
+                    : null;
+                firstParam.typeAnnotation = null;
+            }
+            fnExpr.params.push(j.identifier('ref'));
+        } else {
+            fnExpr.params = [j.identifier('props'), j.identifier('ref')];
+        }
+        // 2. Wrap the function
+        (variableDeclarator.id as Identifier).typeAnnotation = null;
+        variableDeclarator.init = createUseCallbackWrapper(fnExpr, propsType);
     }
 
     const resultText = ast.toSource();
@@ -142,7 +98,17 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    return Boolean(getFunctionDeclaration(path, j) || getVariableDeclaration(path, j));
+    const fnDecl = getFunctionDeclaration(j, path);
+    if (fnDecl && isReactComponentName(fnDecl.node.id)) {
+        return true;
+    }
+
+    const varDecl = getVariableDeclaration(j, path);
+    if (varDecl && isReactComponentName((varDecl.node.declarations[0] as VariableDeclarator).id)) {
+        return true;
+    }
+
+    return false;
 };
 
 codeMod.scope = 'cursor';

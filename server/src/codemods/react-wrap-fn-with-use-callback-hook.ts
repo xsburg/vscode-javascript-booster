@@ -1,110 +1,12 @@
-import {
-    ArrowFunctionExpression,
-    AssignmentExpression,
-    AstNode,
-    BlockStatement,
-    FunctionDeclaration,
-    FunctionExpression,
-    NodePath,
-    StringLiteral,
-    TSEnumDeclaration,
-    VariableDeclaration,
-    VariableDeclarator,
-} from 'ast-types';
-import { JsCodeShift } from 'jscodeshift';
+import { ArrowFunctionExpression, FunctionExpression, VariableDeclarator } from 'ast-types';
 
-import { codeActionsRequestHandler } from '../codeActionsRequest';
 import { CodeModExports } from '../codeModTypes';
+import {
+    getAssignmentExpression,
+    getFunctionDeclaration,
+    getVariableDeclaration,
+} from '../utils/function';
 import { isValidHookLocation } from '../utils/react';
-
-function getVariableDeclaration(
-    path: NodePath<AstNode>,
-    j: JsCodeShift
-): NodePath<VariableDeclaration> | null {
-    let checkTarget: NodePath<AstNode> | undefined;
-    if (j.Identifier.check(path.node) && j.VariableDeclarator.check(path.parent.node)) {
-        // const fo|o = () => {};
-        checkTarget = path.parent.parent;
-    } else if (
-        j.ArrowFunctionExpression.check(path.node) ||
-        j.FunctionExpression.check(path.node)
-    ) {
-        // const foo = () =|> {};
-        // const foo = functi|on() {};
-        checkTarget = path.parent.parent;
-    } else if (j.VariableDeclarator.check(path.node)) {
-        // const foo |= () => {};
-        checkTarget = path.parent;
-    } else if (j.VariableDeclaration.check(path.node)) {
-        // co|nst foo = () => {};
-        checkTarget = path;
-    }
-    if (!checkTarget) {
-        return null;
-    }
-    const preconditionsMet =
-        // Check VariableDeclaration
-        j.VariableDeclaration.check(checkTarget.node) &&
-        checkTarget.node.declarations.length === 1 &&
-        // Check VariableDeclarator
-        j.VariableDeclarator.check(checkTarget.node.declarations[0]) &&
-        j.Identifier.check(checkTarget.node.declarations[0].id) &&
-        (j.ArrowFunctionExpression.check(checkTarget.node.declarations[0].init) ||
-            j.FunctionExpression.check(checkTarget.node.declarations[0].init));
-    if (!preconditionsMet) {
-        return null;
-    }
-    return checkTarget as any;
-}
-
-function getFunctionDeclaration(
-    path: NodePath<AstNode>,
-    j: JsCodeShift
-): NodePath<FunctionDeclaration> | null {
-    if (j.Identifier.check(path.node) && j.FunctionDeclaration.check(path.parent.node)) {
-        // function fo|o() {};
-        return path.parent as any;
-    } else if (j.FunctionDeclaration.check(path.node)) {
-        // funct|ion foo() {};
-        return path as any;
-    }
-    return null;
-}
-
-function getAssignmentExpression(
-    path: NodePath<AstNode>,
-    j: JsCodeShift
-): NodePath<AssignmentExpression> | null {
-    let checkTarget: NodePath<AstNode> | undefined;
-    if (j.Identifier.check(path.node) && j.AssignmentExpression.check(path.parent.node)) {
-        // fo|o = () => {};
-        checkTarget = path.parent;
-    } else if (
-        j.ArrowFunctionExpression.check(path.node) ||
-        j.FunctionExpression.check(path.node)
-    ) {
-        // foo = () =|> {};
-        // foo = functi|on() {};
-        checkTarget = path.parent;
-    } else if (j.AssignmentExpression.check(path.node)) {
-        // foo |= () => {};
-        checkTarget = path;
-    }
-    if (!checkTarget) {
-        return null;
-    }
-    const preconditionsMet =
-        j.AssignmentExpression.check(checkTarget.node) &&
-        j.ExpressionStatement.check(checkTarget.parent.node) &&
-        checkTarget.node.operator === '=' &&
-        j.Identifier.check(checkTarget.node.left) &&
-        (j.ArrowFunctionExpression.check(checkTarget.node.right) ||
-            j.FunctionExpression.check(checkTarget.node.right));
-    if (!preconditionsMet) {
-        return null;
-    }
-    return checkTarget as any;
-}
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -112,9 +14,9 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
     const path = target.firstPath()!;
 
-    let functionDeclaration = getFunctionDeclaration(path, j);
-    let variableDeclaration = getVariableDeclaration(path, j);
-    let assignmentExpression = getAssignmentExpression(path, j);
+    let functionDeclaration = getFunctionDeclaration(j, path);
+    let variableDeclaration = getVariableDeclaration(j, path);
+    let assignmentExpression = getAssignmentExpression(j, path);
 
     function createUseCallbackWrapper(fnExpr: ArrowFunctionExpression | FunctionExpression) {
         return j.callExpression(j.identifier('useCallback'), [fnExpr, j.arrayExpression([])]);
@@ -163,9 +65,9 @@ codeMod.canRun = (fileInfo, api, options) => {
     }
 
     return Boolean(
-        getFunctionDeclaration(path, j) ||
-            getVariableDeclaration(path, j) ||
-            getAssignmentExpression(path, j)
+        getFunctionDeclaration(j, path) ||
+            getVariableDeclaration(j, path) ||
+            getAssignmentExpression(j, path)
     );
 };
 

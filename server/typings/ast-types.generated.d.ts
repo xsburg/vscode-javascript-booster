@@ -64,7 +64,7 @@ declare module 'ast-types' {
         type: string;
         name: string;
         optional: boolean;
-        typeAnnotation: TypeAnnotation | null;
+        typeAnnotation: TSTypeAnnotation | null;
     }
 
     export interface BlockStatement extends Statement {
@@ -295,6 +295,7 @@ declare module 'ast-types' {
         type: string;
         callee: Expression;
         arguments: Array<Expression | SpreadElement>;
+        typeParameters: TSTypeParameterInstantiation | null;
     }
 
     export interface OptionalCallExpression extends Expression {
@@ -392,7 +393,7 @@ declare module 'ast-types' {
             | ObjectProperty
             | RestProperty
         >;
-        typeAnnotation: TypeAnnotation | null;
+        typeAnnotation: TSTypeAnnotation | null;
         decorators: Array<Decorator> | null;
     }
 
