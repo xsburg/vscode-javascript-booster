@@ -63,7 +63,7 @@ codeMod.canRun = (fileInfo, api, options) => {
     if (!checkTarget) {
         return false;
     }
-    const allPreconditionsMet =
+    const preconditionsMet =
         // Check VariableDeclaration
         j.VariableDeclaration.check(checkTarget) &&
         checkTarget.declarations.length === 1 &&
@@ -71,7 +71,7 @@ codeMod.canRun = (fileInfo, api, options) => {
         j.VariableDeclarator.check(checkTarget.declarations[0]) &&
         j.Identifier.check(checkTarget.declarations[0].id) &&
         j.ArrowFunctionExpression.check(checkTarget.declarations[0].init);
-    if (!allPreconditionsMet) {
+    if (!preconditionsMet) {
         return false;
     }
     const usesThisExpr = j(checkTarget).find(j.ThisExpression).length > 0;

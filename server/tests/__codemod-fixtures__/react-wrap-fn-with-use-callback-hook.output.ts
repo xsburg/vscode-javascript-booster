@@ -1,31 +1,38 @@
-/*$ { fixture: 'should-transform-simple-case' } $*/
+/*$ { fixture: 'should-transform-function-decl' } $*/
 
 // @ts-nocheck
 
-enum Foo {
-    Bar = 'Bar',
-    Baz = 'Baz'
+function useHook() {
+    let a, b;
+
+    const onClick = useCallback((a: string, b: number): void => {
+        dispatch(loadData());
+    }, []);
 }
 
-/*$ { fixture: 'should-generate-valid-enum-names' } $*/
+/*$ { fixture: 'should-transform-fn-expression' } $*/
 
-enum Foo {
-    FooBar = 'fooBar',
-    FooBaz = 'foo Baz',
-    FooBoo = 'foo-Boo',
-    FooMoo = 'foo_Moo'
+function useHook() {
+    let a, b;
+    const onClick = useCallback(function onClick(a: string, b: number): void {
+        dispatch(loadData());
+    }, []);
 }
 
-/*$ { fixture: 'should-transform-exported-type' } $*/
+/*$ { fixture: 'should-transform-arrow-expression' } $*/
 
-export enum Foo {
-    Bar = 'Bar',
-    Baz = 'Baz'
+function useHook() {
+    let a, b;
+    const onClick = useCallback((a: string, b: number): void => {
+        dispatch(loadData());
+    }, []);
 }
 
-/*$ { fixture: 'should-remove-duplicates' } $*/
+/*$ { fixture: 'should-transform-assignment-expression' } $*/
 
-enum Foo {
-    Bar = 'Bar',
-    Baz = 'Baz'
+function useHook() {
+    let a, b, onClick;
+    onClick = useCallback((a: string, b: number): void => {
+        dispatch(loadData());
+    }, []);
 }

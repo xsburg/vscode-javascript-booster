@@ -10,6 +10,7 @@ import {
     ObjectMethod,
     ObjectProperty,
     OptionalCallExpression,
+    TypeName,
     VariableDeclarator,
 } from 'ast-types';
 
@@ -173,15 +174,57 @@ function getFunctionName(path: NodePath<AstNode>) {
     }
 }
 
+export function isReactFunctionComponentOrHook(path: NodePath<AstNode>) {
+    const functionName = getFunctionName(path);
+    if (functionName) {
+        if (isComponentName(functionName) || isHook(functionName)) {
+            return true;
+        }
+    }
+    if (isForwardRefCallback(path) || isMemoCallback(path)) {
+        return true;
+    }
+    return false;
+}
+
+const invalidHookParents: TypeName[] = [
+    'WhileStatement',
+    'DoWhileStatement',
+    'ForAwaitStatement',
+    'ForInStatement',
+    'ForOfStatement',
+    'ForStatement',
+    'IfStatement',
+    'SwitchStatement',
+];
+export function isInvalidHookParent(path: NodePath<AstNode>) {
+    return invalidHookParents.includes(path.node.type as any);
+}
+
+/**
+ * We node is inside a hook or function component AND not inside a loop or condition statement.
+ *
+ * Note: Preliminary returns up the code path or conditional expressions are NOT checked.
+ */
+export function isValidHookLocation(path: NodePath<AstNode>) {
+    let insideReactFunctionComponentOrHook = false;
+    let currentPath = path.parent;
+    while (currentPath) {
+        if (isReactFunctionComponentOrHook(currentPath)) {
+            insideReactFunctionComponentOrHook = true;
+            break;
+        }
+        if (isInvalidHookParent(currentPath)) {
+            return false;
+        }
+        currentPath = currentPath.parent;
+    }
+    return insideReactFunctionComponentOrHook;
+}
+
 export function isInsideReactFunctionComponentOrHook(path: NodePath<AstNode>) {
     while (path) {
-        const functionName = getFunctionName(path);
-        if (functionName) {
-            if (isComponentName(functionName) || isHook(functionName)) {
-                return true;
-            }
-        }
-        if (isForwardRefCallback(path) || isMemoCallback(path)) {
+        if (isReactFunctionComponentOrHook(path)) {
             return true;
         }
         path = path.parent;

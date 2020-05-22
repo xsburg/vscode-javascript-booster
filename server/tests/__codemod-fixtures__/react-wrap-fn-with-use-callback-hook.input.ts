@@ -1,17 +1,37 @@
-/*$ { fixture: 'should-transform-simple-case' } $*/
+/*$ { fixture: 'should-transform-function-decl' } $*/
 
 // @ts-nocheck
 
-type Foo = 'Bar' | 'Baz'; /*# { pos: 8 } #*/
+function useHook() {
+    let a, b;
+    function onClick(a: string, b: number): void { /*# { pos: 18 } #*/
+        dispatch(loadData());
+    };
+}
 
-/*$ { fixture: 'should-generate-valid-enum-names' } $*/
+/*$ { fixture: 'should-transform-fn-expression' } $*/
 
-type Foo = 'fooBar' | 'foo Baz' | 'foo-Boo' | 'foo_Moo'; /*# { pos: 8 } #*/
+function useHook() {
+    let a, b;
+    const onClick = function onClick(a: string, b: number): void { /*# { pos: 24 } #*/
+        dispatch(loadData());
+    };
+}
 
-/*$ { fixture: 'should-transform-exported-type' } $*/
+/*$ { fixture: 'should-transform-arrow-expression' } $*/
 
-export type Foo = 'Bar' | 'Baz'; /*# { pos: 15 } #*/
+function useHook() {
+    let a, b;
+    const onClick = (a: string, b: number): void => { /*# { pos: 51 } #*/
+        dispatch(loadData());
+    };
+}
 
-/*$ { fixture: 'should-remove-duplicates' } $*/
+/*$ { fixture: 'should-transform-assignment-expression' } $*/
 
-type Foo = 'Bar' | 'Baz' | 'Baz'; /*# { pos: 8 } #*/
+function useHook() {
+    let a, b, onClick;
+    onClick = (a: string, b: number): void => { /*# { pos: 11 } #*/
+        dispatch(loadData());
+    };
+}

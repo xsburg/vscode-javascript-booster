@@ -6,7 +6,7 @@ function useHook() {
     let a, b;
     function onClick() { /*# { pos: 18 } #*/
         dispatch(loadData());
-    };
+    }
 }
 
 /*$ { fixture: 'should-trigger-inside-function-expr', expected: true } $*/
@@ -15,7 +15,7 @@ const whatever = function useHook() {
     let a, b;
     function onClick() { /*# { pos: 18 } #*/
         dispatch(loadData());
-    };
+    }
 }
 
 /*$ { fixture: 'should-trigger-inside-var-decl', expected: true } $*/
@@ -24,7 +24,7 @@ const useHook = () => {
     let a, b;
     function onClick() { /*# { pos: 18 } #*/
         dispatch(loadData());
-    };
+    }
 }
 
 /*$ { fixture: 'should-trigger-inside-assignment-expr', expected: true } $*/
@@ -34,7 +34,7 @@ useHook = () => {
     let a, b;
     function onClick() { /*# { pos: 18 } #*/
         dispatch(loadData());
-    };
+    }
 }
 
 /*$ { fixture: 'should-trigger-inside-property-member', expected: true } $*/
@@ -44,7 +44,7 @@ let someObj = {
         let a, b;
         function onClick() { /*# { pos: 21 } #*/
             dispatch(loadData());
-        };
+        }
     }
 };
 
@@ -55,7 +55,7 @@ let someObj = {
         let a, b;
         function onClick() { /*# { pos: 21 } #*/
             dispatch(loadData());
-        };
+        }
     }
 };
 
@@ -66,7 +66,7 @@ const {
         let a, b;
         function onClick() { /*# { pos: 21 } #*/
             dispatch(loadData());
-        };
+        }
     }
 } = {};
 
@@ -76,7 +76,7 @@ function useHook() {
     let a, b;
     function onClick() { /*# { pos: 10 } #*/
         dispatch(loadData());
-    };
+    }
 }
 
 /*$ { fixture: 'should-trigger-over-fn-name', expected: true } $*/
@@ -85,7 +85,7 @@ function useHook() {
     let a, b;
     function onClick() { /*# { pos: 18 } #*/
         dispatch(loadData());
-    };
+    }
 }
 
 /*$ { fixture: 'should-trigger-over-fn-expression', expected: true } $*/
@@ -106,6 +106,15 @@ function useHook() {
     };
 }
 
+/*$ { fixture: 'should-trigger-over-assignment-expression', expected: true } $*/
+
+function useHook() {
+    let a, b, onClick;
+    onClick = () => { /*# { pos: 19 } #*/
+        dispatch(loadData());
+    };
+}
+
 /*$ { fixture: 'should-not-trigger-inside-while', expected: false } $*/
 
 function useHook() {
@@ -113,7 +122,7 @@ function useHook() {
     while (true) {
         function onClick() { /*# { pos: 22 } #*/
             dispatch(loadData());
-        };
+        }
     }
 }
 
@@ -124,7 +133,7 @@ function useHook() {
     for (let i = 0; i < 10; i++) {
         function onClick() { /*# { pos: 22 } #*/
             dispatch(loadData());
-        };
+        }
     }
 }
 
@@ -135,18 +144,18 @@ function useHook() {
     for (let n of nums) {
         function onClick() { /*# { pos: 22 } #*/
             dispatch(loadData());
-        };
+        }
     }
 }
 
-/*$ { fixture: 'should-not-trigger-inside-for-of', expected: false } $*/
+/*$ { fixture: 'should-not-trigger-inside-for-in', expected: false } $*/
 
 function useHook() {
     let a, b;
     for (let n in nums) {
         function onClick() { /*# { pos: 22 } #*/
             dispatch(loadData());
-        };
+        }
     }
 }
 
@@ -157,7 +166,7 @@ function useHook() {
     do {
         function onClick() { /*# { pos: 22 } #*/
             dispatch(loadData());
-        };
+        }
     } while (true);
 }
 
@@ -168,7 +177,7 @@ function useHook() {
     if (cond) {
         function onClick() { /*# { pos: 22 } #*/
             dispatch(loadData());
-        };
+        }
     }
 }
 
@@ -180,7 +189,7 @@ function useHook() {
         case 1:
             function onClick() { /*# { pos: 22 } #*/
                 dispatch(loadData());
-            };
+            }
             break;
     }
 }
@@ -192,6 +201,6 @@ function useHook() {
     do {
         function onClick() {
             dispatch(loadData());
-        };
+        }
     } while (true);
 }
