@@ -204,3 +204,7 @@ function useHook() {
         }
     } while (true);
 }
+
+/*$ { fixture: 'should-not-trigger-over-function-component', expected: false } $*/
+
+function TestMe(props: Props) {} /*# { pos: 14 } #*/

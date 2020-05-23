@@ -6,7 +6,7 @@ import {
     getFunctionDeclaration,
     getVariableDeclaration,
 } from '../utils/function';
-import { isValidHookLocation } from '../utils/react';
+import { isReactComponentName, isValidHookLocation } from '../utils/react';
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -64,11 +64,24 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    return Boolean(
-        getFunctionDeclaration(j, path) ||
-            getVariableDeclaration(j, path) ||
-            getAssignmentExpression(j, path)
-    );
+    // We check that the target function is NOT the function component
+    const functionDeclaration = getFunctionDeclaration(j, path);
+    if (functionDeclaration && isReactComponentName(functionDeclaration.node.id)) {
+        return false;
+    }
+    const variableDeclaration = getVariableDeclaration(j, path);
+    if (
+        variableDeclaration &&
+        isReactComponentName((variableDeclaration.node.declarations[0] as VariableDeclarator).id)
+    ) {
+        return false;
+    }
+    const assignmentExpression = getAssignmentExpression(j, path);
+    if (assignmentExpression && isReactComponentName(assignmentExpression.node.left)) {
+        return false;
+    }
+
+    return Boolean(functionDeclaration || variableDeclaration || assignmentExpression);
 };
 
 codeMod.scope = 'cursor';
