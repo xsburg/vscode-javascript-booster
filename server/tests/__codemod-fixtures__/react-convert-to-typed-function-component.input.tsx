@@ -32,7 +32,7 @@ const HelloWorld = (props: Props) => { /*# { pos: 36 } #*/
 
 /*$ { fixture: 'should-transform-exported-arrow-fn-expr' } $*/
 
-export const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos: 75 } #*/
+export const HelloWorld = (props: Props) => { /*# { pos: 43 } #*/
     return <div>Hello, world!</div>;
 }
 

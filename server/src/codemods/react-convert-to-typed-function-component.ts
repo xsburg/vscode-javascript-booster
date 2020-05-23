@@ -19,15 +19,17 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     let functionDeclaration = getFunctionDeclaration(j, path);
     let variableDeclaration = getVariableDeclaration(j, path);
 
-    function createUseCallbackWrapper(
-        fnExpr: ArrowFunctionExpression | FunctionExpression,
-        propsType: TSType | null
-    ) {
-        const callExpr = j.callExpression(j.identifier('memo'), [fnExpr]);
-        if (propsType) {
-            callExpr.typeParameters = j.tsTypeParameterInstantiation([propsType]);
+    function withTypeAnnotation(identifier: Identifier, propsType: TSType | null) {
+        if (!propsType) {
+            propsType = j.tsAnyKeyword();
         }
-        return j.memberExpression(j.identifier('React'), callExpr);
+        identifier.typeAnnotation = j.tsTypeAnnotation(
+            j.tsTypeReference(
+                j.tsQualifiedName(j.identifier('React'), j.identifier('FunctionComponent')),
+                j.tsTypeParameterInstantiation([propsType])
+            )
+        );
+        return identifier;
     }
 
     if (functionDeclaration) {
@@ -53,15 +55,20 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         // 2. Build new statement
         const newNode = j.variableDeclaration('const', [
             j.variableDeclarator(
-                j.identifier(oldFuncDecl.id.name),
-                createUseCallbackWrapper(
-                    j.arrowFunctionExpression([propsParam], oldFuncDecl.body),
-                    propsType
-                )
+                withTypeAnnotation(j.identifier(oldFuncDecl.id.name), propsType),
+                j.arrowFunctionExpression([propsParam], oldFuncDecl.body)
             ),
         ]);
         newNode.comments = oldFuncDecl.comments;
-        functionDeclaration.replace(newNode);
+        if (j.ExportDefaultDeclaration.check(functionDeclaration.parent.node)) {
+            // Special case: export default function() {} => 2 statements (var declaration, then export default)
+            functionDeclaration.parent.insertAfter(
+                j.exportDefaultDeclaration(j.identifier(oldFuncDecl.id.name))
+            );
+            functionDeclaration.parent.replace(newNode);
+        } else {
+            functionDeclaration.replace(newNode);
+        }
     } else if (variableDeclaration) {
         const variableDeclarator = variableDeclaration.node.declarations[0] as VariableDeclarator;
         // Replace const Foo = (props: Props) => {} WITH const Foo = React.memo<Props>((props) => {});
@@ -80,8 +87,8 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
             fnExpr.params = [j.identifier('props')];
         }
         // 2. Wrap the function
-        (variableDeclarator.id as Identifier).typeAnnotation = null;
-        variableDeclarator.init = createUseCallbackWrapper(fnExpr, propsType);
+        withTypeAnnotation(variableDeclarator.id as Identifier, propsType);
+        variableDeclarator.init = fnExpr;
     }
 
     const resultText = ast.toSource();
