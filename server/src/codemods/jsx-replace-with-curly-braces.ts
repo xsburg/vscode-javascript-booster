@@ -41,6 +41,8 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
+codeMod.languageScope = ['javascriptreact', 'typescriptreact'];
+
 codeMod.title = 'Wrap value with {}';
 
 codeMod.description = '';

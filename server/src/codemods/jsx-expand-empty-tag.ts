@@ -49,6 +49,8 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
+codeMod.languageScope = ['javascriptreact', 'typescriptreact'];
+
 codeMod.title = 'Expand empty tag';
 
 codeMod.description = '';

@@ -10,9 +10,14 @@ import {
     ObjectMethod,
     ObjectProperty,
     OptionalCallExpression,
+    TSQualifiedName,
+    TSType,
+    TSTypeAnnotation,
+    TSTypeReference,
     TypeName,
     VariableDeclarator,
 } from 'ast-types';
+import { JsCodeShift } from 'jscodeshift';
 
 /**
  * Catch all identifiers that begin with "use" followed by an uppercase Latin
@@ -243,4 +248,66 @@ export function isInsideReactFunctionComponentOrHook(path: NodePath<AstNode>) {
         path = path.parent;
     }
     return false;
+}
+
+/**
+ * Takes the identifier: `const Identifier: React.FunctionComponent<Props> = () => {}`;
+ *
+ * Check two cases: `const Foo: React.FunctionComponent<Props>` and `const Foo: FunctionComponent<Props>`.
+ *
+ * Returns `Props` type.
+ */
+export function getPropsTypeFromVariableDeclaratorId(
+    j: JsCodeShift,
+    variableDeclaratorId: Identifier
+) {
+    if (!variableDeclaratorId.typeAnnotation) {
+        return null;
+    }
+    let propsType: TSType | null = null;
+    const isIdentifierAnnotation = j.match<TSTypeAnnotation>(variableDeclaratorId.typeAnnotation, {
+        type: j.TSTypeAnnotation.name,
+        typeAnnotation: {
+            type: j.TSTypeReference.name,
+            typeName: {
+                type: j.Identifier.name,
+            } as Identifier,
+            typeParameters: {
+                type: j.TSTypeParameterInstantiation.name,
+                params: {
+                    length: 1,
+                },
+            },
+        } as TSTypeReference,
+    });
+    const isQualifiedNameAnnotation = j.match<TSTypeAnnotation>(
+        variableDeclaratorId.typeAnnotation,
+        {
+            type: j.TSTypeAnnotation.name,
+            typeAnnotation: {
+                type: j.TSTypeReference.name,
+                typeName: {
+                    type: j.TSQualifiedName.name,
+                    left: {
+                        type: j.Identifier.name,
+                        name: 'React',
+                    },
+                    right: {
+                        type: j.Identifier.name,
+                    },
+                } as TSQualifiedName,
+                typeParameters: {
+                    type: j.TSTypeParameterInstantiation.name,
+                    params: {
+                        length: 1,
+                    },
+                },
+            } as TSTypeReference,
+        }
+    );
+    if (isIdentifierAnnotation || isQualifiedNameAnnotation) {
+        propsType = (variableDeclaratorId.typeAnnotation!.typeAnnotation as TSTypeReference)
+            .typeParameters!.params[0];
+    }
+    return propsType;
 }

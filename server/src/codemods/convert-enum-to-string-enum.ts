@@ -106,6 +106,8 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
+codeMod.languageScope = ['typescript', 'typescriptreact'];
+
 codeMod.title = 'Convert to string enum';
 
 codeMod.description = '';

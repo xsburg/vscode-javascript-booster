@@ -52,13 +52,13 @@ const HelloWorld = React.forwardRef<any, Props>((
 
 /*$ { fixture: 'should-transform-with-types-in-declarator-only' } $*/
 
-const HelloWorld = React.forwardRef<any, Props>((props) => {
+const HelloWorld = React.forwardRef<any, Props>((props, ref) => {
     return <div>Hello, world!</div>;
 })
 
 /*$ { fixture: 'should-transform-with-default-params' } $*/
 
-const HelloWorld = React.forwardRef<any, Props>((props = { foo: 'default-text' }) => {
+const HelloWorld = React.forwardRef<any, Props>((props = { foo: 'default-text' }, ref) => {
     return <div>Hello, world!</div>;
 })
 

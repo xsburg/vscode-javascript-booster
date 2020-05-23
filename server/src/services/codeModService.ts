@@ -19,6 +19,7 @@ function parseCodeMod(id: string, modFn: CodeModExports): CodeModDefinition {
         detail: modFn.detail,
         canRun: modFn.canRun || (() => true),
         scope: (modFn.scope as CodeModScope) || CodeModScope.Global,
+        languageScope: modFn.languageScope,
         modFn,
     };
 }
@@ -183,6 +184,7 @@ class CodeModService {
                 {
                     path: options.fileName,
                     source: options.source,
+                    languageId: options.languageId,
                     ast,
                 },
                 {
@@ -227,6 +229,7 @@ class CodeModService {
             {
                 path: options.fileName,
                 source: options.source,
+                languageId: options.languageId,
                 ast,
             },
             {

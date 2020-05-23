@@ -18,6 +18,12 @@ export default function HelloWorld(props: Props) { /*# { pos: 30 } #*/
     return <div>Hello, world!</div>;
 }
 
+/*$ { fixture: 'should-transform-without-typings' } $*/
+
+function HelloWorld(props) { /*# { pos: 4 } #*/
+    return <div>Hello, world!</div>;
+}
+
 /*$ { fixture: 'should-transform-arrow-fn-expr' } $*/
 
 const HelloWorld = (props: Props) => { /*# { pos: 36 } #*/

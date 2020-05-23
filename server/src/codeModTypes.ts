@@ -1,11 +1,18 @@
 import { File } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 
-import { Selection } from './services/astService';
+import { LanguageId, Selection } from './services/astService';
 import { Position } from './utils/Position';
 
+interface FileInfo {
+    path: string;
+    source: string;
+    ast: Collection<File>;
+    languageId: LanguageId;
+}
+
 type CodeModTransform = (
-    fileInfo: { path: string; source: string; ast: Collection<File> },
+    fileInfo: FileInfo,
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
@@ -22,7 +29,7 @@ type CodeModTransform = (
       };
 
 type CanRunFunction = (
-    fileInfo: { path: string; source: string; ast: Collection<File> },
+    fileInfo: FileInfo,
     api: { jscodeshift: JsCodeShift; stats(value: string): void },
     options: {
         target: Collection;
@@ -33,6 +40,7 @@ type CanRunFunction = (
 
 export interface CodeModExports extends CodeModTransform {
     canRun?: CanRunFunction;
+    languageScope?: LanguageId[];
     scope?: 'global' | 'cursor';
     title?: string;
     description?: string;
@@ -50,6 +58,7 @@ export interface CodeModDefinition {
     description: string;
     detail?: string;
     scope: CodeModScope;
+    languageScope?: LanguageId[];
     modFn: CodeModTransform;
     canRun: CanRunFunction;
 }

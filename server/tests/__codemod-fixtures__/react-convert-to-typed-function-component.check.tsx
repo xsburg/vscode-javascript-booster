@@ -32,7 +32,7 @@ const HelloWorld = (props: Props) => { /*# { pos: 36 } #*/
 
 /*$ { fixture: 'should-trigger-over-exported-arrow-fn-expr', expected: true } $*/
 
-export const HelloWorld = (props: Props) => { /*# { pos: 75 } #*/
+export const HelloWorld = (props: Props) => { /*# { pos: 43 } #*/
     return <div>Hello, world!</div>;
 }
 
@@ -45,11 +45,5 @@ const HelloWorld = function(props: Props) { /*# { pos: 25 } #*/
 /*$ { fixture: 'should-not-trigger-when-type-is-present', expected: false } $*/
 
 const HelloWorld: React.FunctionComponent<Props> = (props: Props) => { /*# { pos: 68 } #*/
-    return <div>Hello, world!</div>;
-}
-
-/*$ { fixture: 'should-not-trigger-if-not-typings', expected: false } $*/
-
-function HelloWorld(props) { /*# { pos: 4 } #*/
     return <div>Hello, world!</div>;
 }

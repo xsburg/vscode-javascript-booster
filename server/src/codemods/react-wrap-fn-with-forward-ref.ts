@@ -2,13 +2,16 @@ import {
     ArrowFunctionExpression,
     FunctionExpression,
     Identifier,
+    TSQualifiedName,
     TSType,
+    TSTypeAnnotation,
+    TSTypeReference,
     VariableDeclarator,
 } from 'ast-types';
 
 import { CodeModExports } from '../codeModTypes';
 import { getFunctionDeclaration, getVariableDeclaration } from '../utils/function';
-import { isReactComponentName } from '../utils/react';
+import { getPropsTypeFromVariableDeclaratorId, isReactComponentName } from '../utils/react';
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -72,6 +75,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         }
     } else if (variableDeclaration) {
         const variableDeclarator = variableDeclaration.node.declarations[0] as VariableDeclarator;
+        const variableDeclaratorId = variableDeclarator.id as Identifier;
         // Replace const Foo = (props: Props) => {} WITH const Foo = React.forwardRef<any, Props>((props) => {});
         const fnExpr = variableDeclarator.init as ArrowFunctionExpression | FunctionExpression;
         // 1. Update fn parameters
@@ -88,8 +92,11 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         } else {
             fnExpr.params = [j.identifier('props'), j.identifier('ref')];
         }
+        if (!propsType) {
+            propsType = getPropsTypeFromVariableDeclaratorId(j, variableDeclaratorId);
+        }
         // 2. Wrap the function
-        (variableDeclarator.id as Identifier).typeAnnotation = null;
+        variableDeclaratorId.typeAnnotation = null;
         variableDeclarator.init = createUseCallbackWrapper(fnExpr, propsType);
     }
 
@@ -120,6 +127,8 @@ codeMod.canRun = (fileInfo, api, options) => {
 };
 
 codeMod.scope = 'cursor';
+
+codeMod.languageScope = ['javascriptreact', 'typescriptreact'];
 
 codeMod.title = 'Wrap component into React.forwardRef()';
 

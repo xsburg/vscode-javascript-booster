@@ -103,8 +103,12 @@ codeMod.canRun = (fileInfo, api, options) => {
     }
 
     const varDecl = getVariableDeclaration(j, path);
-    if (varDecl && isReactComponentName((varDecl.node.declarations[0] as VariableDeclarator).id)) {
-        return true;
+    if (varDecl) {
+        const varDeclId = (varDecl.node.declarations[0] as VariableDeclarator).id;
+        if (isReactComponentName(varDeclId) && !varDeclId.typeAnnotation) {
+            // Is function declaration without types
+            return true;
+        }
     }
 
     return false;
@@ -112,7 +116,9 @@ codeMod.canRun = (fileInfo, api, options) => {
 
 codeMod.scope = 'cursor';
 
-codeMod.title = 'Add React.FunctionComponent<Props> typing';
+codeMod.languageScope = ['typescriptreact'];
+
+codeMod.title = 'Convert to React.FunctionComponent<Props> declaration';
 
 codeMod.description = '';
 
