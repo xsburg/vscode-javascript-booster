@@ -42,3 +42,9 @@ function foo(a: number, b: string): number {
 function Foo(props: Props) {
     return doSomething();
 }
+
+/*$ { fixture: 'should-transform-async-functions' } $*/
+
+async function saveData(data: Data) {
+    doSomething();
+}

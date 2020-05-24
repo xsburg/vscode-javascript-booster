@@ -1,18 +1,4 @@
-import {
-    AstNode,
-    BinaryExpression,
-    Expression,
-    ExpressionStatement,
-    FunctionDeclaration,
-    IfStatement,
-    Node,
-    Printable,
-    TemplateElement,
-    UnaryExpression,
-    VariableDeclaration,
-    VariableDeclarator,
-} from 'ast-types';
-import { Collection, JsCodeShift } from 'jscodeshift';
+import { ExpressionStatement } from 'ast-types';
 
 import { CodeModExports } from '../codeModTypes';
 
@@ -30,7 +16,12 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const assignments: ExpressionStatement[] = [];
     path.node.declarations.forEach((d) => {
         if (j.VariableDeclarator.check(d) && d.init) {
-            assignments.push(j.expressionStatement(j.assignmentExpression('=', d.id, d.init)));
+            let id = d.id;
+            if (j.Identifier.check(id)) {
+                // Remove type annotation for identifiers
+                id = j.identifier(id.name);
+            }
+            assignments.push(j.expressionStatement(j.assignmentExpression('=', id, d.init)));
             d.init = null;
         }
     });

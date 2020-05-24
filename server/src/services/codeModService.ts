@@ -156,7 +156,9 @@ class CodeModService {
             if (verbose) {
                 const endMs = performance.now();
                 logService.output(
-                    `Computed executable code actions in ${endMs - startMs!}ms.`,
+                    `Computed executable code actions in ${
+                        Math.round((endMs - startMs!) * 1000) / 1000
+                    }ms.`,
                     'verbose'
                 );
             }
@@ -210,24 +212,33 @@ class CodeModService {
             anchorTarget = ast.findNodeAtPosition(options.selection.anchor);
         }
         return mods.filter((m) => {
-            const r = m.canRun(
-                {
-                    path: options.fileName,
-                    source: options.source,
-                    languageId: options.languageId,
-                    ast,
-                },
-                {
-                    jscodeshift,
-                    stats: noop,
-                },
-                {
-                    target,
-                    anchorTarget,
-                    selection: options.selection,
-                }
-            );
-            return r;
+            try {
+                const r = m.canRun(
+                    {
+                        path: options.fileName,
+                        source: options.source,
+                        languageId: options.languageId,
+                        ast,
+                    },
+                    {
+                        jscodeshift,
+                        stats: noop,
+                    },
+                    {
+                        target,
+                        anchorTarget,
+                        selection: options.selection,
+                    }
+                );
+                return r;
+            } catch (e) {
+                logService.outputError(
+                    `Error while executing [${m.id}].canRun()\nAction name: ${
+                        m.name
+                    }\n${e.toString()}`
+                );
+                return false;
+            }
         });
     }
 
@@ -281,7 +292,9 @@ class CodeModService {
         if (verbose) {
             const endMs = performance.now();
             logService.output(
-                `Computed executable code actions in ${endMs - startMs!}ms.`,
+                `Executed code action "${mod.name}" in ${
+                    Math.round((endMs - startMs!) * 1000) / 1000
+                }ms.`,
                 'verbose'
             );
         }

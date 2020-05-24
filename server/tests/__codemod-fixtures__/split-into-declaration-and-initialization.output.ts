@@ -1,15 +1,28 @@
 /*$ { fixture: 'should-split-simple-case' } $*/
 
-let a = 'foo'; /*# { pos: 3 } #*/
+// @ts-nocheck
+
+let a;
+a = 'foo';
 
 /*$ { fixture: 'should-split-const' } $*/
 
-const a = 'foo'; /*# { pos: 3 } #*/
+let a;
+a = 'foo';
 
 /*$ { fixture: 'should-split-when-no-initializer' } $*/
 
-let a = 'foo', b; /*# { pos: 3 } #*/
+let a, b;
+a = 'foo';
 
 /*$ { fixture: 'should-split-when-many-initializers' } $*/
 
-let a = 'foo', b = 'bar'; /*# { pos: 3 } #*/
+let a, b;
+a = 'foo';
+b = 'bar';
+
+/*$ { fixture: 'should-preserve-type' } $*/
+
+let a: Foo, b: Bar;
+a = 'foo';
+b = 'bar';

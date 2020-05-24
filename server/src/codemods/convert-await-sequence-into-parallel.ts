@@ -15,28 +15,35 @@ import { Collection, JsCodeShift } from 'jscodeshift';
 import { CodeModExports } from '../codeModTypes';
 
 function isExpressionStatement(j: JsCodeShift, s: Collection<Statement>) {
-    return j.match<ExpressionStatement>(s, {
-        type: 'ExpressionStatement',
-        expression: {
-            type: 'AwaitExpression',
-        } as AssignmentExpression,
-    });
+    return (
+        s.length > 0 &&
+        j.match<ExpressionStatement>(s, {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'AwaitExpression',
+            } as AssignmentExpression,
+        })
+    );
 }
 
 function isAssignmentStatement(j: JsCodeShift, s: Collection<Statement>) {
-    return j.match<ExpressionStatement>(s, {
-        type: 'ExpressionStatement',
-        expression: {
-            type: 'AssignmentExpression',
-            right: {
-                type: 'AwaitExpression',
-            },
-        } as AssignmentExpression,
-    });
+    return (
+        s.length > 0 &&
+        j.match<ExpressionStatement>(s, {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'AssignmentExpression',
+                right: {
+                    type: 'AwaitExpression',
+                },
+            } as AssignmentExpression,
+        })
+    );
 }
 
 function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
     return (
+        s.length > 0 &&
         j.match<VariableDeclaration>(s, {
             type: 'VariableDeclaration',
             declarations: [
@@ -47,7 +54,8 @@ function isVariableDeclaration(j: JsCodeShift, s: Collection<Statement>) {
                     },
                 } as VariableDeclarator,
             ],
-        }) && (s.firstNode() as VariableDeclaration).declarations.length === 1
+        }) &&
+        (s.firstNode() as VariableDeclaration).declarations.length === 1
     );
 }
 

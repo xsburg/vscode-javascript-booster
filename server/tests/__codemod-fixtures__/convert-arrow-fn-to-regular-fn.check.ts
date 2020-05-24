@@ -16,9 +16,13 @@ let foo = () => { /*# { pos: 15 } #*/
 
 let foo = () => doSomething(); /*# { pos: 15 } #*/
 
-/*$ { fixture: 'should-trigger-on-type-annotation', expected: true } $*/
+/*$ { fixture: 'should-trigger-on-react-type-annotation', expected: true } $*/
 
 let Foo: React.FunctionComponent<Props> = (props) => doSomething(); /*# { pos: 22 } #*/
+
+/*$ { fixture: 'should-not-trigger-when-other-annotations-present', expected: false } $*/
+
+let Foo: React.FooBar<Props> = (props) => doSomething(); /*# { pos: 41 } #*/
 
 /*$ { fixture: 'should-not-trigger-if-this-used', expected: false } $*/
 

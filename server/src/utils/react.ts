@@ -250,6 +250,13 @@ export function isInsideReactFunctionComponentOrHook(path: NodePath<AstNode>) {
     return false;
 }
 
+const FUNCTION_COMPONENT_TYPE_NAME = [
+    'FunctionComponent',
+    'FC',
+    /* deprecated */ 'StatelessComponent',
+    /* deprecated */ 'SFC',
+];
+
 /**
  * Takes the identifier: `const Identifier: React.FunctionComponent<Props> = () => {}`;
  *
@@ -306,8 +313,17 @@ export function getPropsTypeFromVariableDeclaratorId(
         }
     );
     if (isIdentifierAnnotation || isQualifiedNameAnnotation) {
-        propsType = (variableDeclaratorId.typeAnnotation!.typeAnnotation as TSTypeReference)
-            .typeParameters!.params[0];
+        // Validate that the name is one of FUNCTION_COMPONENT_TYPE_NAME, if yes, assign the type
+        const typeRef = variableDeclaratorId.typeAnnotation!.typeAnnotation as TSTypeReference;
+        let name;
+        if (typeRef.typeName.type === j.Identifier.name) {
+            name = (typeRef.typeName as Identifier).name;
+        } else {
+            name = ((typeRef.typeName as TSQualifiedName).right as Identifier).name;
+        }
+        if (FUNCTION_COMPONENT_TYPE_NAME.includes(name)) {
+            propsType = typeRef.typeParameters!.params[0];
+        }
     }
     return propsType;
 }

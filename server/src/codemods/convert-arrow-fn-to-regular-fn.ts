@@ -57,6 +57,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     resultFn.comments = varDeclaration.comments;
     resultFn.returnType = arrowExpr.returnType;
     resultFn.generator = arrowExpr.generator;
+    resultFn.async = arrowExpr.async;
     $variableDeclaration.replaceWith(resultFn);
 
     const resultText = ast.toSource();
@@ -74,6 +75,23 @@ codeMod.canRun = (fileInfo, api, options) => {
     }
 
     const variableDeclaration = getVariableDeclaration(j, path);
+    if (!variableDeclaration) {
+        return false;
+    }
+    const varDeclarator = variableDeclaration!.node.declarations[0] as VariableDeclarator;
+    if (varDeclarator.init!.type !== j.ArrowFunctionExpression.name) {
+        // Convert only ArrowFunctionExpression, not FunctionExpression
+        return false;
+    }
+
+    if (
+        (varDeclarator.id as Identifier).typeAnnotation &&
+        !getPropsTypeFromVariableDeclaratorId(j, varDeclarator.id as Identifier)
+    ) {
+        // Has type annotation but is not a react function component
+        return false;
+    }
+
     const isVarDecl = Boolean(
         variableDeclaration &&
             (variableDeclaration.node.declarations[0] as VariableDeclarator).init!.type ===

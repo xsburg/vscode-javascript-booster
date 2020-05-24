@@ -1,5 +1,7 @@
 /*$ { fixture: 'should-trigger-at-declaration', expected: true } $*/
 
+// @ts-nocheck
+
 let a = 'foo', b = 'bar'; /*# { pos: 3 } #*/
 
 /*$ { fixture: 'should-trigger-at-declarator', expected: true } $*/

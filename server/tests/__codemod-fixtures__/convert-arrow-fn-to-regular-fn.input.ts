@@ -32,3 +32,9 @@ let foo = (a: number, b: string): number => doSomething(); /*# { pos: 43 } #*/
 /*$ { fixture: 'should-transfer-type-annotation-of-react-component' } $*/
 
 let Foo: React.FunctionComponent<Props> = (props) => doSomething(); /*# { pos: 22 } #*/
+
+/*$ { fixture: 'should-transform-async-functions' } $*/
+
+let saveData = async (data: Data) => { /*# { pos: 36 } #*/
+    doSomething();
+}
