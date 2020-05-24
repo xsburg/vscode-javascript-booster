@@ -1,11 +1,11 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { performance } from 'perf_hooks';
+import { WorkspaceFolder } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 
 import { CodeModDefinition, CodeModExports, CodeModScope } from '../codeModTypes';
-import { configIds, extensionId } from '../const';
 import { noop } from '../utils/helpers';
-import { Position } from '../utils/Position';
 import { requireDynamically } from '../utils/requireDynamically';
 import astService, { LanguageId, Selection } from './astService';
 import connectionService from './connectionService';
@@ -64,10 +64,15 @@ const embeddedCodeMods = loadEmbeddedCodeMods();
 class CodeModService {
     private _codeModsCache: CodeModDefinition[] | null = null;
 
-    public async reloadAllCodeMods(): Promise<CodeModDefinition[]> {
+    public async reloadAllCodeMods(
+        workspaceFolders?: WorkspaceFolder[]
+    ): Promise<CodeModDefinition[]> {
         let codeMods = [...embeddedCodeMods];
         // user-workspace code mods
         const connection = connectionService.connection();
+        if (process.env.NODE_ENV !== 'test') {
+            logService.output(`Running in ${process.env.NODE_ENV} mode.`);
+        }
         if (connection) {
             // Connection is not established when running under Jest
             const wsFolders = await connection.workspace.getWorkspaceFolders();
@@ -108,18 +113,20 @@ class CodeModService {
         const validCodeMods = codeMods.filter((c) => c) as CodeModDefinition[];
         validCodeMods.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
         this._codeModsCache = validCodeMods;
-        logService.output(`${validCodeMods.length} code actions loaded.`);
+        if (process.env.NODE_ENV !== 'test') {
+            logService.output(`${validCodeMods.length} code actions loaded.`);
+        }
         return validCodeMods;
     }
 
-    public async getGlobalMods(options: {
+    public async getExecutableGlobalCodeMods(options: {
         languageId: LanguageId;
         fileName: string;
         source: string;
         selection: Selection;
     }) {
         try {
-            const mods = await this.getRunnableCodeMods(options);
+            const mods = await this.getAllExecutableCodeMods(options);
             return mods.filter((mod) => mod.scope === CodeModScope.Global);
         } catch (e) {
             logService.outputError(
@@ -129,15 +136,31 @@ class CodeModService {
         }
     }
 
-    public async getCodeActionMods(options: {
+    /**
+     * Returns code mods available under the cursor. Global code mods are excluded from the list.
+     */
+    public async getExecutableCodeModsUnderCursor(options: {
         languageId: LanguageId;
         fileName: string;
         source: string;
         selection: Selection;
     }) {
         try {
-            const mods = await this.getRunnableCodeMods(options);
-            return mods.filter((mod) => mod.scope === CodeModScope.Cursor);
+            const verbose = logService.getLogLevel() === 'verbose';
+            let startMs: number;
+            if (verbose) {
+                startMs = performance.now();
+            }
+            const mods = await this.getAllExecutableCodeMods(options);
+            const result = mods.filter((mod) => mod.scope === CodeModScope.Cursor);
+            if (verbose) {
+                const endMs = performance.now();
+                logService.output(
+                    `Computed executable code actions in ${endMs - startMs!}ms.`,
+                    'verbose'
+                );
+            }
+            return result;
         } catch (e) {
             logService.outputError(
                 `Error while executing [getCodeActionMods].getRunnableCodeMods(): ${e.toString()}`
@@ -146,7 +169,14 @@ class CodeModService {
         }
     }
 
-    public async getRunnableCodeMods(options: {
+    /**
+     * Returns all code mods (any scope) which are currently available given the source code.
+     *
+     * Global code mods do not analyse the cursor.
+     *
+     * Cursor code mods take the position of the cursor into account.
+     */
+    public async getAllExecutableCodeMods(options: {
         languageId: LanguageId;
         fileName: string;
         source: string;
@@ -213,6 +243,11 @@ class CodeModService {
         source: string;
         selection?: Selection;
     } {
+        const verbose = logService.getLogLevel() === 'verbose';
+        let startMs: number;
+        if (verbose) {
+            startMs = performance.now();
+        }
         const mod = this._getCodeMod(modId);
         const jscodeshift = astService.getCodeShift(options.languageId);
         const ast = astService.getAstTree(options);
@@ -243,6 +278,13 @@ class CodeModService {
             }
         );
         astService.invalidateAstTree(options.fileName);
+        if (verbose) {
+            const endMs = performance.now();
+            logService.output(
+                `Computed executable code actions in ${endMs - startMs!}ms.`,
+                'verbose'
+            );
+        }
         if (!result) {
             return {
                 source: options.source,

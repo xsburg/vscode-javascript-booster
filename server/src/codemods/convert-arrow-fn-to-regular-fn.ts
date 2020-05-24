@@ -75,8 +75,9 @@ codeMod.canRun = (fileInfo, api, options) => {
 
     const variableDeclaration = getVariableDeclaration(j, path);
     const isVarDecl = Boolean(
-        (variableDeclaration && (variableDeclaration.node.declarations[0] as VariableDeclarator))!
-            .init!.type === j.ArrowFunctionExpression.name
+        variableDeclaration &&
+            (variableDeclaration.node.declarations[0] as VariableDeclarator).init!.type ===
+                j.ArrowFunctionExpression.name
     );
 
     if (!isVarDecl) {

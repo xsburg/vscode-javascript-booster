@@ -23,10 +23,12 @@ export async function activate(context: ExtensionContext) {
     );
 }
 
-export function deactivate() {}
+export function deactivate() {
+    // Nothing
+}
 
 if (process.env.NODE_ENV !== 'production') {
-    // tslint:disable-next-line:no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const testRunnerExports = require('../tests/index');
     module.exports.testRunnerExports = testRunnerExports;
     module.exports.defineIntegrationTests = function defineTests() {

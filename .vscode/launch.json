@@ -50,7 +50,7 @@
             "args": ["--runInBand"],
             "runtimeArgs": ["--nolazy"],
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "test"
             },
             "sourceMaps": true
         },
@@ -63,7 +63,7 @@
             "args": ["--runInBand", "-t=${selectedText}"],
             "runtimeArgs": ["--nolazy"],
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "test"
             },
             "sourceMaps": true
         },

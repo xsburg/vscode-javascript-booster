@@ -23,8 +23,11 @@ import {
 } from '../smartSelectionRequest';
 import codeModService from './codeModService';
 
+export type LogLevel = 'verbose' | 'info' | 'error';
+
 interface JavaScriptBoosterSettings {
     codemodDir: string;
+    logLevel: LogLevel;
     formattingOptions: {
         tabWidth?: number;
         useTabs?: boolean;

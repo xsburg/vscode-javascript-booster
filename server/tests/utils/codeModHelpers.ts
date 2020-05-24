@@ -66,7 +66,7 @@ async function runInlineTransformTest(
         include: [modId],
     };
 
-    const canRun = (await codeModService.getRunnableCodeMods(runOptions)).length === 1;
+    const canRun = (await codeModService.getAllExecutableCodeMods(runOptions)).length === 1;
     if (!canRun) {
         throw new Error('The transform cannot be run at this position.');
     }
@@ -115,7 +115,7 @@ async function runInlineCanRunTest(
         include: [modId],
     };
 
-    const actualCanRun = (await codeModService.getRunnableCodeMods(runOptions)).length === 1;
+    const actualCanRun = (await codeModService.getAllExecutableCodeMods(runOptions)).length === 1;
     // canRun test fail
     expect(actualCanRun).toBe(expected);
 }

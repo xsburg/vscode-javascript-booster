@@ -35,7 +35,7 @@ export const codeActionsRequestHandler: RequestHandler<
 
     const document = connectionService.getDocument(params.textDocumentUri);
     const source = document.getText();
-    const codeMods = await codeModService.getCodeActionMods({
+    const codeMods = await codeModService.getExecutableCodeModsUnderCursor({
         languageId: document.languageId as LanguageId,
         fileName: document.uri,
         source,

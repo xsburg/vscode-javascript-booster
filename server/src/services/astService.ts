@@ -159,8 +159,7 @@ class AstService {
     }
 
     public invalidateAstTree(fileName: string) {
-        const cache = this._astCache.get(fileName);
-        if (cache) {
+        if (this._astCache.has(fileName)) {
             this._astCache.delete(fileName);
         }
     }

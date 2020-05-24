@@ -1,13 +1,24 @@
-import connectionService from './connectionService';
+import connectionService, { LogLevel } from './connectionService';
 
 class LogService {
-    public output(message: string) {
+    public getLogLevel(): LogLevel {
+        return connectionService.connection() ? connectionService.getSettings().logLevel : 'info';
+    }
+
+    public output(message: string, level: LogLevel = 'info') {
+        const msgText = `${new Date().toISOString()}: ${message}`;
         const connection = connectionService.connection();
         if (connection) {
-            connection.console.log(`${new Date().toISOString()}: ${message}`);
+            switch (level) {
+                case 'info':
+                case 'verbose':
+                    connection.console.log(msgText);
+                    break;
+                case 'error':
+                    connection.console.error(msgText);
+            }
         } else {
-            // tslint:disable-next-line:no-console
-            console.log(`${new Date().toISOString()}: ${message}`);
+            console.log(msgText);
         }
     }
 

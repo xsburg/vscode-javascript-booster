@@ -79,6 +79,15 @@
                         "default": "codemods",
                         "description": "Specifies the directory containing workspace related code actions."
                     },
+                    "javascriptBooster.logLevel": {
+                        "enum": [
+                            "error",
+                            "info",
+                            "verbose"
+                        ],
+                        "default": "info",
+                        "description": "Controls the amount of information in the output log. Switching to verbose will also show performance metrics."
+                    },
                     "javascriptBooster.smartExtendFallbackCommand": {
                         "type": "string",
                         "default": "editor.action.smartSelect.grow",
