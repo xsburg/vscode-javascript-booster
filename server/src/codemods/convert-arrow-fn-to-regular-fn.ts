@@ -7,14 +7,33 @@ import {
     FunctionDeclaration,
     Identifier,
     IfStatement,
+    Pattern,
     Printable,
     ReturnStatement,
+    TSType,
     UnaryExpression,
     VariableDeclarator,
 } from 'ast-types';
 import { Collection, JsCodeShift } from 'jscodeshift';
 
 import { CodeModExports } from '../codeModTypes';
+import { getVariableDeclaration } from '../utils/function';
+import { getPropsTypeFromVariableDeclaratorId } from '../utils/react';
+
+function withFirstParamTypeAnnotations(
+    j: JsCodeShift,
+    params: Pattern[],
+    propsType: TSType | null
+) {
+    if (params.length === 0 || !propsType) {
+        return params;
+    }
+    const firstParam = params[0];
+    if (j.Identifier.check(firstParam) || j.ObjectPattern.check(firstParam)) {
+        firstParam.typeAnnotation = j.tsTypeAnnotation(propsType);
+    }
+    return params;
+}
 
 const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const j = api.jscodeshift;
@@ -22,16 +41,20 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const target = options.target;
     const $variableDeclaration = target.thisOrClosest(j.VariableDeclaration);
 
-    const varDecl = $variableDeclaration.firstNode()!;
-    const fnName = ((varDecl.declarations[0] as VariableDeclarator).id as Identifier).name;
-    const arrowExpr = (varDecl.declarations[0] as VariableDeclarator)
-        .init as ArrowFunctionExpression;
+    const varDeclaration = $variableDeclaration.firstNode()!;
+    const varDeclarator = varDeclaration.declarations[0] as VariableDeclarator;
+    const fnName = (varDeclarator.id as Identifier).name;
+    const arrowExpr = varDeclarator.init as ArrowFunctionExpression;
     const body = j.BlockStatement.check(arrowExpr.body)
         ? arrowExpr.body
         : j.blockStatement([j.returnStatement(arrowExpr.body)]);
-
-    const resultFn = j.functionDeclaration(j.identifier(fnName), arrowExpr.params, body);
-    resultFn.comments = varDecl.comments;
+    const propsType = getPropsTypeFromVariableDeclaratorId(j, varDeclarator.id as Identifier);
+    const resultFn = j.functionDeclaration(
+        j.identifier(fnName),
+        withFirstParamTypeAnnotations(j, arrowExpr.params, propsType),
+        body
+    );
+    resultFn.comments = varDeclaration.comments;
     resultFn.returnType = arrowExpr.returnType;
     resultFn.generator = arrowExpr.generator;
     $variableDeclaration.replaceWith(resultFn);
@@ -50,31 +73,16 @@ codeMod.canRun = (fileInfo, api, options) => {
         return false;
     }
 
-    let checkTarget: AstNode | undefined;
-    if (j.Identifier.check(path.node) && j.VariableDeclarator.check(path.parent.node)) {
-        checkTarget = path.parent.parent?.node;
-    } else if (j.ArrowFunctionExpression.check(path.node)) {
-        checkTarget = path.parent.parent?.node;
-    } else if (j.VariableDeclarator.check(path.node)) {
-        checkTarget = path.parent.node;
-    } else if (j.VariableDeclaration.check(path.node)) {
-        checkTarget = path.node;
-    }
-    if (!checkTarget) {
+    const variableDeclaration = getVariableDeclaration(j, path);
+    const isVarDecl = Boolean(
+        (variableDeclaration && (variableDeclaration.node.declarations[0] as VariableDeclarator))!
+            .init!.type === j.ArrowFunctionExpression.name
+    );
+
+    if (!isVarDecl) {
         return false;
     }
-    const preconditionsMet =
-        // Check VariableDeclaration
-        j.VariableDeclaration.check(checkTarget) &&
-        checkTarget.declarations.length === 1 &&
-        // Check VariableDeclarator
-        j.VariableDeclarator.check(checkTarget.declarations[0]) &&
-        j.Identifier.check(checkTarget.declarations[0].id) &&
-        j.ArrowFunctionExpression.check(checkTarget.declarations[0].init);
-    if (!preconditionsMet) {
-        return false;
-    }
-    const usesThisExpr = j(checkTarget).find(j.ThisExpression).length > 0;
+    const usesThisExpr = j(variableDeclaration).find(j.ThisExpression).length > 0;
     return !usesThisExpr;
 };
 

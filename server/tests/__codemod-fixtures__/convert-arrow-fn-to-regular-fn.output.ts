@@ -36,3 +36,9 @@ function foo(a: number, b: string) {
 function foo(a: number, b: string): number {
     return doSomething();
 }
+
+/*$ { fixture: 'should-transfer-type-annotation-of-react-component' } $*/
+
+function Foo(props: Props) {
+    return doSomething();
+}

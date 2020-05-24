@@ -16,6 +16,10 @@ let foo = () => { /*# { pos: 15 } #*/
 
 let foo = () => doSomething(); /*# { pos: 15 } #*/
 
+/*$ { fixture: 'should-trigger-on-type-annotation', expected: true } $*/
+
+let Foo: React.FunctionComponent<Props> = (props) => doSomething(); /*# { pos: 22 } #*/
+
 /*$ { fixture: 'should-not-trigger-if-this-used', expected: false } $*/
 
 let foo = () => { /*# { pos: 15 } #*/
