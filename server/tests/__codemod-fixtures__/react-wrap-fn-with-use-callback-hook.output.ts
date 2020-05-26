@@ -36,3 +36,13 @@ function useHook() {
         dispatch(loadData());
     }, []);
 }
+
+/*$ { fixture: 'should-transform-async-fn' } $*/
+
+function useHook() {
+    let a, b;
+
+    const onClick = useCallback(async (a: string, b: number) => {
+        dispatch(loadData());
+    }, []);
+}

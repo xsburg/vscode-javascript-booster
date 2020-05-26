@@ -26,6 +26,7 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         const oldFuncExpr = functionDeclaration.node;
         // Replace function onClick() {} WITH const onClick = useCallback(() => {}, []);
         const newFuncExpr = j.arrowFunctionExpression(oldFuncExpr.params, oldFuncExpr.body);
+        newFuncExpr.async = oldFuncExpr.async;
         newFuncExpr.returnType = oldFuncExpr.returnType;
         newFuncExpr.typeParameters = oldFuncExpr.typeParameters;
         const newNode = j.variableDeclaration('const', [

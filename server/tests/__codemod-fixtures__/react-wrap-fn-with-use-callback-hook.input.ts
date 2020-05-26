@@ -35,3 +35,12 @@ function useHook() {
         dispatch(loadData());
     };
 }
+
+/*$ { fixture: 'should-transform-async-fn' } $*/
+
+function useHook() {
+    let a, b;
+    async function onClick(a: string, b: number) { /*# { pos: 24 } #*/
+        dispatch(loadData());
+    };
+}
