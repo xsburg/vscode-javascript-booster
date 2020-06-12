@@ -60,7 +60,9 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         )!;
     const consequentStatement = ifArr[ifArr.length - 1].consequent;
 
-    topIf.replace(j.ifStatement(testExpression, consequentStatement));
+    const newIfStatement = j.ifStatement(testExpression, consequentStatement);
+    newIfStatement.comments = topIf.node.comments;
+    topIf.replace(newIfStatement);
 
     const resultText = ast.toSource();
     return resultText;

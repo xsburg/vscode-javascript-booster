@@ -16,7 +16,6 @@ if (a) { /*# { pos: 2 } #*/
     }
 }
 
-
 /*$ { fixture: 'should-merge-multiple-ifs-up' } $*/
 
 if (a) {
@@ -25,4 +24,18 @@ if (a) {
             doSomething();
         }
     }
+}
+
+/*$ { fixture: 'should-keep-comments' } $*/
+
+{
+    // comment above
+    if (a) {
+        if (b) {
+            if (c) { /*# { pos: 14 } #*/
+                doSomething();
+            }
+        }
+    }
+    // comment below
 }

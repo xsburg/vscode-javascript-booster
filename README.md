@@ -125,17 +125,17 @@ If you like this project and find it useful, you could also donate to support it
 ### 14.0.0 (wip)
 
 -   New code actions
-    -   TS: Convert enum to string-enum
-    -   TS: Convert string-enum to type union
-    -   TS: Convert type union of strings to string-enum
-    -   String: Trim whitespaces inside string
-    -   Function: Convert arrow function to regular function
-    -   Function: Convert function declaration to arrow function
-    -   Conditions: Merge nested `if` statements
     -   React: Wrap function into useCallback() hook
     -   React: Wrap component function with React.forwardRef()
     -   React: Wrap component function with React.memo()
-    -   React: Convert function to React.FunctionComponent<Props> declaration
+    -   React: Convert function to React.FunctionComponent<Props>
+    -   TS: Convert enum to string-enum
+    -   TS: Convert string-enum to type union
+    -   TS: Convert type union of strings to string-enum
+    -   Function: Convert arrow function to regular function
+    -   Function: Convert function declaration to arrow function
+    -   Conditions: Merge nested `if` statements declaration
+    -   String: Trim whitespaces inside string
 
 *   Fixes
 

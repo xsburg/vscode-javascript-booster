@@ -14,8 +14,10 @@ const foo = async (arg1: Arg1): ReturnMe => {
 
 /*$ { fixture: 'should-transform-fn-with-default-export' } $*/
 
+// comment above
 const foo = () => {
     doSomething();
 };
 
 export default foo;
+// comment below

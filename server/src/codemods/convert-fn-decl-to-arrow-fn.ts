@@ -25,16 +25,21 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
     const newNode = j.variableDeclaration('const', [
         j.variableDeclarator(j.identifier(oldFuncDecl.id.name), newArrowFn),
     ]);
-    newNode.comments = oldFuncDecl.comments;
     newArrowFn.async = oldFuncDecl.async;
     newArrowFn.returnType = oldFuncDecl.returnType;
     if (j.ExportDefaultDeclaration.check(functionDeclaration.parent.node)) {
         // Special case: export default function() {} => 2 statements (var declaration, then export default)
-        functionDeclaration.parent.insertAfter(
-            j.exportDefaultDeclaration(j.identifier(oldFuncDecl.id.name))
+        const newExportDecl = j.exportDefaultDeclaration(j.identifier(oldFuncDecl.id.name));
+        newExportDecl.comments = (functionDeclaration.parent.node.comments || []).filter(
+            (c) => c.trailing
         );
+        newNode.comments = (functionDeclaration.parent.node.comments || []).filter(
+            (c) => c.leading
+        );
+        functionDeclaration.parent.insertAfter(newExportDecl);
         functionDeclaration.parent.replace(newNode);
     } else {
+        newNode.comments = oldFuncDecl.comments;
         functionDeclaration.replace(newNode);
     }
 

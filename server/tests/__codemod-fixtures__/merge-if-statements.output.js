@@ -16,3 +16,13 @@ if (a && b && c) {
 if (a && b && c) {
     doSomething();
 }
+
+/*$ { fixture: 'should-keep-comments' } $*/
+
+{
+    // comment above
+    if (a && b && c) {
+        doSomething();
+    }
+    // comment below
+}

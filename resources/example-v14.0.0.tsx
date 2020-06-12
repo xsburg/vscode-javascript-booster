@@ -20,9 +20,9 @@ enum TransformType {
 // ### TS: Convert string-enum to type union ###
 
 enum TransformType {
-    TernaryStatement,
-    AssignmentStatement,
-    VariableDeclaration,
+    TernaryStatement = 'TernaryStatement',
+    AssignmentStatement = 'AssignmentStatement',
+    VariableDeclaration = 'VariableDeclaration',
 }
 
 // ### TS: Convert type union of strings to string-enum ###

@@ -14,6 +14,8 @@ async function foo(arg1: Arg1): ReturnMe { /*# { pos: 11 } #*/
 
 /*$ { fixture: 'should-transform-fn-with-default-export' } $*/
 
+// comment above
 export default function foo() { /*# { pos: 21 } #*/
     doSomething();
-};
+}
+// comment below
