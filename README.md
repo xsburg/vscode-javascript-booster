@@ -1,4 +1,6 @@
-# VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster) [![Coverage Status](https://img.shields.io/coveralls/github/xsburg/vscode-javascript-booster.svg)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master) [![GitHub release](https://img.shields.io/github/release/xsburg/vscode-javascript-booster.svg)](https://github.com/xsburg/vscode-javascript-booster) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/xsburg)
+# VS Code JavaScript Booster [![Travis](https://img.shields.io/travis/xsburg/vscode-javascript-booster.svg?branch=master)](https://travis-ci.org/xsburg/vscode-javascript-booster) [![GitHub release](https://img.shields.io/github/release/xsburg/vscode-javascript-booster.svg)](https://github.com/xsburg/vscode-javascript-booster) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/xsburg)
+
+<!-- [![Coverage Status](https://img.shields.io/coveralls/github/xsburg/vscode-javascript-booster.svg)](https://coveralls.io/github/xsburg/vscode-javascript-booster?branch=master) -->
 
 Make your life easier, use code actions to do repetitive tasks for you! They can help a lot, just follow the light bulb 💡!
 
@@ -18,28 +20,62 @@ Install through VS Code extensions. Search for `JavaScript Booster`
 
 ### Code actions
 
--   💥 Flip if-else
--   💥 Remove redundant else
--   💥 Replace if-else with ?:
--   💥 Simplify if-else
--   💥 Flip ?:
--   💥 Simplify ?:
--   💥 Convert shorthand arrow function to statement
--   💥 Convert to shorthand arrow function
--   💥 Add parens to single arrow function parameter
--   💥 Convert function to arrow function
--   💥 Replace string with template string
--   💥 Replace template string with regular string
--   💥 Split string under cursor
--   💥 JSX: Wrap value with {} (JSX attributes)
--   💥 JSX: Remove {} from JSX attribute
--   💥 JSX: Collapse/Expand empty tag
--   💥 Convert var/const to let
--   💥 Convert var to const
--   💥 Split into multiple declarations
--   💥 Split into declaration and initialisation
--   💥 Merge declaration and initialisation
--   💥 \[on selection\] Run selected await statements in parallel with `Promise.all`
+-   Conditions
+
+    -   Flip if-else
+    -   Remove redundant else
+    -   Replace if-else with ?:
+    -   Simplify if-else
+    -   Flip ?:
+    -   Simplify ?:
+    -   Merge nested `if` statements **(new)**
+
+-   Declarations
+
+    -   Convert var/const to let
+    -   Convert var to const
+    -   Split into multiple declarations
+    -   Split into declaration and initialisation
+    -   Merge declaration and initialisation
+
+-   Strings
+
+    -   Replace string with template string
+    -   Replace template string with regular string
+    -   Split string under cursor
+    -   Trim whitespaces inside string **(new)**
+
+-   Functions
+
+    -   Convert shorthand arrow function to statement
+    -   Convert to shorthand arrow function
+    -   Add parens to single arrow function parameter
+    -   Convert function to arrow function
+    -   Convert arrow function to regular function **(new)**
+    -   Convert function declaration to arrow function **(new)**
+
+-   Async
+
+    -   \[on selection\] Run selected await statements in parallel with `Promise.all`
+
+-   TypeScript
+
+    -   Convert enum to string-enum **(new)**
+    -   Convert string-enum to type union **(new)**
+    -   Convert type union of strings to string-enum **(new)**
+
+-   JSX / TSX
+
+    -   Wrap value with {} (JSX attributes)
+    -   Remove {} from JSX attribute
+    -   Collapse/Expand empty tag
+
+-   React
+
+    -   Wrap function into useCallback() hook **(new)**
+    -   React: Wrap component function with React.forwardRef() **(new)**
+    -   React: Wrap component function with React.memo() **(new)**
+    -   React: Convert function to React.FunctionComponent<Props> declaration **(new)**
 
 ### Extend/Shrink selections
 
@@ -60,7 +96,6 @@ You can easily load and run your own code actions. -->
 ### More code actions
 
 -   Convert if -> switch-case
--   Replace ?: with if-else
 -   TS: Change member access (public -> private etc)
 -   TS: Convert alias to interface
 -   TS: Generate missing switch cases for enum
@@ -83,9 +118,36 @@ Largely inspired by [WebStorm](https://www.jetbrains.com/webstorm) and its varie
 
 PRs are always welcome. Please refer to the [Contribution Guide](CONTRIBUTING.md) for tips on how to work with this project. The guide includes basic development workflows like running tests and debugging as well as useful links for creating new code actions.
 
-If you like this project and find it useful, you can buy me a beer through paypal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/xsburg). The beer will be greatly appreciated and help me continue the development. 🧐
+If you like this project and find it useful, you could also donate to support its development [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/xsburg).
 
 ## Release Notes
+
+### 14.0.0 (wip)
+
+-   New code actions
+    -   TS: Convert enum to string-enum
+    -   TS: Convert string-enum to type union
+    -   TS: Convert type union of strings to string-enum
+    -   String: Trim whitespaces inside string
+    -   Function: Convert arrow function to regular function
+    -   Function: Convert function declaration to arrow function
+    -   Conditions: Merge nested `if` statements
+    -   React: Wrap function into useCallback() hook
+    -   React: Wrap component function with React.forwardRef()
+    -   React: Wrap component function with React.memo()
+    -   React: Convert function to React.FunctionComponent<Props> declaration
+
+*   Fixes
+
+    -   replace-with-regular-string should not trigger on tagged template strings
+    -   React: convert to regular function now supports React function components
+
+*   Others
+    -   Add action scoping (e.g. react-only, ts-only)
+    -   Use strict TypeScript in the language server
+    -   Migrate to ESLint
+    -   Switch to Yarn (for selective deps resolution)
+    -   Add log-level, add verbose performance logs
 
 ### 0.12.0
 

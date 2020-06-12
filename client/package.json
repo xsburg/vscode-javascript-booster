@@ -1,7 +1,7 @@
 {
     "name": "vscode-javascript-booster",
     "displayName": "JavaScript Booster",
-    "description": "Boost your productivity with advanced JavaScript refactorings and commands",
+    "description": "Boost your productivity with advanced JavaScript/TypeScript refactorings and commands",
     "icon": "resources/icon.png",
     "version": "0.12.3",
     "publisher": "sburg",
@@ -26,7 +26,8 @@
     "keywords": [
         "javascript",
         "typescript",
-        "refactoring"
+        "refactoring",
+        "code actions"
     ],
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
