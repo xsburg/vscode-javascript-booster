@@ -14,9 +14,11 @@ export function HelloWorld(props: Props) { /*# { pos: 22 } #*/
 
 /*$ { fixture: 'should-transform-exported-default-fn' } $*/
 
+// comment above
 export default function HelloWorld(props: Props) { /*# { pos: 30 } #*/
     return <div>Hello, world!</div>;
 }
+// comment below
 
 /*$ { fixture: 'should-transform-without-typings' } $*/
 

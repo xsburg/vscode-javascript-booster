@@ -14,11 +14,13 @@ export const HelloWorld: React.FunctionComponent<Props> = props => {
 
 /*$ { fixture: 'should-transform-exported-default-fn' } $*/
 
+// comment above
 const HelloWorld: React.FunctionComponent<Props> = props => {
     return <div>Hello, world!</div>;
 };
 
 export default HelloWorld;
+// comment below
 
 /*$ { fixture: 'should-transform-without-typings' } $*/
 

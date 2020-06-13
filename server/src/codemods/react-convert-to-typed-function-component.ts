@@ -62,9 +62,14 @@ const codeMod: CodeModExports = ((fileInfo, api, options) => {
         newNode.comments = oldFuncDecl.comments;
         if (j.ExportDefaultDeclaration.check(functionDeclaration.parent.node)) {
             // Special case: export default function() {} => 2 statements (var declaration, then export default)
-            functionDeclaration.parent.insertAfter(
-                j.exportDefaultDeclaration(j.identifier(oldFuncDecl.id.name))
+            const newExportDecl = j.exportDefaultDeclaration(j.identifier(oldFuncDecl.id.name));
+            newExportDecl.comments = (functionDeclaration.parent.node.comments || []).filter(
+                (c) => c.trailing
             );
+            newNode.comments = (functionDeclaration.parent.node.comments || []).filter(
+                (c) => c.leading
+            );
+            functionDeclaration.parent.insertAfter(newExportDecl);
             functionDeclaration.parent.replace(newNode);
         } else {
             functionDeclaration.replace(newNode);
