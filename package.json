@@ -37,7 +37,7 @@
         "install:client": "cd client && yarn install",
         "postinstall": "yarn run install:server && yarn run install:client",
         "preversion": "yarn test",
-        "version": "cd client && yarn version --new-version $npm_package_version && git add -A",
+        "version": "cd client && yarn version --no-git-tag-version --new-version $npm_package_version && git add -A",
         "postversion": "git push && git push --tags"
     },
     "devDependencies": {
