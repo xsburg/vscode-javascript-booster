@@ -6,11 +6,42 @@ All notable changes to the "vscode-javascript-booster" extension are documented 
 
 <!-- CHANGELOG STARTS HERE -->
 
+### 14.0.0
+
+![Features](resources/recording-v14.0.0.gif)
+
+In this release: a bunch of new code actions including React and TypeScript; resolve technical debt and do the groundwork for more exciting features!
+
+-   New code actions
+    -   React: Wrap function into useCallback() hook
+    -   React: Wrap component function with React.forwardRef()
+    -   React: Wrap component function with React.memo()
+    -   React: Convert function to React.FunctionComponent<Props>
+    -   TS: Convert enum to string-enum
+    -   TS: Convert string-enum to type union
+    -   TS: Convert type union of strings to string-enum
+    -   Function: Convert arrow function to regular function
+    -   Function: Convert function declaration to arrow function
+    -   Conditions: Merge nested `if` statements declaration
+    -   String: Trim whitespaces inside string
+
+*   Fixes
+
+    -   replace-with-regular-string should not trigger on tagged template strings
+    -   React: convert to regular function now supports React function components
+
+*   Others
+    -   Add action scoping (e.g. react-only, ts-only)
+    -   Use strict TypeScript in the language server
+    -   Migrate to ESLint
+    -   Switch to Yarn (for selective deps resolution)
+    -   Add log-level, add verbose performance logs
+
 ### 0.12.0
 
 -   Add new refactoring: `Replace ?: with if-else` (#19):
 
-![Replace ?: with if-else](resources/replace-ternary-with-if-else.gif)
+    ![Replace ?: with if-else](resources/replace-ternary-with-if-else.gif)
 
 -   Fixed 'Remove redundant else' refactoring not to appear when there is not else statement (#21).
 -   The project now uses Webpack internally to minimize the extension size and improve performance (#22).

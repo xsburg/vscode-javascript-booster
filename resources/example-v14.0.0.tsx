@@ -1,38 +1,57 @@
 /* eslint-disable */
 // @ts-nocheck
+// Scroll view: ctrl+pageUp/pageDown
+
+// ### React: Wrap function into useCallback() hook ###
+
+export function Toolbar(props: Props) {
+    const [disabled, setDisabled] = useState();
+    const dispatch = useDispatch();
+
+    function onClick(event: React.MouseEvent<HTMLDivElement>) {
+        dispatch(loadData());
+    }
+
+    return (
+        <Button onClick={onClick} disabled={disabled}>
+            Click me
+        </Button>
+    );
+}
+
+// ### React: Wrap component function with React.forwardRef() ###
+
+export function DataTable(props: Props) {
+    return <div>Hello, world!</div>;
+}
+
+// ### React: Wrap component function with React.memo() ###
+
+export const TableRow: React.FunctionComponent<Props> = (props: Props) => {
+    return <div>Hello, world!</div>;
+};
+
+// ### React: Convert function to React.FunctionComponent<Props> declaration ###
+
+export default function DocumentCard(props: Props) {
+    return <div>Hello, world!</div>;
+}
 
 // ### TS: Convert enum to string-enum ###
+// ### TS: Convert string-enum to type union ###
+// ### TS: Convert type union of strings to string-enum ###
 
-// Simple transform
 enum TransformType {
     TernaryStatement,
     AssignmentStatement,
     VariableDeclaration,
 }
 
-// Infer value casing
-enum TransformType {
-    TernaryStatement = 'ternary-statement',
-    AssignmentStatement,
-    VariableDeclaration,
+enum ActionScope {
+    GlobalScope = 'global-scope',
+    FileScope,
+    CursorScope,
 }
-
-// ### TS: Convert string-enum to type union ###
-
-enum TransformType {
-    TernaryStatement = 'TernaryStatement',
-    AssignmentStatement = 'AssignmentStatement',
-    VariableDeclaration = 'VariableDeclaration',
-}
-
-// ### TS: Convert type union of strings to string-enum ###
-
-type TransformTypeUnion = 'ternaryStatement' | 'assignment-statement' | 'variable_declaration';
-
-// ### String: Trim whitespaces inside string ###
-
-let stringWithWhitespaces = ' \n  I need to trim whitespaces here! \
-  ';
 
 // ### Function: Convert arrow function to regular function ###
 
@@ -66,59 +85,11 @@ if (isStatement) {
     }
 }
 
-// ### React: Wrap function into useCallback() hook ###
+// ### String: Trim whitespaces inside string ###
 
-function Toolbar(props: Props) {
-    const [disabled, setDisabled] = useState();
-    const dispatch = useDispatch();
-
-    function onClick(a: string, b: number) {
-        dispatch(loadData());
-    }
-
-    return <Button onClick={onClick}>Click me</Button>;
-}
-
-// ### React: Wrap component function with React.forwardRef() ###
-
-export function HelloWorld(props: Props) {
-    return <div>Hello, world!</div>;
-}
-
-const HelloWorld2: React.FunctionComponent<Props> = (props: Props) => {
-    return <div>Hello, world!</div>;
-};
-
-// ### React: Wrap component function with React.memo() ###
-
-export function HelloWorld3(props: Props) {
-    return <div>Hello, world!</div>;
-}
-
-const HelloWorld4: React.FunctionComponent<Props> = (props: Props) => {
-    return <div>Hello, world!</div>;
-};
-
-// ### React: Convert function to React.FunctionComponent<Props> declaration ###
-
-export function HelloWorld5(props: Props) {
-    return <div>Hello, world!</div>;
-}
-
-export const HelloWorld6 = (props: Props) => {
-    return <div>Hello, world!</div>;
-};
+let stringWithWhitespaces = ' \n  I need to trim whitespaces here! \
+  ';
 
 // ------------
 
-export {
-    TransformTypeUnion,
-    TransformType,
-    stringWithWhitespaces,
-    Foo,
-    parseCodeMod,
-    Toolbar,
-    HelloWorld2,
-    HelloWorld3,
-    HelloWorld4,
-};
+export { ActionScope, TransformType, stringWithWhitespaces, Foo, parseCodeMod };

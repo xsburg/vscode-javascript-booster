@@ -8,9 +8,13 @@ This VS Code extension provides various code actions (quick fixes) when editing 
 
 You might want to reassign the default shortcut for the quick fix menu to `Alt+Enter` if you are moving from WebStorm. Search for `editor.action.quickFix` command.
 
-![Features](resources/features.gif)
+**New**: React and TypeScript-specific code actions 🚀
+
+![Features](resources/recording-v14.0.0.gif)
 
 ## Installation
+
+![Features](resources/features.gif)
 
 Install through VS Code extensions. Search for `JavaScript Booster`
 
@@ -122,7 +126,11 @@ If you like this project and find it useful, you could also donate to support it
 
 ## Release Notes
 
-### 14.0.0 (wip)
+### 14.0.0
+
+![Features](resources/recording-v14.0.0.gif)
+
+In this release: a bunch of new code actions including React and TypeScript; resolve technical debt and do the groundwork for more exciting features!
 
 -   New code actions
     -   React: Wrap function into useCallback() hook
