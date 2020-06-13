@@ -37,17 +37,17 @@
         "install:client": "cd client && yarn install",
         "postinstall": "yarn run install:server && yarn run install:client",
         "preversion": "yarn test",
-        "version": "cd client && yarn version $npm_package_version && git add -A",
+        "version": "cd client && yarn version --new-version $npm_package_version && git add -A",
         "postversion": "git push && git push --tags"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^2.33.0",
         "@typescript-eslint/parser": "^2.33.0",
-        "typescript": "3.9.2",
-        "fs-extra": "^9.0.0",
         "eslint": "^7.0.0",
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-jest": "^23.13.0",
-        "eslint-plugin-simple-import-sort": "^5.0.3"
+        "eslint-plugin-simple-import-sort": "^5.0.3",
+        "fs-extra": "^9.0.0",
+        "typescript": "3.9.2"
     }
 }
