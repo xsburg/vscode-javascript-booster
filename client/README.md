@@ -133,6 +133,7 @@ If you like this project and find it useful, you could also donate to support it
 In this release: a bunch of new code actions including React and TypeScript; resolve technical debt and do the groundwork for more exciting features!
 
 -   New code actions
+
     -   React: Wrap function into useCallback() hook
     -   React: Wrap component function with React.forwardRef()
     -   React: Wrap component function with React.memo()
@@ -145,12 +146,12 @@ In this release: a bunch of new code actions including React and TypeScript; res
     -   Conditions: Merge nested `if` statements declaration
     -   String: Trim whitespaces inside string
 
-*   Fixes
+-   Fixes
 
     -   replace-with-regular-string should not trigger on tagged template strings
     -   React: convert to regular function now supports React function components
 
-*   Others
+-   Others
     -   Add action scoping (e.g. react-only, ts-only)
     -   Use strict TypeScript in the language server
     -   Migrate to ESLint
